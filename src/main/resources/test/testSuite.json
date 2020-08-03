@@ -3,7 +3,7 @@
   "executions":[
     {
         "type": "BqQuery",
-        "queryPath": "src\\test\\resources\\test.sql"
+        "queryPath": "\\src\\test\\resources\\test.sql"
 
     }
   ]

@@ -47,6 +47,10 @@ public class TestRunnerService {
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
             switch (executionActionConfig.getType()) {
+                case "airFlow" :
+                case "BqQuery" :
+                    bq();
+                case "noOps" :
                 case "talend":
                     runTalendJob(contextLoader, executionActionConfig, testCase);
             }
@@ -154,6 +158,10 @@ public class TestRunnerService {
             executionActionService.run(contextLoader, talendTask);
         }
 
+    }
+
+    private void bq() {
+        System.out.println("bqType");
     }
     
 }
