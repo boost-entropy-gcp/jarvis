@@ -26,8 +26,8 @@ import org.junit.runners.Parameterized;
 public class IntegrationTestRunner {
     
     private static final String API_URL = "apiUrl";
-    public static final String CONTEXT_PATH = "";
-    public static final String CONFIG_PATH = "";
+    public static final String CONTEXT_PATH = "C:\\Users\\bberr\\git\\aliz\\jarvis\\src\\main\\resources\\contexts.json";
+    public static final String CONFIG_PATH = "C:\\Users\\bberr\\git\\aliz\\jarvis\\src\\main\\resources\\test";
     
     
     @Autowired

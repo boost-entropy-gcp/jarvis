@@ -1,33 +1,10 @@
 package ai.aliz.talendtestrunner;
 
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-
-import ai.aliz.talendtestrunner.config.AppConfig;
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.service.AssertActionService;
-import ai.aliz.talendtestrunner.service.InitActionService;
-import ai.aliz.talendtestrunner.testconfig.ExecuteAction;
-import ai.aliz.talendtestrunner.testconfig.TestSuite;
 
 @SpringBootApplication
 @Log4j2

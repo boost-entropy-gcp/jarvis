@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class TestSuite {
     
     public static final String TEST_SUITE_FILE_NAME = "testSuite.json";
     private Boolean caseAutoDetect;
-    
+
     private final List<TestCase> testCases = new ArrayList<>();
     
     private String configPath;
@@ -103,6 +105,7 @@ public class TestSuite {
     public static TestSuite parseFromJson(File testConfigFile, TestSuite parentSuite, ContextLoader contextLoader) {
         
         Gson gson = new Gson();
+        TestCase testCase = new TestCase();
         TestSuite testSuite = new TestSuite();
         testSuite.setParentSuite(parentSuite);
         if (parentSuite != null) {
@@ -121,171 +124,22 @@ public class TestSuite {
             testSuite.setCaseAutoDetect(caseAutoDetect);
             
             Map<String, Object> defaultProperties = (Map<String, Object>) testSuiteMap.getOrDefault("defaultProperties", new HashMap<>());
-            
+            List<Map<String, String>> executionActions = (List<Map<String, String>>)testSuiteMap.getOrDefault("executions", Collections.singletonMap("type", "noOps"));
+
+            List<ExecutionActionConfig> executionActionConfigs = getExecutionActionConfigs(contextLoader, executionActions);
+            testCase.getExecutionActionConfigs().addAll(executionActionConfigs);
+
             if (Boolean.TRUE.equals(caseAutoDetect)) {
                 List<TestCase> testCases = Files.list(Paths.get(descriptorFolder)).filter(Files::isDirectory).map(path -> {
-                    TestCase testCase = new TestCase();
                     File testCaseFolder = path.toFile();
                     testCase.setPath(testCaseFolder.getAbsolutePath());
                     testCase.setName(testCaseFolder.getName());
-                    
-                    Path preFolder = Paths.get(testCaseFolder.getAbsolutePath(), "pre");
-                    Preconditions.checkArgument(Files.isDirectory(preFolder), "Pre folder does not exists %s", preFolder);
-                    List<InitActionConfig> initActions = null;
-                    try {
-                        initActions = Files.list(preFolder).flatMap(initActionFile -> {
-                            
-                            List<InitActionConfig> initActionConfigs = Lists.newArrayList();
-                            
-                            String fileName = initActionFile.toFile().getName();
-                            if (Files.isRegularFile(initActionFile)) {
-                                InitActionConfig initActionConfig = new InitActionConfig();
-                                String baseName = FilenameUtils.getBaseName(fileName);
-                                Preconditions.checkNotNull(contextLoader.getContext(baseName), "No context exists with name: %s", baseName);
-                                
-                                initActionConfig.setSystem(baseName);
-                                
-                                String extension = FilenameUtils.getExtension(fileName);
-                                
-                                initActionConfig.setDescriptorFolder(null);
-                                
-                                switch (extension) {
-                                    case "bql":
-                                    case "sql":
-                                        initActionConfig.setType("SQLExec");
-                                        initActionConfig.getProperties().put("sourcePath", initActionFile.toFile().getAbsolutePath());
-                                        break;
-                                    default:
-                                        throw new UnsupportedOperationException("Not supported extension for init action autodetect: " + initActionFile);
-                                    
-                                }
-                                initActionConfigs.add(initActionConfig);
-                            } else {
-                                Context context = contextLoader.getContext(fileName);
-                                Preconditions.checkNotNull(context, "No context exists with name: %s", fileName);
-                                String system = fileName;
-                                
-                                Type contextType = context.getType();
-                                switch (contextType) {
-                                    case SFTP:
-                                        InitActionConfig initActionConfig = new InitActionConfig();
-                                        initActionConfig.setSystem(system);
-                                        initActionConfig.setType("SFTPLoad");
-                                        initActionConfig.getProperties().put("sourcePath", initActionFile.toFile().getAbsolutePath());
-                                        break;
-                                    case BigQuery:
-                                        for (File datasetFolder : initActionFile.toFile().listFiles()) {
-                                            Preconditions.checkArgument(datasetFolder.isDirectory(), "%s is not a directory", datasetFolder);
-                                            String datasetName = datasetFolder.getName();
-                                            for (File tableJsonFile : datasetFolder.listFiles()) {
-                                                Preconditions.checkArgument(tableJsonFile.isFile());
-                                                String tableJsonFileName = tableJsonFile.getName();
-                                                String extension = FilenameUtils.getExtension(tableJsonFileName);
-                                                InitActionConfig bqLoadInitActionConfig = new InitActionConfig();
-                                                bqLoadInitActionConfig.setSystem(system);
-                                                String tableName = FilenameUtils.getBaseName(tableJsonFileName);
-                                                bqLoadInitActionConfig.setType("BQLoad");
-                                                Map<String, Object> properties = bqLoadInitActionConfig.getProperties();
-                                                properties.put("sourcePath", tableJsonFile.getAbsolutePath());
-                                                properties.put("dataset", datasetName);
-                                                properties.put("table", tableName);
-                                                properties.put("sourceFormat", extension);
-                                                properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + context.getId() + ".noMetadatAddition", false));
-                                                
-                                                initActionConfigs.add(bqLoadInitActionConfig);
-                                            }
-                                        }
-                                        break;
-                                    default:
-                                        throw new UnsupportedOperationException(String.format("Not supported context type %s for folder %s", contextType, fileName));
-                                }
-                                
-                            }
-                            
-                            return initActionConfigs.stream();
-                        }).collect(Collectors.toList());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    
+
+
+                    List<InitActionConfig> initActions = getInitActionConfigs(contextLoader, defaultProperties, testCaseFolder);
                     testCase.getInitActionConfigs().addAll(initActions);
-                    
-                    ExecuteAction.TalendTask talendTask = new ExecuteAction.TalendTask();
-                    talendTask.setTaskName(new File(descriptorFolder).getName());
-                    testCase.getExecuteActions().add(talendTask);
-                    
-                    Path assertFolder = Paths.get(testCaseFolder.getAbsolutePath(), "assert");
-                    Preconditions.checkArgument(Files.isDirectory(assertFolder), "Assert folder does not exists %s", assertFolder);
-                    List<AssertActionConfig> assertActionConfigs = null;
-                    try {
-                        assertActionConfigs = Files.list(assertFolder).flatMap(assertActionConfigPath -> {
-                            List<AssertActionConfig> assertActionConfigsForFolder = new ArrayList<>();
-                            if (Files.isDirectory(assertActionConfigPath)) {
-                                
-                                File assertContextFolder = assertActionConfigPath.toFile();
-                                String directoryName = assertContextFolder.getName();
-                                Context context = contextLoader.getContext(directoryName);
-                                Preconditions.checkNotNull(context, "There is context for assert folder: " + assertActionConfigPath);
-                                String system = context.getId();
-                                
-                                switch (context.getType()) {
-                                    case BigQuery:
-                                        for (File datasetFolder : assertContextFolder.listFiles()) {
-                                            Preconditions.checkArgument(Files.isDirectory(datasetFolder.toPath()),
-                                                                        "The context folder should contain only directories for the different datasets: %s",
-                                                                        datasetFolder);
-                                            String datasetName = datasetFolder.getName();
-                                            for (File tableDataFile : datasetFolder.listFiles()) {
-                                                Preconditions.checkArgument(Files.isRegularFile(tableDataFile.toPath()),
-                                                                            "The dataset folder should contain only json files for the different tables: %s",
-                                                                            tableDataFile);
-                                                String tableName = FilenameUtils.getBaseName(tableDataFile.getName());
-                                                AssertActionConfig assertActionConfig = new AssertActionConfig();
-                                                assertActionConfig.setType("AssertDataEquals");
-                                                assertActionConfig.setSystem(system);
-                                                Map<String, Object> properties = assertActionConfig.getProperties();
-                                                properties.put("dataset", datasetName);
-                                                properties.put("table", tableName);
-                                                
-                                                properties.put("assertKeyColumns",
-                                                               defaultProperties.getOrDefault("assert.assertKeyColumns", Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
-                                                properties.put("excludePreviouslyInsertedRows", defaultProperties.getOrDefault("assert.excludePreviouslyInsertedRows", false));
-                                                properties.put("sourceFormat", "json");
-                                                properties.put("sourcePath", tableDataFile.getAbsolutePath());
-                                                assertActionConfigsForFolder.add(assertActionConfig);
-                                            }
-                                        }
-                                        break;
-                                    case MySQL:
-                                        for (File tableDataFile : assertContextFolder.listFiles()) {
-                                            Preconditions.checkArgument(Files.isRegularFile(tableDataFile.toPath()),
-                                                                        "The assert folder should contain only json files for the different tables: %s",
-                                                                        tableDataFile);
-                                            AssertActionConfig assertActionConfig = new AssertActionConfig();
-                                            assertActionConfig.setType("AssertTalendJobState");
-                                            assertActionConfig.setSystem(system);
-                                            Map<String, Object> properties = assertActionConfig.getProperties();
-                                            properties.put("sourcePath", tableDataFile.getAbsolutePath());
-                                            assertActionConfigsForFolder.add(assertActionConfig);
-                                            
-                                        }
-                                        break;
-                                    
-                                    default:
-                                        throw new UnsupportedOperationException("Not supported context type for assert " + context.getType());
-                                    
-                                }
-                                
-                            } else {
-                                throw new UnsupportedOperationException("Files are not supported in assert autodetect: " + assertActionConfigPath);
-                            }
-                            
-                            return assertActionConfigsForFolder.stream();
-                        }).collect(Collectors.toList());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    
+
+                    List<AssertActionConfig> assertActionConfigs = getAssertActionConfigs(contextLoader, descriptorFolder, defaultProperties, testCase, testCaseFolder);
                     testCase.getAssertActionConfigs().addAll(assertActionConfigs);
                     
                     return testCase;
@@ -297,49 +151,7 @@ public class TestSuite {
             
             List<Map<String, Object>> testCases = (List<Map<String, Object>>) testSuiteMap.get("testCases");
             if (testCases != null) {
-                for (Map<String, Object> testCaseMap : testCases) {
-                    TestCase testCase = new TestCase();
-                    String caseName = (String) testCaseMap.get("name");
-                    testCase.setName(caseName);
-                    
-                    List<Map<String, Object>> initActions = (List<Map<String, Object>>) testCaseMap.get("initActions");
-                    for (Map<String, Object> initActionMap : initActions) {
-                        InitActionConfig initActionConfig = new InitActionConfig();
-                        initActionConfig.setSystem((String) initActionMap.remove("system"));
-                        initActionConfig.setType((String) initActionMap.remove("type"));
-                        initActionConfig.setDescriptorFolder(descriptorFolder + caseName + File.separator);
-                        initActionConfig.getProperties().putAll(initActionMap);
-                        
-                        testCase.getInitActionConfigs().add(initActionConfig);
-                    }
-                    
-                    for (Map<String, Object> executeActionMap : (List<Map<String, Object>>) testCaseMap.get("executeActions")) {
-                        final String type = (String) executeActionMap.get("type");
-                        switch (type) {
-                            case "TalendTask":
-                                ExecuteAction.TalendTask talendTask = new ExecuteAction.TalendTask();
-                                talendTask.setTaskName((String) executeActionMap.get("taskName"));
-                                testCase.getExecuteActions().add(talendTask);
-                                break;
-                            default:
-                                throw new RuntimeException("Unsupported initAction: " + type);
-                        }
-                    }
-                    
-                    List<Map<String, Object>> assertActions = (List<Map<String, Object>>) testCaseMap.get("assertActions");
-                    for (Map<String, Object> assertActionMap : assertActions) {
-                        final String type = (String) assertActionMap.get("type");
-                        
-                        AssertActionConfig assertActionConfig = new AssertActionConfig();
-                        assertActionConfig.setSystem((String) assertActionMap.remove("system"));
-                        assertActionConfig.setType(type);
-                        assertActionConfig.setDescriptorFolder(descriptorFolder + caseName + File.separator);
-                        assertActionConfig.setProperties(assertActionMap);
-                        testCase.getAssertActionConfigs().add(assertActionConfig);
-                    }
-                    
-                    testSuite.getTestCases().add(testCase);
-                }
+                setTestCases(testSuite, descriptorFolder, testCases);
             }
             
         } catch (Exception e) {
@@ -347,5 +159,282 @@ public class TestSuite {
         }
         return testSuite;
         
+    }
+
+    private static List<ExecutionActionConfig> getExecutionActionConfigs(ContextLoader contextLoader, List<Map<String, String>> executions) {
+//        Path executeFolder = Paths.get(testCaseFolder.getAbsolutePath(), "execution");
+//        Preconditions.checkArgument(Files.isDirectory(executeFolder), "Execution folder does not exists %s", executeFolder);
+//        List<ExecutionActionConfig> executionAction = null;
+        List<ExecutionActionConfig> executionActionConfigs = Lists.newArrayList();
+
+//        try {
+//            executionAction = Files.list(executeFolder).flatMap(executionFile -> {
+//
+//
+//                        String executionFileName = executionFile.toFile().getName();
+//                        if (Files.isRegularFile(executionFile)) {
+//                            ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
+//                            String executionBaseName = FilenameUtils.getBaseName(executionFileName);
+//                            Preconditions.checkNotNull(contextLoader.getContext(executionBaseName), "No context exists with name: %s", executionBaseName);
+//
+//                            executionActionConfig.setSystem(executionBaseName);
+//
+//                            String executionExtension = FilenameUtils.getExtension(executionFileName);
+//
+//                            executionActionConfig.setDescriptorFolder(null);
+//                            switch (executionExtension) {
+//                                case "sql":
+//                                    executionActionConfig.setType("BigQuery");
+//                                    executionActionConfig.getProperties().put("sourcePath", executionFile.toFile().getAbsolutePath());
+//                                    break;
+//                                default:
+//                                    throw new UnsupportedOperationException("Not supported extension for init action autodetect: " + executionFile);
+//
+//                            }
+//                            executionActionConfigs.add(executionActionConfig);
+//                        } else {
+//                            ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
+//                            executionActionConfig.setType("noOps");
+//                        }
+//                return executionActionConfigs.stream();
+//            }).collect(Collectors.toList());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        String repositoryRoot = moderateFilePathSlashes(contextLoader.getContext("local").getParameter("repositoryRoot"));
+        return executions.stream()
+                .flatMap(e -> {
+                    ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
+                    executionActionConfig.setType(checkExecutionType(e.get("type")));
+                    executionActionConfig.getProperties().put("sourcePath", repositoryRoot + e.get("queryPath"));
+                    executionActionConfigs.add(executionActionConfig);
+
+                    return executionActionConfigs.stream();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private static void setTestCases(TestSuite testSuite, String descriptorFolder, List<Map<String, Object>> testCases) {
+        for (Map<String, Object> testCaseMap : testCases) {
+            TestCase testCase = new TestCase();
+            String caseName = (String) testCaseMap.get("name");
+            testCase.setName(caseName);
+
+            List<Map<String, Object>> initActions = (List<Map<String, Object>>) testCaseMap.get("initActions");
+            for (Map<String, Object> initActionMap : initActions) {
+                InitActionConfig initActionConfig = new InitActionConfig();
+                initActionConfig.setSystem((String) initActionMap.remove("system"));
+                initActionConfig.setType((String) initActionMap.remove("type"));
+                initActionConfig.setDescriptorFolder(descriptorFolder + caseName + File.separator);
+                initActionConfig.getProperties().putAll(initActionMap);
+
+                testCase.getInitActionConfigs().add(initActionConfig);
+            }
+
+            for (Map<String, Object> executeActionMap : (List<Map<String, Object>>) testCaseMap.get("executeActions")) {
+                final String type = (String) executeActionMap.get("type");
+                switch (type) {
+                    case "TalendTask":
+                        TalendTask talendTask = new TalendTask();
+                        talendTask.setTaskName((String) executeActionMap.get("taskName"));
+                        testCase.getExecuteActions().add(talendTask);
+                        break;
+                    default:
+                        throw new RuntimeException("Unsupported initAction: " + type);
+                }
+            }
+
+            List<Map<String, Object>> assertActions = (List<Map<String, Object>>) testCaseMap.get("assertActions");
+            for (Map<String, Object> assertActionMap : assertActions) {
+                final String type = (String) assertActionMap.get("type");
+
+                AssertActionConfig assertActionConfig = new AssertActionConfig();
+                assertActionConfig.setSystem((String) assertActionMap.remove("system"));
+                assertActionConfig.setType(type);
+                assertActionConfig.setDescriptorFolder(descriptorFolder + caseName + File.separator);
+                assertActionConfig.setProperties(assertActionMap);
+                testCase.getAssertActionConfigs().add(assertActionConfig);
+            }
+
+            testSuite.getTestCases().add(testCase);
+        }
+    }
+
+    private static List<AssertActionConfig> getAssertActionConfigs(ContextLoader contextLoader, String descriptorFolder, Map<String, Object> defaultProperties, TestCase testCase, File testCaseFolder) {
+        TalendTask talendTask = new TalendTask();
+        talendTask.setTaskName(new File(descriptorFolder).getName());
+        testCase.getExecuteActions().add(talendTask);
+
+        Path assertFolder = Paths.get(testCaseFolder.getAbsolutePath(), "assert");
+        Preconditions.checkArgument(Files.isDirectory(assertFolder), "Assert folder does not exists %s", assertFolder);
+        List<AssertActionConfig> assertActionConfigs = null;
+        try {
+            assertActionConfigs = Files.list(assertFolder).flatMap(assertActionConfigPath -> {
+                List<AssertActionConfig> assertActionConfigsForFolder = new ArrayList<>();
+                if (Files.isDirectory(assertActionConfigPath)) {
+
+                    File assertContextFolder = assertActionConfigPath.toFile();
+                    String directoryName = assertContextFolder.getName();
+                    Context context = contextLoader.getContext(directoryName);
+                    Preconditions.checkNotNull(context, "There is context for assert folder: " + assertActionConfigPath);
+                    String system = context.getId();
+
+                    switch (context.getType()) {
+                        case BigQuery:
+                            for (File datasetFolder : assertContextFolder.listFiles()) {
+                                Preconditions.checkArgument(Files.isDirectory(datasetFolder.toPath()),
+                                                            "The context folder should contain only directories for the different datasets: %s",
+                                                            datasetFolder);
+                                String datasetName = datasetFolder.getName();
+                                for (File tableDataFile : datasetFolder.listFiles()) {
+                                    Preconditions.checkArgument(Files.isRegularFile(tableDataFile.toPath()),
+                                                                "The dataset folder should contain only json files for the different tables: %s",
+                                                                tableDataFile);
+                                    String tableName = FilenameUtils.getBaseName(tableDataFile.getName());
+                                    AssertActionConfig assertActionConfig = new AssertActionConfig();
+                                    assertActionConfig.setType("AssertDataEquals");
+                                    assertActionConfig.setSystem(system);
+                                    Map<String, Object> properties = assertActionConfig.getProperties();
+                                    properties.put("dataset", datasetName);
+                                    properties.put("table", tableName);
+
+                                    properties.put("assertKeyColumns",
+                                                   defaultProperties.getOrDefault("assert.assertKeyColumns", Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
+                                    properties.put("excludePreviouslyInsertedRows", defaultProperties.getOrDefault("assert.excludePreviouslyInsertedRows", false));
+                                    properties.put("sourceFormat", "json");
+                                    properties.put("sourcePath", tableDataFile.getAbsolutePath());
+                                    assertActionConfigsForFolder.add(assertActionConfig);
+                                }
+                            }
+                            break;
+                        case MySQL:
+                            for (File tableDataFile : assertContextFolder.listFiles()) {
+                                Preconditions.checkArgument(Files.isRegularFile(tableDataFile.toPath()),
+                                                            "The assert folder should contain only json files for the different tables: %s",
+                                                            tableDataFile);
+                                AssertActionConfig assertActionConfig = new AssertActionConfig();
+                                assertActionConfig.setType("AssertTalendJobState");
+                                assertActionConfig.setSystem(system);
+                                Map<String, Object> properties = assertActionConfig.getProperties();
+                                properties.put("sourcePath", tableDataFile.getAbsolutePath());
+                                assertActionConfigsForFolder.add(assertActionConfig);
+
+                            }
+                            break;
+
+                        default:
+                            throw new UnsupportedOperationException("Not supported context type for assert " + context.getType());
+
+                    }
+
+                } else {
+                    throw new UnsupportedOperationException("Files are not supported in assert autodetect: " + assertActionConfigPath);
+                }
+
+                return assertActionConfigsForFolder.stream();
+            }).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return assertActionConfigs;
+    }
+
+    private static List<InitActionConfig> getInitActionConfigs(ContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
+        Path preFolder = Paths.get(testCaseFolder.getAbsolutePath(), "pre");
+        Preconditions.checkArgument(Files.isDirectory(preFolder), "Pre folder does not exists %s", preFolder);
+        List<InitActionConfig> initActions = null;
+        try {
+            initActions = Files.list(preFolder).flatMap(initActionFile -> {
+
+                List<InitActionConfig> initActionConfigs = Lists.newArrayList();
+
+                String fileName = initActionFile.toFile().getName();
+                if (Files.isRegularFile(initActionFile)) {
+                    InitActionConfig initActionConfig = new InitActionConfig();
+                    String baseName = FilenameUtils.getBaseName(fileName);
+                    Preconditions.checkNotNull(contextLoader.getContext(baseName), "No context exists with name: %s", baseName);
+
+                    initActionConfig.setSystem(baseName);
+
+                    String extension = FilenameUtils.getExtension(fileName);
+
+                    initActionConfig.setDescriptorFolder(null);
+
+                    switch (extension) {
+                        case "bql":
+                        case "sql":
+                            initActionConfig.setType("SQLExec");
+                            initActionConfig.getProperties().put("sourcePath", initActionFile.toFile().getAbsolutePath());
+                            break;
+                        default:
+                            throw new UnsupportedOperationException("Not supported extension for init action autodetect: " + initActionFile);
+
+                    }
+                    initActionConfigs.add(initActionConfig);
+                } else {
+                    Context context = contextLoader.getContext(fileName);
+                    Preconditions.checkNotNull(context, "No context exists with name: %s", fileName);
+                    String system = fileName;
+
+                    Type contextType = context.getType();
+                    switch (contextType) {
+                        case SFTP:
+                            InitActionConfig initActionConfig = new InitActionConfig();
+                            initActionConfig.setSystem(system);
+                            initActionConfig.setType("SFTPLoad");
+                            initActionConfig.getProperties().put("sourcePath", initActionFile.toFile().getAbsolutePath());
+                            break;
+                        case BigQuery:
+                            for (File datasetFolder : initActionFile.toFile().listFiles()) {
+                                Preconditions.checkArgument(datasetFolder.isDirectory(), "%s is not a directory", datasetFolder);
+                                String datasetName = datasetFolder.getName();
+                                for (File tableJsonFile : datasetFolder.listFiles()) {
+                                    Preconditions.checkArgument(tableJsonFile.isFile());
+                                    String tableJsonFileName = tableJsonFile.getName();
+                                    String extension = FilenameUtils.getExtension(tableJsonFileName);
+                                    InitActionConfig bqLoadInitActionConfig = new InitActionConfig();
+                                    bqLoadInitActionConfig.setSystem(system);
+                                    String tableName = FilenameUtils.getBaseName(tableJsonFileName);
+                                    bqLoadInitActionConfig.setType("BQLoad");
+                                    Map<String, Object> properties = bqLoadInitActionConfig.getProperties();
+                                    properties.put("sourcePath", tableJsonFile.getAbsolutePath());
+                                    properties.put("dataset", datasetName);
+                                    properties.put("table", tableName);
+                                    properties.put("sourceFormat", extension);
+                                    properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + context.getId() + ".noMetadatAddition", false));
+
+                                    initActionConfigs.add(bqLoadInitActionConfig);
+                                }
+                            }
+                            break;
+                        default:
+                            throw new UnsupportedOperationException(String.format("Not supported context type %s for folder %s", contextType, fileName));
+                    }
+
+                }
+
+                return initActionConfigs.stream();
+            }).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return initActions;
+    }
+
+    private static String moderateFilePathSlashes(String path) {
+        path.replace('\\', File.separatorChar);
+        path.replace('/', File.separatorChar);
+
+        return path;
+    }
+
+    private static String checkExecutionType(String executionType) {
+       try {
+           ExecutionType.valueOf(executionType);
+        } catch (Exception e) {
+           throw new RuntimeException(String.format("Execution type %s dose not exists", executionType));
+       }
+       return executionType;
     }
 }

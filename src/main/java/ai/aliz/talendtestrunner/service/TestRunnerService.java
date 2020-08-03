@@ -1,5 +1,6 @@
 package ai.aliz.talendtestrunner.service;
 
+import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.factory.TestStepFactory;
 import ai.aliz.talendtestrunner.testcase.TestCase;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.testconfig.ExecuteAction;
+import ai.aliz.talendtestrunner.testconfig.TalendTask;
 import ai.aliz.talendtestrunner.util.TestCollector;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
@@ -39,10 +40,18 @@ public class TestRunnerService {
     private final AssertActionService assertActionService;
     private final TalendJobStateChecker talendJobStateChecker;
     private final BigQueryExecutor bigQueryExecutor;
+    private final ExecutionActionService executionActionService;
     
     public void runTest(ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
         initActionService.run(testCase.getInitActionConfigs(), contextLoader);
-//        testCase.getExecuteActions().forEach(executeAction -> runTalendJob(contextLoader, executeAction, testCase));
+
+        testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
+            switch (executionActionConfig.getType()) {
+                case "talend":
+                    runTalendJob(contextLoader, executionActionConfig, testCase);
+            }
+        });
+
         testCase.getAssertActionConfigs().forEach(assertAction -> assertActionService.assertResult(assertAction, contextLoader));
     }
     
@@ -99,26 +108,26 @@ public class TestRunnerService {
     }
     
     @SneakyThrows
-    private void runTalendJob(ContextLoader contextLoader, ExecuteAction executeAction, ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
+    private void runTalendJob(ContextLoader contextLoader, ExecutionActionConfig executionActionConfig, ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
         Context talendDatabaseContext = contextLoader.getContext("TalendDatabase");
-        
-        ExecuteAction.TalendTask talendTask = (ExecuteAction.TalendTask) executeAction;
-        
+
+        TalendTask talendTask = new TalendTask(executionActionConfig.getType());
+
         if (config.isManualJobRun()) {
-    
-            
-    
+
+
+
             Optional<AssertActionConfig> talendStateAssertActionConfig = testCase.getAssertActionConfigs()
                                                                                  .stream()
                                                                                  .filter(a -> contextLoader.getContext(a.getSystem()).getType() == Type.MySQL)
                                                                                  .findAny();
-            
+
             if(talendStateAssertActionConfig.isPresent()) {
                 String jobState = talendJobStateChecker.getJobState(talendTask.getTaskName(), talendDatabaseContext);
-    
+
                 while (jobState.equals(talendJobStateChecker.getJobState(talendTask.getTaskName(), talendDatabaseContext))) {
                     Thread.sleep(5000l);
-                    log.info("Waiting for execution on manual job run for testCase {}", executeAction);
+                    log.info("Waiting for execution on manual job run for testCase {}", executionActionConfig);
                 }
             } else {
                 AssertActionConfig bqTableAssertActionConfig = testCase.getAssertActionConfigs()
@@ -126,25 +135,25 @@ public class TestRunnerService {
                                                                        .filter(a -> "AssertDataEquals".equals(a.getType()) && contextLoader.getContext(a.getSystem()).getType() == Type.BigQuery)
                                                                        .findAny()
                                                                        .get();
-    
+
                 Map<String, Object> properties = bqTableAssertActionConfig.getProperties();
-    
+
                 Context context = contextLoader.getContext(bqTableAssertActionConfig.getSystem());
                 String dataset = TestRunnerUtil.getDatasetName(properties, context);
                 String table =(String) properties.get("table");
                 String project = context.getParameters().get("project");
                 Long lastModifiedAt = bigQueryExecutor.getTableLastModifiedAt(context, project, dataset, table);
-                
+
                 while (lastModifiedAt.equals(bigQueryExecutor.getTableLastModifiedAt(context, project, dataset, table))) {
                     Thread.sleep(5000l);
-                    log.info("Waiting for execution on manual job run for testCase {}", executeAction);
+                    log.info("Waiting for execution on manual job run for testCase {}", executionActionConfig);
                 }
             }
         } else {
-            log.info("Executing job for testcase {}", executeAction);
-            executeAction.run(contextLoader);
+            log.info("Executing job for testcase {}", executionActionConfig);
+            executionActionService.run(contextLoader, talendTask);
         }
-        
+
     }
     
 }

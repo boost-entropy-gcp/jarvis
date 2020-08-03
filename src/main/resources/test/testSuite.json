@@ -1,0 +1,10 @@
+{
+  "caseAutoDetect": true,
+  "executions":[
+    {
+        "type": "BqQuery",
+        "queryPath": "src\\test\\resources\\test.sql"
+
+    }
+  ]
+}
