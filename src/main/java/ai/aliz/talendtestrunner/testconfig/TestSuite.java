@@ -206,7 +206,7 @@ public class TestSuite {
         return executions.stream()
                 .flatMap(e -> {
                     ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
-                    executionActionConfig.setType(checkExecutionType(e.get("type")));
+                    executionActionConfig.setType(ExecutionType.valueOf(checkExecutionType(e.get("type"))));
                     executionActionConfig.getProperties().put("sourcePath", repositoryRoot + e.get("queryPath"));
                     executionActionConfigs.add(executionActionConfig);
 
@@ -232,18 +232,18 @@ public class TestSuite {
                 testCase.getInitActionConfigs().add(initActionConfig);
             }
 
-            for (Map<String, Object> executeActionMap : (List<Map<String, Object>>) testCaseMap.get("executeActions")) {
-                final String type = (String) executeActionMap.get("type");
-                switch (type) {
-                    case "TalendTask":
-                        TalendTask talendTask = new TalendTask();
-                        talendTask.setTaskName((String) executeActionMap.get("taskName"));
-                        testCase.getExecuteActions().add(talendTask);
-                        break;
-                    default:
-                        throw new RuntimeException("Unsupported initAction: " + type);
-                }
-            }
+//            for (Map<String, Object> executeActionMap : (List<Map<String, Object>>) testCaseMap.get("executeActions")) {
+//                final String type = (String) executeActionMap.get("type");
+//                switch (type) {
+//                    case "TalendTask":
+//                        TalendTask talendTask = new TalendTask();
+//                        talendTask.setTaskName((String) executeActionMap.get("taskName"));
+//                        testCase.getExecuteActions().add(talendTask);
+//                        break;
+//                    default:
+//                        throw new RuntimeException("Unsupported initAction: " + type);
+//                }
+//            }
 
             List<Map<String, Object>> assertActions = (List<Map<String, Object>>) testCaseMap.get("assertActions");
             for (Map<String, Object> assertActionMap : assertActions) {
@@ -262,10 +262,6 @@ public class TestSuite {
     }
 
     private static List<AssertActionConfig> getAssertActionConfigs(ContextLoader contextLoader, String descriptorFolder, Map<String, Object> defaultProperties, TestCase testCase, File testCaseFolder) {
-        TalendTask talendTask = new TalendTask();
-        talendTask.setTaskName(new File(descriptorFolder).getName());
-        testCase.getExecuteActions().add(talendTask);
-
         Path assertFolder = Paths.get(testCaseFolder.getAbsolutePath(), "assert");
         Preconditions.checkArgument(Files.isDirectory(assertFolder), "Assert folder does not exists %s", assertFolder);
         List<AssertActionConfig> assertActionConfigs = null;

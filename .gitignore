@@ -33,4 +33,5 @@ build/
 talend-test-runner.log*
 
 .DS_Store
-/src/main/resources/contexts.json
+/terraform/bq/.terraform/
+/terraform/.terraform/

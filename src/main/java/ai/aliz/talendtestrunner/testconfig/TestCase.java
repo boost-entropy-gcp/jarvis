@@ -18,6 +18,5 @@ public class TestCase {
 
     private List<ExecutionActionConfig> executionActionConfigs = new ArrayList<>();
 
-    private List<TalendTask> executeActions = new ArrayList<>();
     private List<AssertActionConfig> assertActionConfigs = new ArrayList<>();
 }

@@ -22,7 +22,6 @@ import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.factory.TestStepFactory;
 import ai.aliz.talendtestrunner.testcase.TestCase;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.testconfig.TalendTask;
 import ai.aliz.talendtestrunner.util.TestCollector;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
@@ -47,12 +46,19 @@ public class TestRunnerService {
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
             switch (executionActionConfig.getType()) {
-                case "airFlow" :
-                case "BqQuery" :
-                    bq();
-                case "noOps" :
-                case "talend":
+                case AirFlow:
+                    break;
+                case BqQuery:
+                    executeBQQuery();
+                    break;
+                case NoOps:
+                    break;
+                case Talend:
                     runTalendJob(contextLoader, executionActionConfig, testCase);
+                    break;
+
+                default:
+                    throw new UnsupportedOperationException(String.format("Not supported execution action type: %s", executionActionConfig.getType()));
             }
         });
 
@@ -115,7 +121,7 @@ public class TestRunnerService {
     private void runTalendJob(ContextLoader contextLoader, ExecutionActionConfig executionActionConfig, ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
         Context talendDatabaseContext = contextLoader.getContext("TalendDatabase");
 
-        TalendTask talendTask = new TalendTask(executionActionConfig.getType());
+        String taskName = executionActionConfig.getProperties().get("sourcePath").toString();
 
         if (config.isManualJobRun()) {
 
@@ -127,9 +133,9 @@ public class TestRunnerService {
                                                                                  .findAny();
 
             if(talendStateAssertActionConfig.isPresent()) {
-                String jobState = talendJobStateChecker.getJobState(talendTask.getTaskName(), talendDatabaseContext);
+                String jobState = talendJobStateChecker.getJobState(taskName, talendDatabaseContext);
 
-                while (jobState.equals(talendJobStateChecker.getJobState(talendTask.getTaskName(), talendDatabaseContext))) {
+                while (jobState.equals(talendJobStateChecker.getJobState(taskName, talendDatabaseContext))) {
                     Thread.sleep(5000l);
                     log.info("Waiting for execution on manual job run for testCase {}", executionActionConfig);
                 }
@@ -155,12 +161,12 @@ public class TestRunnerService {
             }
         } else {
             log.info("Executing job for testcase {}", executionActionConfig);
-            executionActionService.run(contextLoader, talendTask);
+            executionActionService.run(contextLoader, taskName);
         }
 
     }
 
-    private void bq() {
+    private void executeBQQuery() {
         System.out.println("bqType");
     }
     

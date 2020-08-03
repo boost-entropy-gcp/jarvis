@@ -10,7 +10,7 @@ public class ExecutionActionConfig implements StepConfig {
 
 
     private String system;
-    private String type;
+    private ExecutionType type;
 
     private String descriptorFolder;
 
