@@ -8,7 +8,7 @@ import java.util.Map;
 @Data
 public class Context {
     private String id;
-    private Type type;
+    private ContextType contextType;
     private Map<String, String> parameters;
 
     public Map<String, String> getParameters() {

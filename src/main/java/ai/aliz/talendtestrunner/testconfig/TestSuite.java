@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +25,19 @@ import org.apache.commons.io.FilenameUtils;
 
 import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.context.Type;
+import ai.aliz.talendtestrunner.context.ContextType;
 
 @Data
 @ToString(exclude = "parentSuite")
 public class TestSuite {
     
     public static final String TEST_SUITE_FILE_NAME = "testSuite.json";
+    public static final String EXECUTIONS_KEY = "executions";
+    public static final String DEFAULT_PROPERTIES_KEY = "defaultProperties";
+    public static final String PROPERTIES_KEY = "properties";
+    public static final String CASE_AUTO_DETECT_KEY = "caseAutoDetect";
+    public static final String TEST_CASES_KEY = "testCases";
+
     private Boolean caseAutoDetect;
 
     private final List<TestCase> testCases = new ArrayList<>();
@@ -118,16 +123,18 @@ public class TestSuite {
         try (FileReader fileReader = new FileReader(testConfigFile)) {
             Map testSuiteMap = gson.fromJson(fileReader, Map.class);
             
-            testSuite.setProperties((Map<String, Object>) testSuiteMap.get("properties"));
+            testSuite.setProperties((Map<String, Object>) testSuiteMap.get(PROPERTIES_KEY));
             
-            Boolean caseAutoDetect = (Boolean) testSuiteMap.get("caseAutoDetect");
+            Boolean caseAutoDetect = (Boolean) testSuiteMap.get(CASE_AUTO_DETECT_KEY);
             testSuite.setCaseAutoDetect(caseAutoDetect);
             
-            Map<String, Object> defaultProperties = (Map<String, Object>) testSuiteMap.getOrDefault("defaultProperties", new HashMap<>());
-            List<Map<String, String>> executionActions = (List<Map<String, String>>)testSuiteMap.getOrDefault("executions", Collections.singletonMap("type", "noOps"));
+            Map<String, Object> defaultProperties = (Map<String, Object>) testSuiteMap.getOrDefault(DEFAULT_PROPERTIES_KEY, new HashMap<>());
 
-            List<ExecutionActionConfig> executionActionConfigs = getExecutionActionConfigs(contextLoader, executionActions);
-            testCase.getExecutionActionConfigs().addAll(executionActionConfigs);
+            if (testSuiteMap.get(EXECUTIONS_KEY) != null) {
+                List<Map<String, String>> executionActions = (List<Map<String, String>>) testSuiteMap.getOrDefault(EXECUTIONS_KEY, Collections.singletonMap("type", "noOps"));
+                List<ExecutionActionConfig> executionActionConfigs = getExecutionActionConfigs(contextLoader, executionActions);
+                testCase.getExecutionActionConfigs().addAll(executionActionConfigs);
+            }
 
             if (Boolean.TRUE.equals(caseAutoDetect)) {
                 List<TestCase> testCases = Files.list(Paths.get(descriptorFolder)).filter(Files::isDirectory).map(path -> {
@@ -149,7 +156,7 @@ public class TestSuite {
                 
             }
             
-            List<Map<String, Object>> testCases = (List<Map<String, Object>>) testSuiteMap.get("testCases");
+            List<Map<String, Object>> testCases = (List<Map<String, Object>>) testSuiteMap.get(TEST_CASES_KEY);
             if (testCases != null) {
                 setTestCases(testSuite, descriptorFolder, testCases);
             }
@@ -162,52 +169,15 @@ public class TestSuite {
     }
 
     private static List<ExecutionActionConfig> getExecutionActionConfigs(ContextLoader contextLoader, List<Map<String, String>> executions) {
-//        Path executeFolder = Paths.get(testCaseFolder.getAbsolutePath(), "execution");
-//        Preconditions.checkArgument(Files.isDirectory(executeFolder), "Execution folder does not exists %s", executeFolder);
-//        List<ExecutionActionConfig> executionAction = null;
         List<ExecutionActionConfig> executionActionConfigs = Lists.newArrayList();
-
-//        try {
-//            executionAction = Files.list(executeFolder).flatMap(executionFile -> {
-//
-//
-//                        String executionFileName = executionFile.toFile().getName();
-//                        if (Files.isRegularFile(executionFile)) {
-//                            ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
-//                            String executionBaseName = FilenameUtils.getBaseName(executionFileName);
-//                            Preconditions.checkNotNull(contextLoader.getContext(executionBaseName), "No context exists with name: %s", executionBaseName);
-//
-//                            executionActionConfig.setSystem(executionBaseName);
-//
-//                            String executionExtension = FilenameUtils.getExtension(executionFileName);
-//
-//                            executionActionConfig.setDescriptorFolder(null);
-//                            switch (executionExtension) {
-//                                case "sql":
-//                                    executionActionConfig.setType("BigQuery");
-//                                    executionActionConfig.getProperties().put("sourcePath", executionFile.toFile().getAbsolutePath());
-//                                    break;
-//                                default:
-//                                    throw new UnsupportedOperationException("Not supported extension for init action autodetect: " + executionFile);
-//
-//                            }
-//                            executionActionConfigs.add(executionActionConfig);
-//                        } else {
-//                            ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
-//                            executionActionConfig.setType("noOps");
-//                        }
-//                return executionActionConfigs.stream();
-//            }).collect(Collectors.toList());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
 
         String repositoryRoot = moderateFilePathSlashes(contextLoader.getContext("local").getParameter("repositoryRoot"));
         return executions.stream()
                 .flatMap(e -> {
                     ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
-                    executionActionConfig.setType(ExecutionType.valueOf(checkExecutionType(e.get("type"))));
+                    executionActionConfig.setType(ExecutionType.valueOf(checkExecutionType(e.get("contextType"))));
                     executionActionConfig.getProperties().put("sourcePath", repositoryRoot + e.get("queryPath"));
+                    executionActionConfig.setSystem(repositoryRoot + e.get("queryPath"));
                     executionActionConfigs.add(executionActionConfig);
 
                     return executionActionConfigs.stream();
@@ -262,8 +232,7 @@ public class TestSuite {
     }
 
     private static List<AssertActionConfig> getAssertActionConfigs(ContextLoader contextLoader, String descriptorFolder, Map<String, Object> defaultProperties, TestCase testCase, File testCaseFolder) {
-        Path assertFolder = Paths.get(testCaseFolder.getAbsolutePath(), "assert");
-        Preconditions.checkArgument(Files.isDirectory(assertFolder), "Assert folder does not exists %s", assertFolder);
+        Path assertFolder = getTargetFolderPath(testCaseFolder, "assert");
         List<AssertActionConfig> assertActionConfigs = null;
         try {
             assertActionConfigs = Files.list(assertFolder).flatMap(assertActionConfigPath -> {
@@ -276,7 +245,7 @@ public class TestSuite {
                     Preconditions.checkNotNull(context, "There is context for assert folder: " + assertActionConfigPath);
                     String system = context.getId();
 
-                    switch (context.getType()) {
+                    switch (context.getContextType()) {
                         case BigQuery:
                             for (File datasetFolder : assertContextFolder.listFiles()) {
                                 Preconditions.checkArgument(Files.isDirectory(datasetFolder.toPath()),
@@ -320,7 +289,7 @@ public class TestSuite {
                             break;
 
                         default:
-                            throw new UnsupportedOperationException("Not supported context type for assert " + context.getType());
+                            throw new UnsupportedOperationException("Not supported context type for assert " + context.getContextType());
 
                     }
 
@@ -337,8 +306,7 @@ public class TestSuite {
     }
 
     private static List<InitActionConfig> getInitActionConfigs(ContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
-        Path preFolder = Paths.get(testCaseFolder.getAbsolutePath(), "pre");
-        Preconditions.checkArgument(Files.isDirectory(preFolder), "Pre folder does not exists %s", preFolder);
+        Path preFolder =getTargetFolderPath(testCaseFolder, "pre");
         List<InitActionConfig> initActions = null;
         try {
             initActions = Files.list(preFolder).flatMap(initActionFile -> {
@@ -373,7 +341,7 @@ public class TestSuite {
                     Preconditions.checkNotNull(context, "No context exists with name: %s", fileName);
                     String system = fileName;
 
-                    Type contextType = context.getType();
+                    ContextType contextType = context.getContextType();
                     switch (contextType) {
                         case SFTP:
                             InitActionConfig initActionConfig = new InitActionConfig();
@@ -416,6 +384,12 @@ public class TestSuite {
             throw new RuntimeException(e);
         }
         return initActions;
+    }
+
+    private static Path getTargetFolderPath(File testCaseFolder, String folderName) {
+        Path folderPath = Paths.get(testCaseFolder.getAbsolutePath(), folderName);
+        Preconditions.checkArgument(Files.isDirectory(folderPath), "%s folder does not exists %s", folderName, folderPath);
+        return folderPath;
     }
 
     private static String moderateFilePathSlashes(String path) {

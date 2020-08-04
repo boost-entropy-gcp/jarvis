@@ -1,5 +1,6 @@
 package ai.aliz.talendtestrunner.service;
 
+import ai.aliz.talendtestrunner.context.ContextType;
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import ai.aliz.talendtestrunner.config.AppConfig;
 import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.context.Type;
 import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.factory.TestStepFactory;
 import ai.aliz.talendtestrunner.testcase.TestCase;
@@ -49,7 +49,7 @@ public class TestRunnerService {
                 case AirFlow:
                     break;
                 case BqQuery:
-                    executeBQQuery();
+                    executeBQQuery(TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig), contextLoader.getContext("local"));
                     break;
                 case NoOps:
                     break;
@@ -129,7 +129,7 @@ public class TestRunnerService {
 
             Optional<AssertActionConfig> talendStateAssertActionConfig = testCase.getAssertActionConfigs()
                                                                                  .stream()
-                                                                                 .filter(a -> contextLoader.getContext(a.getSystem()).getType() == Type.MySQL)
+                                                                                 .filter(a -> contextLoader.getContext(a.getSystem()).getContextType() == ContextType.MySQL)
                                                                                  .findAny();
 
             if(talendStateAssertActionConfig.isPresent()) {
@@ -142,7 +142,7 @@ public class TestRunnerService {
             } else {
                 AssertActionConfig bqTableAssertActionConfig = testCase.getAssertActionConfigs()
                                                                        .stream()
-                                                                       .filter(a -> "AssertDataEquals".equals(a.getType()) && contextLoader.getContext(a.getSystem()).getType() == Type.BigQuery)
+                                                                       .filter(a -> "AssertDataEquals".equals(a.getType()) && contextLoader.getContext(a.getSystem()).getContextType() == ContextType.BigQuery)
                                                                        .findAny()
                                                                        .get();
 
@@ -166,8 +166,8 @@ public class TestRunnerService {
 
     }
 
-    private void executeBQQuery() {
-        System.out.println("bqType");
+    private void executeBQQuery(String sql, Context context) {
+        bigQueryExecutor.executeQuery(sql, context);
     }
     
 }

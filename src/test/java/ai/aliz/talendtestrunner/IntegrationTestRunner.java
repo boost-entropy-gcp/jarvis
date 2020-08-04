@@ -28,7 +28,7 @@ public class IntegrationTestRunner {
     
     private static final String API_URL = "apiUrl";
     public static final String CONTEXT_PATH = new File(IntegrationTestRunner.class.getClassLoader().getResource("contexts.json").getFile()).getPath();
-    public static final String CONFIG_PATH = new File(IntegrationTestRunner.class.getClassLoader().getResource("test").getFile()).getPath();
+    public static final String CONFIG_PATH = new File(IntegrationTestRunner.class.getClassLoader().getResource("test_bqQuery").getFile()).getPath();
     
     
     @Autowired

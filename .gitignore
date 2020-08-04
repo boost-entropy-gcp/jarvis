@@ -33,5 +33,3 @@ build/
 talend-test-runner.log*
 
 .DS_Store
-/terraform/bq/.terraform/
-/terraform/.terraform/

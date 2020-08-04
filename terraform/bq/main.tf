@@ -18,6 +18,13 @@ resource "google_bigquery_table" "test2" {
   schema = file("${local.schema_def_folder}/test2.json")
 }
 
+resource "google_bigquery_table" "test3" {
+  dataset_id = google_bigquery_dataset.test.dataset_id
+  table_id = "tf_test3"
+  project = var.project
+  schema = file("${local.schema_def_folder}/test3.json")
+}
+
 data "template_file" "test_view_tpl" {
   template = file("${path.module}/view/test_view.sql")
   vars     = {

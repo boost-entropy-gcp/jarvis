@@ -1,5 +1,5 @@
 package ai.aliz.talendtestrunner.context;
 
-public enum Type {
+public enum ContextType {
     BigQuery, MySQL, MSSQL, TalendAPI, SFTP, LocalContext
 }

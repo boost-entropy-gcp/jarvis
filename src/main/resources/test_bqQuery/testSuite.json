@@ -2,7 +2,7 @@
   "caseAutoDetect": true,
   "executions":[
     {
-        "type": "BqQuery",
+        "contextType": "BqQuery",
         "queryPath": "\\src\\test\\resources\\test.sql"
 
     }

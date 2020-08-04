@@ -135,7 +135,7 @@ public class InitActionService {
 
                 }
                 case "SQLExec": {
-                    switch (context.getType()) {
+                    switch (context.getContextType()) {
                         case MSSQL:
                         case MySQL:
                             mxSQLQueryExecutor.executeScript(TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig), context);
@@ -144,7 +144,7 @@ public class InitActionService {
                             bigQueryExecutor.executeScript(TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig), context);
                             break;
                         default:
-                            throw new UnsupportedOperationException("Not supported context type: " + context.getType());
+                            throw new UnsupportedOperationException("Not supported context type: " + context.getContextType());
                     }
 
                     break;

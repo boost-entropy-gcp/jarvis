@@ -6,7 +6,7 @@
   },
   {
     "contextType": "INTEGER",
-    "name": "age",
+    "name": "counter",
     "mode": "NULLABLE"
   }
 ]
