@@ -33,5 +33,4 @@ build/
 talend-test-runner.log*
 
 .DS_Store
-/src/test/resources/test2.properties
 /src/test/resources/test.properties
