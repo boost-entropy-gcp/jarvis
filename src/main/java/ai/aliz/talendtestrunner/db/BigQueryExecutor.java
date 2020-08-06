@@ -116,7 +116,7 @@ public class BigQueryExecutor implements QueryExecutor {
     
     public TableResult executeQueryAndGetResult(String query, Context context) {
         String completedQuery = placeholderResolver.resolve(query, context.getParameters());
-        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query).build();
+        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
         BigQuery bigquery = createBigQueryClient(context);
         try {

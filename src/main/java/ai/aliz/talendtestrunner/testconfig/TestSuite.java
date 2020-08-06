@@ -146,7 +146,7 @@ public class TestSuite {
                     List<InitActionConfig> initActions = getInitActionConfigs(contextLoader, defaultProperties, testCaseFolder);
                     testCase.getInitActionConfigs().addAll(initActions);
 
-                    List<AssertActionConfig> assertActionConfigs = getAssertActionConfigs(contextLoader, descriptorFolder, defaultProperties, testCase, testCaseFolder);
+                    List<AssertActionConfig> assertActionConfigs = getAssertActionConfigs(contextLoader, defaultProperties, testCaseFolder);
                     testCase.getAssertActionConfigs().addAll(assertActionConfigs);
                     
                     return testCase;
@@ -175,9 +175,8 @@ public class TestSuite {
         return executions.stream()
                 .flatMap(e -> {
                     ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
-                    executionActionConfig.setType(ExecutionType.valueOf(checkExecutionType(e.get("contextType"))));
+                    executionActionConfig.setType(ExecutionType.valueOf(checkExecutionType(e.get("executionType"))));
                     executionActionConfig.getProperties().put("sourcePath", repositoryRoot + e.get("queryPath"));
-                    executionActionConfig.setSystem(repositoryRoot + e.get("queryPath"));
                     executionActionConfigs.add(executionActionConfig);
 
                     return executionActionConfigs.stream();
@@ -202,19 +201,6 @@ public class TestSuite {
                 testCase.getInitActionConfigs().add(initActionConfig);
             }
 
-//            for (Map<String, Object> executeActionMap : (List<Map<String, Object>>) testCaseMap.get("executeActions")) {
-//                final String type = (String) executeActionMap.get("type");
-//                switch (type) {
-//                    case "TalendTask":
-//                        TalendTask talendTask = new TalendTask();
-//                        talendTask.setTaskName((String) executeActionMap.get("taskName"));
-//                        testCase.getExecuteActions().add(talendTask);
-//                        break;
-//                    default:
-//                        throw new RuntimeException("Unsupported initAction: " + type);
-//                }
-//            }
-
             List<Map<String, Object>> assertActions = (List<Map<String, Object>>) testCaseMap.get("assertActions");
             for (Map<String, Object> assertActionMap : assertActions) {
                 final String type = (String) assertActionMap.get("type");
@@ -231,7 +217,7 @@ public class TestSuite {
         }
     }
 
-    private static List<AssertActionConfig> getAssertActionConfigs(ContextLoader contextLoader, String descriptorFolder, Map<String, Object> defaultProperties, TestCase testCase, File testCaseFolder) {
+    private static List<AssertActionConfig> getAssertActionConfigs(ContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
         Path assertFolder = getTargetFolderPath(testCaseFolder, "assert");
         List<AssertActionConfig> assertActionConfigs = null;
         try {
@@ -260,15 +246,10 @@ public class TestSuite {
                                     AssertActionConfig assertActionConfig = new AssertActionConfig();
                                     assertActionConfig.setType("AssertDataEquals");
                                     assertActionConfig.setSystem(system);
-                                    Map<String, Object> properties = assertActionConfig.getProperties();
-                                    properties.put("dataset", datasetName);
-                                    properties.put("table", tableName);
-
+                                    Map<String, Object> properties = addBqProperties(datasetName, tableDataFile, "json", assertActionConfig, tableName);
                                     properties.put("assertKeyColumns",
                                                    defaultProperties.getOrDefault("assert.assertKeyColumns", Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
                                     properties.put("excludePreviouslyInsertedRows", defaultProperties.getOrDefault("assert.excludePreviouslyInsertedRows", false));
-                                    properties.put("sourceFormat", "json");
-                                    properties.put("sourcePath", tableDataFile.getAbsolutePath());
                                     assertActionConfigsForFolder.add(assertActionConfig);
                                 }
                             }
@@ -281,8 +262,7 @@ public class TestSuite {
                                 AssertActionConfig assertActionConfig = new AssertActionConfig();
                                 assertActionConfig.setType("AssertTalendJobState");
                                 assertActionConfig.setSystem(system);
-                                Map<String, Object> properties = assertActionConfig.getProperties();
-                                properties.put("sourcePath", tableDataFile.getAbsolutePath());
+                                assertActionConfig.getProperties().put("sourcePath", tableDataFile.getAbsolutePath());
                                 assertActionConfigsForFolder.add(assertActionConfig);
 
                             }
@@ -361,11 +341,7 @@ public class TestSuite {
                                     bqLoadInitActionConfig.setSystem(system);
                                     String tableName = FilenameUtils.getBaseName(tableJsonFileName);
                                     bqLoadInitActionConfig.setType("BQLoad");
-                                    Map<String, Object> properties = bqLoadInitActionConfig.getProperties();
-                                    properties.put("sourcePath", tableJsonFile.getAbsolutePath());
-                                    properties.put("dataset", datasetName);
-                                    properties.put("table", tableName);
-                                    properties.put("sourceFormat", extension);
+                                    Map<String, Object> properties = addBqProperties(datasetName, tableJsonFile, extension, bqLoadInitActionConfig, tableName);
                                     properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + context.getId() + ".noMetadatAddition", false));
 
                                     initActionConfigs.add(bqLoadInitActionConfig);
@@ -384,6 +360,15 @@ public class TestSuite {
             throw new RuntimeException(e);
         }
         return initActions;
+    }
+
+    private static Map<String, Object> addBqProperties(String datasetName, File tableJsonFile, String extension, StepConfig stepConfig, String tableName) {
+        Map<String, Object> properties = stepConfig.getProperties();
+        properties.put("sourcePath", tableJsonFile.getAbsolutePath());
+        properties.put("dataset", datasetName);
+        properties.put("table", tableName);
+        properties.put("sourceFormat", extension);
+        return properties;
     }
 
     private static Path getTargetFolderPath(File testCaseFolder, String folderName) {

@@ -49,7 +49,7 @@ public class TestRunnerService {
                 case AirFlow:
                     break;
                 case BqQuery:
-                    executeBQQuery(TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig), contextLoader.getContext("local"));
+                    executeBQQuery(TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig), contextLoader.getContext("EDW"));
                     break;
                 case NoOps:
                     break;

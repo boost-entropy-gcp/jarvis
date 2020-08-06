@@ -86,3 +86,77 @@ Make contexts.json file in test/resources to define parameters for the tests.
 1. Set up the folder system with the files, pay attention of naming the folders and files, the json format and data in the json files.
 2. In IntegrationTestRunner.class set the CONTEXTS_PATH and the CONFIG_PATH. CONTEXTS_PATH is the absolute path of the contexts.json. CONFIG_PATH is the absolute path of the folder which has the test cases.
 3. Run IntegrationTestRunner.class
+
+
+###Test BQ query
+
+######Folder system
+Same as it was at the bq view tests.
+
+1. test_view
+2. test_bqQuery (= CONFIG_PATH)
+    * test_case1
+        * assert
+            * _{id from contexts.json}_
+                * _{bigQuery dataset}_
+                    * test_view.json
+        * pre
+            * _{id from contexts.json}_ 
+                * _{bigQuery dataset}_ 
+                    * _{bigQuery table}_.json
+            * _{id from context.json}_.sql      
+    * test_case2
+    * testSuite.json 
+3. one or more .sql file somewhere in the project (testSuit.json queryPath) to make Bq table modification(s).
+    
+Load to the BQ table and assert data are the same as it was at the bq view test.
+
+
+
+In BqQuery test the testSuit.json contains one or more BqQuery execution. contextType is always BqQuery, queryPath is the path feom the project folder to the .sql file.
+
+testSuite.json example
+```
+{
+  "caseAutoDetect": true,
+   "executions":[
+       {
+           "contextType": "BqQuery",
+           "queryPath": "\\src\\test\\resources\\test.sql" (example)
+       }
+     ]
+}
+```
+
+######contexts json
+
+context.json example
+
+contexts.json (= CONTEXT_PATH)
+
+Make contexts.json file in test/resources to define parameters for the tests. LocalContext is for read local files, and the BigQuery context is for make the bigQuery job. The repositoryPath is the absolute path on the project folder. The test get the .sql file absolute path from the repositoryPath + testSuit.json queryPath.
+```
+[
+  {
+    "id": {id},
+    "contextType": "BigQuery",
+    "parameters": {
+      "project": {gcp project name}
+    }
+  }
+  {
+    "id": {id},
+    "contextType": "LocalContext",
+    "parameters": {
+      "repositoryRoot": {project folder path}
+    }
+  }
+]
+```
+
+#####To run test for BqQuery:
+
+1. Set up the folder system with the files, pay attention of naming the folders and files, the json format and data in the json files.
+2. In IntegrationTestRunner.class set the CONTEXTS_PATH and the CONFIG_PATH. CONTEXTS_PATH is the absolute path of the contexts.json. CONFIG_PATH is the absolute path of the folder which has the test cases.
+3. Set up the contexts.json with LocalContext and add execution to the testSuit.json. LocalContext is for read local files.
+4. Run IntegrationTestRunner.class
