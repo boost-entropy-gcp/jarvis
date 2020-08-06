@@ -1,21 +1,21 @@
 [
   {
-    "contextType": "INTEGER",
+    "type": "INTEGER",
     "name": "id",
     "mode": "NULLABLE"
   },
   {
-    "contextType": "STRING",
+    "type": "STRING",
     "name": "first_name",
     "mode": "NULLABLE"
   },
   {
-    "contextType": "STRING",
+    "type": "STRING",
     "name": "last_name",
     "mode": "NULLABLE"
   },
   {
-    "contextType": "STRING",
+    "type": "STRING",
     "name": "tf_test1_INSERTED_BY",
     "mode": "NULLABLE"
   }

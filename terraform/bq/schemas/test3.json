@@ -1,11 +1,11 @@
 [
   {
-    "contextType": "INTEGER",
+    "type": "INTEGER",
     "name": "user_id",
     "mode": "NULLABLE"
   },
   {
-    "contextType": "INTEGER",
+    "type": "INTEGER",
     "name": "counter",
     "mode": "NULLABLE"
   }

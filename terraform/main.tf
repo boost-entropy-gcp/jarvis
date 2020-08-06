@@ -5,4 +5,5 @@ provider "google" {
 
 module "BigQuery" {
   source = "./bq"
+  project = var.project
 }
