@@ -46,7 +46,7 @@ public class TestRunnerService {
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
             switch (executionActionConfig.getType()) {
-                case AirFlow:
+                case Airflow:
                     break;
                 case BqQuery:
                     executeBQQuery(TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig), contextLoader.getContext("EDW"));
