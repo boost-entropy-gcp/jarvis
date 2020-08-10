@@ -342,7 +342,7 @@ public class TestSuite {
                                     String tableName = FilenameUtils.getBaseName(tableJsonFileName);
                                     bqLoadInitActionConfig.setType("BQLoad");
                                     Map<String, Object> properties = addBqProperties(datasetName, tableJsonFile, extension, bqLoadInitActionConfig, tableName);
-                                    properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + context.getId() + ".noMetadatAddition", false));
+                                    properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + context.getId() + ".noMetadatAddition", true));
 
                                     initActionConfigs.add(bqLoadInitActionConfig);
                                 }
