@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.context.Type;
+import ai.aliz.talendtestrunner.context.ContextType;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
@@ -27,9 +27,9 @@ public class AssertActionService {
         
         Context context = contextLoader.getContext(assertActionConfig.getSystem());
         
-        Type type = context.getType();
+        ContextType contextType = context.getContextType();
         
-        switch (type) {
+        switch (contextType) {
             case BigQuery:
                 switch (assertActionConfig.getType()) {
                     case "AssertDataEquals":
@@ -39,7 +39,7 @@ public class AssertActionService {
                         bigQueryAssertor.assertNoChange(assertActionConfig, context);
                         break;
                     default:
-                        throw new UnsupportedOperationException(String.format("Not supported assert type %s for context type %s", assertActionConfig.getType(), type));
+                        throw new UnsupportedOperationException(String.format("Not supported assert type %s for context type %s", assertActionConfig.getType(), contextType));
                 }
                 
                 break;
@@ -52,7 +52,7 @@ public class AssertActionService {
                 }
                 break;
             default:
-                throw new UnsupportedOperationException("Not supported type: " + type);
+                throw new UnsupportedOperationException("Not supported type: " + contextType);
         }
         
         log.info("Assert action finished");

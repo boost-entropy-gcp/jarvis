@@ -1,7 +1,7 @@
 package ai.aliz.talendtestrunner.db;
 
 import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.Type;
+import ai.aliz.talendtestrunner.context.ContextType;
 import ai.aliz.talendtestrunner.util.PlaceholderResolver;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -101,14 +101,14 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     }
 
     private String getConnectionPattern(Context context) {
-        Type type = context.getType();
-        switch (type) {
+        ContextType contextType = context.getContextType();
+        switch (contextType) {
             case MySQL:
                 return My_CONNECTION_STRING_PATTERN;
             case MSSQL:
                 return MS_CONNECTION_STRING_PATTERN;
             default:
-                throw new IllegalArgumentException("Unsupported connection type: " + type);
+                throw new IllegalArgumentException("Unsupported connection type: " + contextType);
         }
     }
 

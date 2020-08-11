@@ -1,0 +1,17 @@
+[
+  {
+    "type": "INTEGER",
+    "name": "id",
+    "mode": "NULLABLE"
+  },
+  {
+    "type": "STRING",
+    "name": "first_name",
+    "mode": "NULLABLE"
+  },
+  {
+    "type": "STRING",
+    "name": "last_name",
+    "mode": "NULLABLE"
+  }
+]

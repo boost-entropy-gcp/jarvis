@@ -1,6 +1,8 @@
 package ai.aliz.talendtestrunner;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,9 +28,7 @@ import org.junit.runners.Parameterized;
 public class IntegrationTestRunner {
     
     private static final String API_URL = "apiUrl";
-    public static final String CONTEXT_PATH = "";
-    public static final String CONFIG_PATH = "";
-    
+    public static final String CONTEXT_PATH = getPathFromProperties("test.context.path");
     
     @Autowired
     private TestRunnerService testRunnerService;
@@ -44,15 +44,26 @@ public class IntegrationTestRunner {
     
     @Parameterized.Parameters(name = "{0}")
     public static Collection jobNames() {
+        String configPath = getPathFromProperties("test.config.path");
         ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
         contextLoader.parseContext(CONTEXT_PATH);
-        return TestSuite.readTestConfig(CONFIG_PATH, contextLoader)
+        return TestSuite.readTestConfig(configPath, contextLoader)
                         .listTestCases()
                         .stream()
-                        .map(testCase1 -> new Object[]{testCase1.getPath().substring(CONFIG_PATH.length()), testCase1})
+                        .map(testCase1 -> new Object[]{testCase1.getPath().substring(configPath.length()), testCase1})
                         .collect(Collectors.toList());
     }
-    
+
+    private static String getPathFromProperties(String key) {
+        Properties properties = new Properties();
+        try {
+            properties.load(IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return properties.getProperty(key);
+    }
+
     private String name;
     private TestCase testCase;
     
