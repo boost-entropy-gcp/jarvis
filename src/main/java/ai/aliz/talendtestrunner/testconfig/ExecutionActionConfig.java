@@ -1,6 +1,7 @@
 package ai.aliz.talendtestrunner.testconfig;
 
 import lombok.Data;
+import lombok.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Map;
 public class ExecutionActionConfig implements StepConfig {
 
 
-    private String system;
+    private String executionContext;
     private ExecutionType type;
 
     private String descriptorFolder;

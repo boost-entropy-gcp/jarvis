@@ -1,6 +1,7 @@
 package ai.aliz.talendtestrunner;
 
-import java.io.IOException;
+import lombok.SneakyThrows;
+
 import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -27,7 +28,6 @@ import org.junit.runners.Parameterized;
 @SpringBootTest
 public class IntegrationTestRunner {
     
-    private static final String API_URL = "apiUrl";
     public static final String CONTEXT_PATH = getPathFromProperties("test.context.path");
     
     @Autowired
@@ -54,13 +54,10 @@ public class IntegrationTestRunner {
                         .collect(Collectors.toList());
     }
 
+    @SneakyThrows
     private static String getPathFromProperties(String key) {
         Properties properties = new Properties();
-        try {
-            properties.load(IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        properties.load(IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties"));
         return properties.getProperty(key);
     }
 
