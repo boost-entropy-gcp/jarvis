@@ -1,12 +1,15 @@
 package ai.aliz.talendtestrunner;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.SneakyThrows;
+import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -28,8 +31,9 @@ import org.junit.runners.Parameterized;
 public class IntegrationTestRunner {
     
     private static final String API_URL = "apiUrl";
-    public static final String CONTEXT_PATH = getPathFromProperties("test.context.path");
-    
+    public static String CONTEXT_PATH = null;
+    public static String CONFIG_PATH = null;
+
     @Autowired
     private TestRunnerService testRunnerService;
     
@@ -44,24 +48,23 @@ public class IntegrationTestRunner {
     
     @Parameterized.Parameters(name = "{0}")
     public static Collection jobNames() {
-        String configPath = getPathFromProperties("test.config.path");
         ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
+        setValuesFromProperties();
         contextLoader.parseContext(CONTEXT_PATH);
-        return TestSuite.readTestConfig(configPath, contextLoader)
+        return TestSuite.readTestConfig(CONFIG_PATH, contextLoader)
                         .listTestCases()
                         .stream()
-                        .map(testCase1 -> new Object[]{testCase1.getPath().substring(configPath.length()), testCase1})
+                        .map(testCase1 -> new Object[]{testCase1.getPath().substring(CONFIG_PATH.length()), testCase1})
                         .collect(Collectors.toList());
     }
 
-    private static String getPathFromProperties(String key) {
+    @SneakyThrows
+    private static void setValuesFromProperties() {
+        InputStream input = IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties");
         Properties properties = new Properties();
-        try {
-            properties.load(IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return properties.getProperty(key);
+        properties.load(input);
+        CONFIG_PATH = properties.getProperty("test.config.path");
+        CONTEXT_PATH = properties.getProperty("test.context.path");
     }
 
     private String name;

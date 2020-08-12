@@ -227,8 +227,7 @@ public class TestSuite {
 
                     File assertContextFolder = assertActionConfigPath.toFile();
                     String directoryName = assertContextFolder.getName();
-                    Context context = contextLoader.getContext(directoryName);
-                    Preconditions.checkNotNull(context, "There is context for assert folder: " + assertActionConfigPath);
+                    Context context = getContext(contextLoader, directoryName);
                     String system = context.getId();
 
                     switch (context.getContextType()) {
@@ -317,8 +316,7 @@ public class TestSuite {
                     }
                     initActionConfigs.add(initActionConfig);
                 } else {
-                    Context context = contextLoader.getContext(fileName);
-                    Preconditions.checkNotNull(context, "No context exists with name: %s", fileName);
+                    Context context = getContext(contextLoader, fileName);
                     String system = fileName;
 
                     ContextType contextType = context.getContextType();
@@ -360,6 +358,12 @@ public class TestSuite {
             throw new RuntimeException(e);
         }
         return initActions;
+    }
+
+    private static Context getContext(ContextLoader contextLoader, String fileName) {
+        Context context = contextLoader.getContext(fileName);
+        Preconditions.checkNotNull(context, "No context exists with name: %s", fileName);
+        return context;
     }
 
     private static Map<String, Object> addBqProperties(String datasetName, File tableJsonFile, String extension, StepConfig stepConfig, String tableName) {

@@ -1,0 +1,40 @@
+[
+  {
+    "id": "id used in the folder system",
+    "contextType": "BigQuery",
+    "parameters": {
+      "project": "{GCP project id}"
+    }
+  },
+  {
+    "id": "local",
+    "contextType": "LocalContext",
+    "parameters": {
+      "repositoryRoot": "{absolute path of the project folder}"
+    }
+  },
+  {
+    "id": "id used in the folder system",
+    "contextType": "MySQL",
+    "parameters": {
+    }
+  },
+  {
+    "id": "id used in the folder system",
+    "contextType": "MSSQL",
+    "parameters": {
+    }
+  },
+  {
+    "id": "id used in the folder system",
+    "contextType": "SFTP",
+    "parameters": {
+    }
+  },
+  {
+    "id": "id used in the folder system",
+    "contextType": "TalendAPI",
+    "parameters": {
+    }
+  }
+]
