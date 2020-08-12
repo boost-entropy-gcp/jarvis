@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
@@ -177,6 +178,7 @@ public class TestSuite {
                     ExecutionActionConfig executionActionConfig = new ExecutionActionConfig();
                     executionActionConfig.setType(ExecutionType.valueOf(checkExecutionType(e.get("executionType"))));
                     executionActionConfig.getProperties().put("sourcePath", repositoryRoot + e.get("queryPath"));
+                    executionActionConfig.setExecutionContext(Objects.requireNonNull(e.get("executionContext"), "executionContext property must be specified on BqQuery executions"));
                     executionActionConfigs.add(executionActionConfig);
 
                     return executionActionConfigs.stream();
