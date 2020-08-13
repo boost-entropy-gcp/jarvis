@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ai.aliz.talendtestrunner.context.ContextLoader;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
+@Ignore
 public class TestConfigParseTest {
     
     @Test
