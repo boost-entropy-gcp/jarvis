@@ -7,12 +7,14 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import ai.aliz.talendtestrunner.config.AppConfig;
@@ -22,6 +24,7 @@ import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.factory.TestStepFactory;
 import ai.aliz.talendtestrunner.testcase.TestCase;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
+import ai.aliz.talendtestrunner.testconfig.ExecutionType;
 import ai.aliz.talendtestrunner.util.TestCollector;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
@@ -35,16 +38,29 @@ public class TestRunnerService {
     private final TestStepFactory testStepFactory;
     private final ExecutorServiceImpl executorService;
     private final AppConfig config;
+    private final ApplicationContext applicationContext;
     private final InitActionService initActionService;
     private final AssertActionService assertActionService;
     private final TalendJobStateChecker talendJobStateChecker;
     private final BigQueryExecutor bigQueryExecutor;
     private final ExecutionActionService executionActionService;
     
+    private static Map<ExecutionType, Class<? extends Executor>> executorMap = new HashMap<>();
+    
+    static {
+        executorMap.put(ExecutionType.BqQuery, BqQueryExecutor.class);
+    }
+    
+    
     public void runTest(ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
         initActionService.run(testCase.getInitActionConfigs(), contextLoader);
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
+    
+            Class<? extends Executor> executorClass = executorMap.get(executionActionConfig.getType());
+            Executor executor = applicationContext.getBean(executorClass);
+            executor.execute(executionActionConfig);
+    
             switch (executionActionConfig.getType()) {
                 case Airflow:
                     break;
