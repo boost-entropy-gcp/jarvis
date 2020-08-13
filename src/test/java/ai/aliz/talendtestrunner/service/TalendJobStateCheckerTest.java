@@ -1,6 +1,7 @@
 package ai.aliz.talendtestrunner.service;
 
 import ai.aliz.talendtestrunner.context.ContextLoader;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
+@Ignore
 public class TalendJobStateCheckerTest {
     private static final String API_URL = "apiUrl";
 

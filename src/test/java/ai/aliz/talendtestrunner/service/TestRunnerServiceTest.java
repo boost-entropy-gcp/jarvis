@@ -4,6 +4,7 @@ import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.testcase.TestCase;
 import ai.aliz.talendtestrunner.util.TestCollector;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import java.util.Collection;
 
 @RunWith(Parameterized.class)
 @SpringBootTest
+@Ignore
 public class TestRunnerServiceTest {
     private static final String API_URL = "apiUrl";
 
