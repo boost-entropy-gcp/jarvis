@@ -1,6 +1,8 @@
 package ai.aliz.talendtestrunner.service;
 
 import ai.aliz.talendtestrunner.context.ContextType;
+import ai.aliz.talendtestrunner.service.executor.BqQueryExecutor;
+import ai.aliz.talendtestrunner.service.executor.Executor;
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -60,22 +62,6 @@ public class TestRunnerService {
             Class<? extends Executor> executorClass = executorMap.get(executionActionConfig.getType());
             Executor executor = applicationContext.getBean(executorClass);
             executor.execute(executionActionConfig);
-    
-            switch (executionActionConfig.getType()) {
-                case Airflow:
-                    break;
-                case BqQuery:
-                    executeBQQuery(TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig), contextLoader.getContext(executionActionConfig.getExecutionContext()));
-                    break;
-                case NoOps:
-                    break;
-                case Talend:
-                    runTalendJob(contextLoader, executionActionConfig, testCase);
-                    break;
-
-                default:
-                    throw new UnsupportedOperationException(String.format("Not supported execution action type: %s", executionActionConfig.getType()));
-            }
         });
 
         testCase.getAssertActionConfigs().forEach(assertAction -> assertActionService.assertResult(assertAction, contextLoader));
@@ -181,9 +167,4 @@ public class TestRunnerService {
         }
 
     }
-
-    private void executeBQQuery(String sql, Context context) {
-        bigQueryExecutor.executeQuery(sql, context);
-    }
-    
 }

@@ -34,6 +34,7 @@ import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ai.aliz.talendtestrunner.context.Context;
@@ -50,6 +51,9 @@ public class BigQueryExecutor implements QueryExecutor {
     private ExecutorServiceImpl executorService;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private BigQuery bigQuery;
     
     public void executeScript(String query, Context context) {
         String[] splits = query.split(";");
@@ -101,7 +105,7 @@ public class BigQueryExecutor implements QueryExecutor {
         }
     }
     
-    private BigQuery createBigQueryClient(Context context) {
+    public BigQuery createBigQueryClient(Context context) {
         return BigQueryOptions.newBuilder().setProjectId(context.getParameters().get("project")).build().getService();
     }
     
@@ -118,10 +122,10 @@ public class BigQueryExecutor implements QueryExecutor {
         String completedQuery = placeholderResolver.resolve(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
-        BigQuery bigquery = createBigQueryClient(context);
+        bigQuery = createBigQueryClient(context);
         try {
             log.info("Executing query {}", query);
-            TableResult queryResult = bigquery.query(queryConfig);
+            TableResult queryResult = bigQuery.query(queryConfig);
             
             return queryResult;
         } catch (Exception e) {

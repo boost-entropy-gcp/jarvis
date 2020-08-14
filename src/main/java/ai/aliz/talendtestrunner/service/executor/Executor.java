@@ -1,4 +1,4 @@
-package ai.aliz.talendtestrunner.service;
+package ai.aliz.talendtestrunner.service.executor;
 
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 

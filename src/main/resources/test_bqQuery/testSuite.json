@@ -3,8 +3,8 @@
   "executions":[
     {
         "executionType": "BqQuery",
-        "queryPath": "\\src\\test\\resources\\test.sql"
-
+        "queryPath": "\\src\\test\\resources\\test.sql",
+        "executionContext": "EDW"
     }
   ]
 }
