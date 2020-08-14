@@ -1,28 +1,25 @@
 package ai.aliz.talendtestrunner;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
-
 import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.service.TestRunnerService;
 import ai.aliz.talendtestrunner.testconfig.TestCase;
 import ai.aliz.talendtestrunner.testconfig.TestSuite;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
+
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 @RunWith(Parameterized.class)
 @SpringBootTest
@@ -54,10 +51,10 @@ public class IntegrationTestRunner {
         contextPath = properties.getProperty("test.context.path");
         contextLoader.parseContext(contextPath);
         return TestSuite.readTestConfig(configPath, contextLoader)
-                        .listTestCases()
-                        .stream()
-                        .map(testCase1 -> new Object[]{testCase1.getPath().substring(configPath.length()), testCase1})
-                        .collect(Collectors.toList());
+                .listTestCases()
+                .stream()
+                .map(testCase1 -> new Object[]{testCase1.getPath().substring(configPath.length()), testCase1})
+                .collect(Collectors.toList());
     }
 
     private String name;

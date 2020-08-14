@@ -122,7 +122,8 @@ testSuite.json example
    "executions":[
        {
            "contextType": "BqQuery",
-           "queryPath": "\\src\\test\\resources\\test.sql" (example)
+           "queryPath": "\\src\\test\\resources\\test.sql", (example)
+           "executionContext": "{context id}"
        }
      ]
 }
@@ -174,6 +175,7 @@ Make contexts.json file in test/resources to define parameters for the tests. Lo
     * List of
         * executionType (type of execution. _BigQuery, Airflow, Talend, NoOps_)
         * queryPath (path of the file for do the execution)
+        * executionContext (context id)
 2. 
 ######defaultProperties:
 
