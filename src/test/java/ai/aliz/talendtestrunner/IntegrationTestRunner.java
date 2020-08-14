@@ -1,6 +1,5 @@
 package ai.aliz.talendtestrunner;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Properties;
@@ -9,7 +8,6 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.SneakyThrows;
-import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -31,8 +29,7 @@ import org.junit.runners.Parameterized;
 public class IntegrationTestRunner {
     
     private static final String API_URL = "apiUrl";
-    public static String CONTEXT_PATH = null;
-    public static String CONFIG_PATH = null;
+    public static String contextPath = null;
 
     @Autowired
     private TestRunnerService testRunnerService;
@@ -47,24 +44,20 @@ public class IntegrationTestRunner {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
     
     @Parameterized.Parameters(name = "{0}")
+    @SneakyThrows
     public static Collection jobNames() {
         ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
-        setValuesFromProperties();
-        contextLoader.parseContext(CONTEXT_PATH);
-        return TestSuite.readTestConfig(CONFIG_PATH, contextLoader)
-                        .listTestCases()
-                        .stream()
-                        .map(testCase1 -> new Object[]{testCase1.getPath().substring(CONFIG_PATH.length()), testCase1})
-                        .collect(Collectors.toList());
-    }
-
-    @SneakyThrows
-    private static void setValuesFromProperties() {
         InputStream input = IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties");
         Properties properties = new Properties();
         properties.load(input);
-        CONFIG_PATH = properties.getProperty("test.config.path");
-        CONTEXT_PATH = properties.getProperty("test.context.path");
+        String configPath = properties.getProperty("test.config.path");
+        contextPath = properties.getProperty("test.context.path");
+        contextLoader.parseContext(contextPath);
+        return TestSuite.readTestConfig(configPath, contextLoader)
+                        .listTestCases()
+                        .stream()
+                        .map(testCase1 -> new Object[]{testCase1.getPath().substring(configPath.length()), testCase1})
+                        .collect(Collectors.toList());
     }
 
     private String name;
@@ -77,7 +70,7 @@ public class IntegrationTestRunner {
     
     @Test
     public void runTestCase() throws Exception {
-        contextLoader.parseContext(CONTEXT_PATH);
+        contextLoader.parseContext(contextPath);
         testRunnerService.runTest(testCase);
     }
 }

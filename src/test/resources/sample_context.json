@@ -1,9 +1,12 @@
 [
   {
-    "id": "id used in the folder system",
+    "id": "{id, same as the folder name in the assert and pre folders}",
     "contextType": "BigQuery",
     "parameters": {
-      "project": "{GCP project id}"
+      "project": "scoot-edw-dev",
+      "datasetNamePrefix": "csk_",
+      "edwCoreDataset": "EDW_CORE",
+      "stagingDataset": "STAGING"
     }
   },
   {
@@ -14,27 +17,46 @@
     }
   },
   {
-    "id": "id used in the folder system",
+    "id": "{id, name of the sql file}",
     "contextType": "MySQL",
     "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "database": "{database}",
+      "user": "{username}",
+      "password": "{password}"
     }
   },
   {
-    "id": "id used in the folder system",
+    "id": "{id, name of folder}",
     "contextType": "MSSQL",
     "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "database": "{database}",
+      "user": "{username}",
+      "password": "{password}"
     }
   },
   {
-    "id": "id used in the folder system",
+    "id": "SFTP-password",
     "contextType": "SFTP",
     "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "user": "{username}",
+      "password": "{password}",
+      "remoteBasePath": "/out"
     }
   },
   {
-    "id": "id used in the folder system",
+    "id": "TalendAPI",
     "contextType": "TalendAPI",
     "parameters": {
+      "apiUrl": "{talend API url}",
+      "apiKey": "{API key}",
+      "environment": "{env}",
+      "workspace": "{workspace}"
     }
   }
 ]
