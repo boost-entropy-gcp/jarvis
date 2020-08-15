@@ -1,13 +1,10 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.talendtestrunner.context.ContextType;
-import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,11 +17,12 @@ import org.springframework.stereotype.Service;
 import ai.aliz.talendtestrunner.config.AppConfig;
 import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
+import ai.aliz.talendtestrunner.context.ContextType;
 import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.factory.TestStepFactory;
 import ai.aliz.talendtestrunner.testcase.TestCase;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.testconfig.ExecutionType;
+import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import ai.aliz.talendtestrunner.util.TestCollector;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
@@ -45,21 +43,10 @@ public class TestRunnerService {
     private final BigQueryExecutor bigQueryExecutor;
     private final ExecutionActionService executionActionService;
     
-    private static Map<ExecutionType, Class<? extends Executor>> executorMap = new HashMap<>();
-    
-    static {
-        executorMap.put(ExecutionType.BqScript, BqQueryExecutor.class);
-    }
-    
-    
     public void runTest(ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
         initActionService.run(testCase.getInitActionConfigs(), contextLoader);
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
-    
-            Class<? extends Executor> executorClass = executorMap.get(executionActionConfig.getType());
-            Executor executor = applicationContext.getBean(executorClass);
-            executor.execute(executionActionConfig);
     
             switch (executionActionConfig.getType()) {
                 case Airflow:
