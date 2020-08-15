@@ -48,7 +48,7 @@ public class TestRunnerService {
     private static Map<ExecutionType, Class<? extends Executor>> executorMap = new HashMap<>();
     
     static {
-        executorMap.put(ExecutionType.BqQuery, BqQueryExecutor.class);
+        executorMap.put(ExecutionType.BqScript, BqQueryExecutor.class);
     }
     
     
@@ -64,8 +64,9 @@ public class TestRunnerService {
             switch (executionActionConfig.getType()) {
                 case Airflow:
                     break;
-                case BqQuery:
-                    executeBQQuery(TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig), contextLoader.getContext(executionActionConfig.getExecutionContext()));
+                case BqScript:
+                    String scriptString = TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig);
+                    bigQueryExecutor.executeStatement(scriptString, contextLoader.getContext(executionActionConfig.getExecutionContext()));
                     break;
                 case NoOps:
                     break;
@@ -180,10 +181,6 @@ public class TestRunnerService {
             executionActionService.run(contextLoader, taskName);
         }
 
-    }
-
-    private void executeBQQuery(String sql, Context context) {
-        bigQueryExecutor.executeQuery(sql, context);
     }
     
 }
