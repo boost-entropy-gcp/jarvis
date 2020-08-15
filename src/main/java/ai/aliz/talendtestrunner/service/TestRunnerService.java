@@ -1,7 +1,5 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.talendtestrunner.context.ContextType;
-import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -13,15 +11,18 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import ai.aliz.talendtestrunner.config.AppConfig;
 import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
+import ai.aliz.talendtestrunner.context.ContextType;
 import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.factory.TestStepFactory;
 import ai.aliz.talendtestrunner.testcase.TestCase;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
+import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import ai.aliz.talendtestrunner.util.TestCollector;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
@@ -35,6 +36,7 @@ public class TestRunnerService {
     private final TestStepFactory testStepFactory;
     private final ExecutorServiceImpl executorService;
     private final AppConfig config;
+    private final ApplicationContext applicationContext;
     private final InitActionService initActionService;
     private final AssertActionService assertActionService;
     private final TalendJobStateChecker talendJobStateChecker;
@@ -45,11 +47,13 @@ public class TestRunnerService {
         initActionService.run(testCase.getInitActionConfigs(), contextLoader);
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
+    
             switch (executionActionConfig.getType()) {
                 case Airflow:
                     break;
-                case BqQuery:
-                    executeBQQuery(TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig), contextLoader.getContext(executionActionConfig.getExecutionContext()));
+                case BqScript:
+                    String scriptString = TestRunnerUtil.getSourceContentFromConfigProperties(executionActionConfig);
+                    bigQueryExecutor.executeStatement(scriptString, contextLoader.getContext(executionActionConfig.getExecutionContext()));
                     break;
                 case NoOps:
                     break;
@@ -164,10 +168,6 @@ public class TestRunnerService {
             executionActionService.run(contextLoader, taskName);
         }
 
-    }
-
-    private void executeBQQuery(String sql, Context context) {
-        bigQueryExecutor.executeQuery(sql, context);
     }
     
 }
