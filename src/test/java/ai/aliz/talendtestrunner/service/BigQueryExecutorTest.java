@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,7 +65,10 @@ public class BigQueryExecutorTest {
                 Field.of("test", LegacySQLTypeName.STRING));
         FieldValue fieldValue = FieldValue.of(FieldValue.Attribute.PRIMITIVE, "1");
         FieldValue fieldValue2 = FieldValue.of(FieldValue.Attribute.PRIMITIVE, "test");
-        FieldValueList fieldValues = FieldValueList.of(List.of(fieldValue, fieldValue2));
+        List<FieldValue> fieldValueList = new ArrayList<>();
+        fieldValueList.add(fieldValue);
+        fieldValueList.add(fieldValue2);
+        FieldValueList fieldValues = FieldValueList.of(fieldValueList);
         Page<FieldValueList> page = new PageImpl<>(null, "c", Arrays.asList(fieldValues));
         return new TableResult(schema, 1L, page);
     }
