@@ -53,7 +53,6 @@ public class BigQueryExecutorTest {
         TableResult tableResult = getTableResult();
         Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
         Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
-        contextLoader.parseContext(CONTEXT_PATH);
         Context bqContext = contextLoader.getContext("EDW");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
         Assert.assertEquals("[{\"test_id\":\"1\",\"test\":\"test\"}]", result);
