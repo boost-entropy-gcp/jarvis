@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +33,7 @@ import java.util.List;
 @SpringBootTest
 public class BigQueryExecutorTest {
     private static final String API_URL = "apiUrl";
-    private static final String CONTEXT_PATH = "C:\\Users\\bberr\\git\\aliz\\jarvis\\src\\test\\resources\\contexts.json";
+    private static final String CONTEXT_PATH = "C:\\Users\\bberr\\git\\aliz\\jarvis\\src\\test\\resources\\test-contexts.json";
 
     @Autowired
     private BigQueryExecutor bigQueryExecutor;
@@ -53,7 +54,7 @@ public class BigQueryExecutorTest {
         Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
         Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
         contextLoader.parseContext(CONTEXT_PATH);
-        Context bqContext = contextLoader.getContext("EDW");
+        Context bqContext = contextLoader.getContext("test");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
         Assert.assertEquals("[{\"test_id\":\"1\",\"test\":\"test\"}]", result);
     }
@@ -64,7 +65,10 @@ public class BigQueryExecutorTest {
                 Field.of("test", LegacySQLTypeName.STRING));
         FieldValue fieldValue = FieldValue.of(FieldValue.Attribute.PRIMITIVE, "1");
         FieldValue fieldValue2 = FieldValue.of(FieldValue.Attribute.PRIMITIVE, "test");
-        FieldValueList fieldValues = FieldValueList.of(List.of(fieldValue, fieldValue2));
+        List<FieldValue> fieldValueList = new ArrayList<>();
+        fieldValueList.add(fieldValue);
+        fieldValueList.add(fieldValue2);
+        FieldValueList fieldValues = FieldValueList.of(fieldValueList);
         Page<FieldValueList> page = new PageImpl<>(null, "c", Arrays.asList(fieldValues));
         return new TableResult(schema, 1L, page);
     }
