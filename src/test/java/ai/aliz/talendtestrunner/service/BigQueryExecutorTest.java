@@ -33,7 +33,7 @@ import java.util.List;
 @SpringBootTest
 public class BigQueryExecutorTest {
     private static final String API_URL = "apiUrl";
-    private static final String CONTEXT_PATH = "C:\\Users\\bberr\\git\\aliz\\jarvis\\src\\test\\resources\\contexts.json";
+    private static final String CONTEXT_PATH = "C:\\Users\\bberr\\git\\aliz\\jarvis\\src\\test\\resources\\test-contexts.json";
 
     @Autowired
     private BigQueryExecutor bigQueryExecutor;
@@ -53,7 +53,8 @@ public class BigQueryExecutorTest {
         TableResult tableResult = getTableResult();
         Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
         Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
-        Context bqContext = contextLoader.getContext("EDW");
+        contextLoader.parseContext(CONTEXT_PATH);
+        Context bqContext = contextLoader.getContext("test");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
         Assert.assertEquals("[{\"test_id\":\"1\",\"test\":\"test\"}]", result);
     }
