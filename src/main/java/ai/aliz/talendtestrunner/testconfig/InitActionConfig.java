@@ -9,7 +9,7 @@ import java.util.Map;
 public class InitActionConfig implements StepConfig {
     
     private String system;
-    private String type;
+    private InitActionType type;
     
     private String descriptorFolder;
     

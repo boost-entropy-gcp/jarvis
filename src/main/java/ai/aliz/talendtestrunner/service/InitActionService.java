@@ -4,7 +4,12 @@ import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.db.MxSQLQueryExecutor;
+import ai.aliz.talendtestrunner.service.initAction.BQLoad;
+import ai.aliz.talendtestrunner.service.initAction.InitAction;
+import ai.aliz.talendtestrunner.service.initAction.SFTPLoad;
+import ai.aliz.talendtestrunner.service.initAction.SQLExec;
 import ai.aliz.talendtestrunner.testconfig.InitActionConfig;
+import ai.aliz.talendtestrunner.testconfig.InitActionType;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryOptions;
@@ -20,6 +25,7 @@ import com.google.gson.JsonElement;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
@@ -47,10 +54,21 @@ public class InitActionService {
     private BigQueryExecutor bigQueryExecutor;
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private ExecutorServiceImpl executorService;
 
     @Autowired
     private SftpService sftpService;
+
+    private static Map<InitActionType, Class<? extends InitAction>> initActionTypeClassMap = new HashMap<>();
+
+    static {
+        initActionTypeClassMap.put(InitActionType.BQLoad, BQLoad.class);
+        initActionTypeClassMap.put(InitActionType.SFTPLoad, SFTPLoad.class);
+        initActionTypeClassMap.put(InitActionType.SQLExec, SQLExec.class);
+    }
 
     public void run(List<InitActionConfig> initActionConfigs, ContextLoader contextLoader) {
         List<Runnable> initActionRunnables = initActionConfigs.stream()
@@ -70,98 +88,88 @@ public class InitActionService {
         try {
             log.info("========================================================");
             log.info("Executing initaction: {}", initActionConfig);
-            String type = initActionConfig.getType();
-            String system = initActionConfig.getSystem();
-            Context context = contextLoader.getContext(system);
-            switch (type) {
-                case "BQLoad": {
-                    String project = context.getParameter("project");
-                    Map<String, Object> properties = initActionConfig.getProperties();
-                    String dataset = (String) properties.get("dataset");
 
-                    String datasetNamePrefix = context.getParameter("datasetNamePrefix");
-                    if (datasetNamePrefix != null) {
-                        dataset = datasetNamePrefix + dataset;
-                    }
-                    String table = (String) properties.get("table");
-
-                    BigQuery bigQuery = BigQueryOptions.newBuilder().setProjectId(project).build().getService();
-
-                    TableId tableId = TableId.of(project, dataset, table);
-
-                    String sourceContent = TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig);
-
-                    FormatOptions formatOption;
-
-                    String sourceFormat = (String) properties.get("sourceFormat");
-                    switch (sourceFormat) {
-                        case "json": {
-                            Gson gson = new Gson();
-                            JsonArray jsonArray = getJsonArrayFromSource(sourceContent, gson);
-                            Boolean noMetadatAddition = (Boolean) properties.get("noMetadatAddition");
-                            if (noMetadatAddition == null || !noMetadatAddition) {
-                                jsonArray = addTableMetadata(jsonArray, table);
-                            }
-                            sourceContent = convertToNDJson(jsonArray);
-                            formatOption = FormatOptions.json();
-                            break;
-                        }
-                        default:
-                            throw new RuntimeException("Unsupported format: " + sourceFormat);
-                    }
-
-                    WriteChannelConfiguration writeChannelConfiguration = WriteChannelConfiguration.newBuilder(tableId)
-                            .setWriteDisposition(JobInfo.WriteDisposition.WRITE_TRUNCATE)
-                            .setFormatOptions(formatOption).build();
-                    TableDataWriteChannel writer = bigQuery.writer(writeChannelConfiguration);
-                    try (OutputStream stream = Channels.newOutputStream(writer)) {
-                        InputStream byteArrayInputStream = new ByteArrayInputStream(sourceContent.getBytes());
-                        IOUtils.copy(byteArrayInputStream, stream);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    Job job = writer.getJob();
-
-                    try {
-                        job = job.waitFor();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    if (job.getStatus().getError() != null || job.getStatus().getExecutionErrors() != null && !job.getStatus().getExecutionErrors().isEmpty()) {
-                        throw new RuntimeException(String.format("Failed to execute load job for %s. Error: %s)", initActionConfig, job.getStatus().toString()));
-                    }
-                    break;
-
-                }
-                case "SQLExec": {
-                    switch (context.getContextType()) {
-                        case MSSQL:
-                        case MySQL:
-                            mxSQLQueryExecutor.executeScript(TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig), context);
-                            break;
-                        case BigQuery:
-                            bigQueryExecutor.executeScript(TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig), context);
-                            break;
-                        default:
-                            throw new UnsupportedOperationException("Not supported context type: " + context.getContextType());
-                    }
-
-                    break;
-
-                }
-                case "SFTPLoad": {
-                    sftpService.loadFilesToSftp(initActionConfig, context);
-                    break;
-                }
-                default:
-                    throw new IllegalArgumentException("Not supported type: " + type);
-            }
+            Class<? extends InitAction> initActionClass = initActionTypeClassMap.get(initActionConfig.getType());
+            InitAction initAction = applicationContext.getBean(initActionClass);
+            initAction.doInitAction(initActionConfig);
 
             log.info("InitAction {} finished", initActionConfig);
             log.info("========================================================");
         } catch (Exception e) {
             throw new RuntimeException(String.format("InitAction: %s failed", initActionConfig), e);
+        }
+    }
+
+    public void doSqlInitAction(InitActionConfig initActionConfig, Context context) {
+        switch (context.getContextType()) {
+            case MSSQL:
+            case MySQL:
+                mxSQLQueryExecutor.executeScript(TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig), context);
+                break;
+            case BigQuery:
+                bigQueryExecutor.executeScript(TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig), context);
+                break;
+            default:
+                throw new UnsupportedOperationException("Not supported context type: " + context.getContextType());
+        }
+    }
+
+    public void doBigQueryInitAction(InitActionConfig initActionConfig, Context context) {
+        String project = context.getParameter("project");
+        Map<String, Object> properties = initActionConfig.getProperties();
+        String dataset = (String) properties.get("dataset");
+
+        String datasetNamePrefix = context.getParameter("datasetNamePrefix");
+        if (datasetNamePrefix != null) {
+            dataset = datasetNamePrefix + dataset;
+        }
+        String table = (String) properties.get("table");
+
+        BigQuery bigQuery = BigQueryOptions.newBuilder().setProjectId(project).build().getService();
+
+        TableId tableId = TableId.of(project, dataset, table);
+
+        String sourceContent = TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig);
+
+        FormatOptions formatOption;
+
+        String sourceFormat = (String) properties.get("sourceFormat");
+        switch (sourceFormat) {
+            case "json": {
+                Gson gson = new Gson();
+                JsonArray jsonArray = getJsonArrayFromSource(sourceContent, gson);
+                Boolean noMetadatAddition = (Boolean) properties.get("noMetadatAddition");
+                if (noMetadatAddition == null || !noMetadatAddition) {
+                    jsonArray = addTableMetadata(jsonArray, table);
+                }
+                sourceContent = convertToNDJson(jsonArray);
+                formatOption = FormatOptions.json();
+                break;
+            }
+            default:
+                throw new RuntimeException("Unsupported format: " + sourceFormat);
+        }
+
+        WriteChannelConfiguration writeChannelConfiguration = WriteChannelConfiguration.newBuilder(tableId)
+                .setWriteDisposition(JobInfo.WriteDisposition.WRITE_TRUNCATE)
+                .setFormatOptions(formatOption).build();
+        TableDataWriteChannel writer = bigQuery.writer(writeChannelConfiguration);
+        try (OutputStream stream = Channels.newOutputStream(writer)) {
+            InputStream byteArrayInputStream = new ByteArrayInputStream(sourceContent.getBytes());
+            IOUtils.copy(byteArrayInputStream, stream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Job job = writer.getJob();
+
+        try {
+            job = job.waitFor();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (job.getStatus().getError() != null || job.getStatus().getExecutionErrors() != null && !job.getStatus().getExecutionErrors().isEmpty()) {
+            throw new RuntimeException(String.format("Failed to execute load job for %s. Error: %s)", initActionConfig, job.getStatus().toString()));
         }
     }
 

@@ -1,8 +1,11 @@
 package ai.aliz.talendtestrunner.service;
 
 import ai.aliz.talendtestrunner.context.ContextType;
+import ai.aliz.talendtestrunner.service.executor.AirflowExecutor;
 import ai.aliz.talendtestrunner.service.executor.BqQueryExecutor;
 import ai.aliz.talendtestrunner.service.executor.Executor;
+import ai.aliz.talendtestrunner.service.executor.NoOpsExecutor;
+import ai.aliz.talendtestrunner.service.executor.TalendExecutor;
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -51,6 +54,9 @@ public class TestRunnerService {
     
     static {
         executorMap.put(ExecutionType.BqQuery, BqQueryExecutor.class);
+        executorMap.put(ExecutionType.Airflow, AirflowExecutor.class);
+        executorMap.put(ExecutionType.Talend, TalendExecutor.class);
+        executorMap.put(ExecutionType.NoOps, NoOpsExecutor.class);
     }
     
     

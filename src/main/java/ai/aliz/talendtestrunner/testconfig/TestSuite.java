@@ -132,7 +132,7 @@ public class TestSuite {
             Map<String, Object> defaultProperties = (Map<String, Object>) testSuiteMap.getOrDefault(DEFAULT_PROPERTIES_KEY, new HashMap<>());
 
             if (testSuiteMap.get(EXECUTIONS_KEY) != null) {
-                List<Map<String, String>> executionActions = (List<Map<String, String>>) testSuiteMap.getOrDefault(EXECUTIONS_KEY, Collections.singletonMap("type", "noOps"));
+                List<Map<String, String>> executionActions = (List<Map<String, String>>) testSuiteMap.getOrDefault(EXECUTIONS_KEY, Collections.singletonMap("type", "NoOps"));
                 List<ExecutionActionConfig> executionActionConfigs = getExecutionActionConfigs(contextLoader, executionActions);
                 testCase.getExecutionActionConfigs().addAll(executionActionConfigs);
             }
@@ -196,7 +196,7 @@ public class TestSuite {
             for (Map<String, Object> initActionMap : initActions) {
                 InitActionConfig initActionConfig = new InitActionConfig();
                 initActionConfig.setSystem((String) initActionMap.remove("system"));
-                initActionConfig.setType((String) initActionMap.remove("type"));
+                initActionConfig.setType(InitActionType.valueOf((String) initActionMap.remove("type")));
                 initActionConfig.setDescriptorFolder(descriptorFolder + caseName + File.separator);
                 initActionConfig.getProperties().putAll(initActionMap);
 
@@ -310,7 +310,7 @@ public class TestSuite {
                     switch (extension) {
                         case "bql":
                         case "sql":
-                            initActionConfig.setType("SQLExec");
+                            initActionConfig.setType(InitActionType.valueOf("SQLExec"));
                             initActionConfig.getProperties().put("sourcePath", initActionFile.toFile().getAbsolutePath());
                             break;
                         default:
@@ -328,7 +328,7 @@ public class TestSuite {
                         case SFTP:
                             InitActionConfig initActionConfig = new InitActionConfig();
                             initActionConfig.setSystem(system);
-                            initActionConfig.setType("SFTPLoad");
+                            initActionConfig.setType(InitActionType.valueOf("SFTPLoad"));
                             initActionConfig.getProperties().put("sourcePath", initActionFile.toFile().getAbsolutePath());
                             break;
                         case BigQuery:
@@ -342,7 +342,7 @@ public class TestSuite {
                                     InitActionConfig bqLoadInitActionConfig = new InitActionConfig();
                                     bqLoadInitActionConfig.setSystem(system);
                                     String tableName = FilenameUtils.getBaseName(tableJsonFileName);
-                                    bqLoadInitActionConfig.setType("BQLoad");
+                                    bqLoadInitActionConfig.setType(InitActionType.valueOf("BQLoad"));
                                     Map<String, Object> properties = addBqProperties(datasetName, tableJsonFile, extension, bqLoadInitActionConfig, tableName);
                                     properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + context.getId() + ".noMetadatAddition", true));
 

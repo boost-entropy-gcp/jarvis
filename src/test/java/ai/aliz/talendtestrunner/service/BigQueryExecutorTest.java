@@ -30,7 +30,6 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@Ignore
 public class BigQueryExecutorTest {
     private static final String API_URL = "apiUrl";
     private static final String CONTEXT_PATH = "C:\\Users\\bberr\\git\\aliz\\jarvis\\src\\test\\resources\\contexts.json";
@@ -44,21 +43,26 @@ public class BigQueryExecutorTest {
     @MockBean
     private BigQuery bigQuery;
 
+    @MockBean
+    private BigQueryService bigQueryService;
+
     @Test
     @SneakyThrows
     public void testSampleQuery() {
         TableResult tableResult = getTableResult();
         Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
+        Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
         contextLoader.parseContext(CONTEXT_PATH);
         Context bqContext = contextLoader.getContext("EDW");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
+        Assert.assertEquals("[{\"test_id\":\"1\",\"test\":\"test\"}]", result);
     }
 
     public TableResult getTableResult() {
         Schema schema = Schema.of(
                 Field.of("test_id", LegacySQLTypeName.INTEGER),
                 Field.of("test", LegacySQLTypeName.STRING));
-        FieldValue fieldValue = FieldValue.of(FieldValue.Attribute.PRIMITIVE, 1);
+        FieldValue fieldValue = FieldValue.of(FieldValue.Attribute.PRIMITIVE, "1");
         FieldValue fieldValue2 = FieldValue.of(FieldValue.Attribute.PRIMITIVE, "test");
         FieldValueList fieldValues = FieldValueList.of(List.of(fieldValue, fieldValue2));
         Page<FieldValueList> page = new PageImpl<>(null, "c", Arrays.asList(fieldValues));
