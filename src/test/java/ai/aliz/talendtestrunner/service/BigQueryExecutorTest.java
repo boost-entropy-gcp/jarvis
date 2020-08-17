@@ -25,15 +25,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class BigQueryExecutorTest {
     private static final String API_URL = "apiUrl";
-    private static final String CONTEXT_PATH = "C:\\Users\\bberr\\git\\aliz\\jarvis\\src\\test\\resources\\test-contexts.json";
+    private static final String CONTEXT_PATH = new File(Objects.requireNonNull(BigQueryExecutorTest.class.getClassLoader().getResource("test-contexts.json")).getFile()).getPath();
 
     @Autowired
     private BigQueryExecutor bigQueryExecutor;
