@@ -121,8 +121,9 @@ testSuite.json example
   "caseAutoDetect": true,
    "executions":[
        {
-           "contextType": "BqQuery",
-           "queryPath": "\\src\\test\\resources\\test.sql" (example)
+           "executionType": "BqQuery",
+           "queryPath": "\\src\\test\\resources\\test.sql", (example)
+           "executionContext": "{context id}"
        }
      ]
 }
@@ -160,3 +161,30 @@ Make contexts.json file in test/resources to define parameters for the tests. Lo
 2. In IntegrationTestRunner.class set the CONTEXTS_PATH and the CONFIG_PATH. CONTEXTS_PATH is the absolute path of the contexts.json. CONFIG_PATH is the absolute path of the folder which has the test cases.
 3. Set up the contexts.json with LocalContext and add execution to the testSuit.json. LocalContext is for read local files.
 4. Run IntegrationTestRunner.class
+
+####testSuits.json
+
+1. caseAutoDetect
+    * boolean
+        * If it's true the test will make initActionConfigs and assertActionConfigs.
+        
+        
+######executions:
+
+1. execution
+    * List of
+        * executionType (type of execution. _BigQuery, Airflow, Talend, NoOps_)
+        * queryPath (path of the file for do the execution)
+        * executionContext (context id)
+2. 
+######defaultProperties:
+
+1. assert.excludePreviouslyInsertedRows
+    * boolean
+        * Deafult value is false. If it's true it puts "WHERE {tableName}_INSERTED_BY != 'test_init'" to the query for assert.
+2. assert.assertKeyColumns
+    * list -> default {tableName}_BID, {tableName}_VALID_FROM
+        *
+3. init.{contextId}.noMetadatAddition
+    * boolean
+        * Default value is true. If it's false the test add a {tableName}_INSERTED_BY field with "test_init" value to the table which load by json file.
