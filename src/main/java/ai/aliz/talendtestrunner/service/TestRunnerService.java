@@ -126,7 +126,7 @@ public class TestRunnerService {
     }
     
     @SneakyThrows
-    private void runTalendJob(ContextLoader contextLoader, ExecutionActionConfig executionActionConfig, ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
+    public void runTalendJob(ContextLoader contextLoader, ExecutionActionConfig executionActionConfig) {
         Context talendDatabaseContext = contextLoader.getContext("TalendDatabase");
 
         String taskName = executionActionConfig.getProperties().get("sourcePath").toString();
@@ -135,7 +135,7 @@ public class TestRunnerService {
 
 
 
-            Optional<AssertActionConfig> talendStateAssertActionConfig = testCase.getAssertActionConfigs()
+            Optional<AssertActionConfig> talendStateAssertActionConfig = executionActionConfig.getAssertActionConfigs()
                                                                                  .stream()
                                                                                  .filter(a -> contextLoader.getContext(a.getSystem()).getContextType() == ContextType.MySQL)
                                                                                  .findAny();
@@ -148,7 +148,7 @@ public class TestRunnerService {
                     log.info("Waiting for execution on manual job run for testCase {}", executionActionConfig);
                 }
             } else {
-                AssertActionConfig bqTableAssertActionConfig = testCase.getAssertActionConfigs()
+                AssertActionConfig bqTableAssertActionConfig = executionActionConfig.getAssertActionConfigs()
                                                                        .stream()
                                                                        .filter(a -> "AssertDataEquals".equals(a.getType()) && contextLoader.getContext(a.getSystem()).getContextType() == ContextType.BigQuery)
                                                                        .findAny()

@@ -149,6 +149,8 @@ public class TestSuite {
 
                     List<AssertActionConfig> assertActionConfigs = getAssertActionConfigs(contextLoader, defaultProperties, testCaseFolder);
                     testCase.getAssertActionConfigs().addAll(assertActionConfigs);
+
+                    addAssertActionsToExecutionActions(testCase);
                     
                     return testCase;
                 }).collect(Collectors.toList());
@@ -156,7 +158,9 @@ public class TestSuite {
                 testSuite.getTestCases().addAll(testCases);
                 
             }
-            
+
+
+
             List<Map<String, Object>> testCases = (List<Map<String, Object>>) testSuiteMap.get(TEST_CASES_KEY);
             if (testCases != null) {
                 setTestCases(testSuite, descriptorFolder, testCases);
@@ -167,6 +171,13 @@ public class TestSuite {
         }
         return testSuite;
         
+    }
+
+    private static TestCase addAssertActionsToExecutionActions(TestCase testCase) {
+        for (ExecutionActionConfig executionActionConfig : testCase.getExecutionActionConfigs()) {
+            executionActionConfig.setAssertActionConfigs(testCase.getAssertActionConfigs());
+        }
+        return testCase;
     }
 
     private static List<ExecutionActionConfig> getExecutionActionConfigs(ContextLoader contextLoader, List<Map<String, String>> executions) {
