@@ -61,7 +61,7 @@ public class TestRunnerService {
     
     
     public void runTest(ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
-        initActionService.run(testCase.getInitActionConfigs(), contextLoader);
+        initActionService.run(testCase.getInitActionConfigs());
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
     

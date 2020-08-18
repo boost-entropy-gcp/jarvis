@@ -70,12 +70,12 @@ public class InitActionService {
         initActionTypeClassMap.put(InitActionType.SQLExec, SQLExec.class);
     }
 
-    public void run(List<InitActionConfig> initActionConfigs, ContextLoader contextLoader) {
+    public void run(List<InitActionConfig> initActionConfigs) {
         List<Runnable> initActionRunnables = initActionConfigs.stream()
                 .map(initActionConfig -> new Runnable() {
                     @Override
                     public void run() {
-                        InitActionService.this.run(initActionConfig, contextLoader);
+                        InitActionService.this.run(initActionConfig);
                     }
                 })
                 .collect(Collectors.toList());
@@ -83,7 +83,7 @@ public class InitActionService {
         executorService.executeRunnablesInParallel(initActionRunnables, 5, TimeUnit.MINUTES);
     }
 
-    public void run(InitActionConfig initActionConfig, ContextLoader contextLoader) {
+    public void run(InitActionConfig initActionConfig) {
 
         try {
             log.info("========================================================");
