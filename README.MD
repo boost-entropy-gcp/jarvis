@@ -121,7 +121,7 @@ testSuite.json example
   "caseAutoDetect": true,
    "executions":[
        {
-           "contextType": "BqQuery",
+           "executionType": "BqQuery",
            "queryPath": "\\src\\test\\resources\\test.sql", (example)
            "executionContext": "{context id}"
        }
