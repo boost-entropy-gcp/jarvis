@@ -1,7 +1,12 @@
-[
-  {
-    "first_name": "fName1",
-    "last_name": "lName1",
-    "age": "1"
-  }
-]
+{
+  "assert.properties": {
+    "filterCondition": "age = 1"
+  },
+  "rows": [
+    {
+      "first_name": "fName1",
+      "last_name": "lName1",
+      "age": "1"
+    }
+  ]
+}

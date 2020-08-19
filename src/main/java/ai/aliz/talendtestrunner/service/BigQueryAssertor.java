@@ -52,6 +52,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -129,6 +130,18 @@ public class BigQueryAssertor {
         
         if (Boolean.TRUE.equals(assertActionConfig.getProperties().get("excludePreviouslyInsertedRows"))) {
             selectQuery = selectQuery + " WHERE " + table + "_INSERTED_BY != '" + InitActionService.TEST_INIT + "'";
+        }
+
+        if (assertActionConfig.getProperties().keySet().contains("filterCondition")) {
+            try {
+                if (!selectQuery.contains("WHERE")) {
+                    selectQuery = selectQuery + " WHERE " + assertActionConfig.getProperties().get("filterCondition");
+                } else {
+                    selectQuery = selectQuery + " AND " + assertActionConfig.getProperties().get("filterCondition");
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
         }
         
         TableResult result = bigQueryExecutor.executeQueryAndGetResult(selectQuery, context);
@@ -244,7 +257,9 @@ public class BigQueryAssertor {
     private Map<String, Object> convertJsonNodeToObjectMap(String tableId, JsonNode jsonNode, FieldList fieldList, Multimap<String, VariablePlaceholder> variablePlaceHolderMap) {
         
         HashMap<String, Object> map = new HashMap<>();
-        
+
+
+
         Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
         while (fields.hasNext()) {
             Map.Entry<String, JsonNode> field = fields.next();
@@ -295,16 +310,16 @@ public class BigQueryAssertor {
                             children.add(childObjectMap);
                         }
                         map.put(fieldSchema.getName(), children);
-                        
+
                     } else {
                         throw new UnsupportedOperationException("Primitive type in array is not supported: " + fieldSchema);
                     }
-                    
+
                 } else {
                     throw new UnsupportedOperationException("Not supported type: " + type);
                 }
             }
-            
+
         }
         return map;
     }
@@ -320,8 +335,13 @@ public class BigQueryAssertor {
         } else {
             sourceFile = new File(assertActionConfig.getDescriptorFolder() + sourcePath);
         }
-        
-        return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
+        try {
+            String text = new String(Files.readAllBytes(Paths.get(sourceFile.getPath())), StandardCharsets.UTF_8);
+            JSONObject object = new JSONObject(text);
+            return String.valueOf(object.get("rows"));
+        } catch (Exception e) {
+            return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
+        }
     }
     
     @SneakyThrows

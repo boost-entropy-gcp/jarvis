@@ -1,12 +1,22 @@
 package ai.aliz.talendtestrunner.testconfig;
 
+import ai.aliz.talendtestrunner.context.Context;
+import ai.aliz.talendtestrunner.context.ContextLoader;
+import ai.aliz.talendtestrunner.context.ContextType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.ToString;
+import org.apache.commons.io.FilenameUtils;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,16 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-
-import org.apache.commons.io.FilenameUtils;
-
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.context.ContextType;
 
 @Data
 @ToString(exclude = "parentSuite")
@@ -251,6 +251,7 @@ public class TestSuite {
                                     properties.put("assertKeyColumns",
                                                    defaultProperties.getOrDefault("assert.assertKeyColumns", Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
                                     properties.put("excludePreviouslyInsertedRows", defaultProperties.getOrDefault("assert.excludePreviouslyInsertedRows", false));
+                                    addAssertProperties(properties, tableDataFile);
                                     assertActionConfigsForFolder.add(assertActionConfig);
                                 }
                             }
@@ -360,6 +361,17 @@ public class TestSuite {
             throw new RuntimeException(e);
         }
         return initActions;
+    }
+
+    @SneakyThrows
+    private static void addAssertProperties(Map<String, Object> properties, File tableDataFile) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String text = new String(Files.readAllBytes(Paths.get(tableDataFile.getPath())), StandardCharsets.UTF_8);
+        if (text.contains("assert.properties")) {
+            JSONObject object = new JSONObject(text);
+            Map<String, Object> property = objectMapper.readValue(object.get("assert.properties").toString(), Map.class);
+            property.forEach(properties::putIfAbsent);
+        }
     }
 
     private static Context getContext(ContextLoader contextLoader, String fileName) {
