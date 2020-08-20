@@ -94,8 +94,7 @@ public class BigQueryExecutor implements QueryExecutor {
         BigQuery bigquery = createBigQueryClient(context);
         try {
             log.info("Executing statement \n{}", completedQuery);
-            Iterable<FieldValueList> result = bigquery.query(queryConfig).iterateAll();
-            log.debug("Query result {}", result);
+            bigquery.query(queryConfig);
         } catch (Exception e) {
             throw new RuntimeException("Failed to execute statement: \n" + completedQuery, e);
         }
