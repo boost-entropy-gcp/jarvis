@@ -20,12 +20,7 @@ public class AssertServiceTest {
         AssertActionConfig assertActionConfig = new AssertActionConfig();
         String path = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("assertTest.json").getFile())).getPath();
         assertActionConfig.getProperties().put("sourcePath", path);
-        String expected = "[\r\n" +
-                "  {\r\n" +
-                "    \"name\": \"test\",\r\n" +
-                "    \"test\": \"test\"\r\n" +
-                "  }\r\n" +
-                "]";
+        String expected = "[{\"name\": \"test\", \"test\": \"test\"}]";
         String actual = TestRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig);
         Assert.assertEquals(expected, actual);
     }
