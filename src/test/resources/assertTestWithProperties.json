@@ -1,0 +1,11 @@
+{
+  "assert.properties": {
+    "filterCondition": "age = 1"
+  },
+  "rows": [
+    {
+      "name": "test",
+      "test": "test"
+    }
+  ]
+}

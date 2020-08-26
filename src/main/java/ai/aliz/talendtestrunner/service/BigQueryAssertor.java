@@ -66,7 +66,8 @@ import org.junit.Assert;
 @Service
 @Slf4j
 public class BigQueryAssertor {
-    
+
+    public static final String FILTER_CONDITION = "filterCondition";
     @Autowired
     private BigQueryExecutor bigQueryExecutor;
     
@@ -116,64 +117,29 @@ public class BigQueryAssertor {
     
     private void assertTableFieldByField(AssertActionConfig assertActionConfig, Context context) throws IOException {
         String project = context.getParameter("project");
-        Map<String, Object> properties = assertActionConfig.getProperties();
-        String dataset = (String) properties.get("dataset");
+        String dataset = (String) assertActionConfig.getProperties().get("dataset");
         String datasetNamePrefix = context.getParameter("datasetNamePrefix");
         if (datasetNamePrefix != null) {
             dataset = datasetNamePrefix + dataset;
         }
-        String table = (String) properties.get("table");
-        
+        String table = (String) assertActionConfig.getProperties().get("table");
         String tableId = String.format(BQ_TABLE_ID_TEMPLATE, project, dataset, table);
-        
-        String selectQuery = String.format("SELECT * FROM %s", tableId);
-        
-        if (Boolean.TRUE.equals(assertActionConfig.getProperties().get("excludePreviouslyInsertedRows"))) {
-            selectQuery = selectQuery + " WHERE " + table + "_INSERTED_BY != '" + InitActionService.TEST_INIT + "'";
-        }
 
-        if (assertActionConfig.getProperties().keySet().contains("filterCondition")) {
-            try {
-                if (!selectQuery.contains("WHERE")) {
-                    selectQuery = selectQuery + " WHERE " + assertActionConfig.getProperties().get("filterCondition");
-                } else {
-                    selectQuery = selectQuery + " AND " + assertActionConfig.getProperties().get("filterCondition");
-                }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-        }
-        
+        String selectQuery = getSelectQuery(assertActionConfig, table, tableId);
+
         TableResult result = bigQueryExecutor.executeQueryAndGetResult(selectQuery, context);
-        
         Schema schema = result.getSchema();
         
         ArrayNode actualJson = bigQueryExecutor.bigQueryResultToJsonArrayNode(result);
-        ArrayNode expectedJson = objectMapper.readValue(getSourceContent(assertActionConfig), ArrayNode.class);
-        
-        List<Map<String, Object>> expectedMap = new ArrayList<>();
-        List<Map<String, Object>> actualMap = new ArrayList<>();
-        
+        ArrayNode expectedJson = objectMapper.readValue(TestRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig), ArrayNode.class);
+
         Multimap<String, VariablePlaceholder> variablePlaceholderMultimap = ArrayListMultimap.create();
-        
-        Iterator<JsonNode> elements = expectedJson.elements();
-        while (elements.hasNext()) {
-            JsonNode jsonNode = elements.next();
-            Map<String, Object> objectMap = convertJsonNodeToObjectMap(tableId, jsonNode, schema.getFields(), variablePlaceholderMultimap);
-            expectedMap.add(objectMap);
-        }
-        
-        Iterator<JsonNode> actualIterator = actualJson.elements();
-        while (actualIterator.hasNext()) {
-            JsonNode jsonNode = actualIterator.next();
-            Map<String, Object> objectMap = convertJsonNodeToObjectMap(tableId, jsonNode, schema.getFields(), variablePlaceholderMultimap);
-            actualMap.add(objectMap);
-        }
-        
+        List<Map<String, Object>> expectedMap = getMapFromJson(tableId, schema, expectedJson, variablePlaceholderMultimap);
+        List<Map<String, Object>> actualMap = getMapFromJson(tableId, schema, actualJson, variablePlaceholderMultimap);
+
         List<String> assertKeyColumns = (List<String>) assertActionConfig.getProperties().get("assertKeyColumns");
         
         List<String> differences = new ArrayList<>();
-        
         Map<List<Object>, Map<String, Object>> expectedNodeMap = createKeyedMap(expectedMap, assertKeyColumns, differences, false);
         Map<List<Object>, Map<String, Object>> actualNodemap = createKeyedMap(actualMap, assertKeyColumns, differences, true);
         
@@ -181,6 +147,13 @@ public class BigQueryAssertor {
             List<Object> key = assertKeyColumns.stream().map(columnName -> node.get(columnName)).collect(Collectors.toList());
             actualNodemap.put(key, node);
         });
+
+        addDifferences(variablePlaceholderMultimap, differences, expectedNodeMap, actualNodemap);
+
+        Assert.assertTrue(differences.stream().collect(Collectors.joining("\n")), differences.isEmpty());
+    }
+
+    private void addDifferences(Multimap<String, VariablePlaceholder> variablePlaceholderMultimap, List<String> differences, Map<List<Object>, Map<String, Object>> expectedNodeMap, Map<List<Object>, Map<String, Object>> actualNodemap) {
         log.info("Asserting key-wise matching...");
         Sets.SetView<List<Object>> expectedButNotIntheActual = Sets.difference(expectedNodeMap.keySet(), actualNodemap.keySet());
         if (!expectedButNotIntheActual.isEmpty()) {
@@ -190,7 +163,7 @@ public class BigQueryAssertor {
                 differences.add("Expected but not in the result: " + key);
             });
         }
-        
+
         Sets.SetView<List<Object>> notExpectedButIntheActual = Sets.difference(actualNodemap.keySet(), expectedNodeMap.keySet());
         if (!notExpectedButIntheActual.isEmpty()) {
             log.warn("In the result but not expected");
@@ -199,17 +172,17 @@ public class BigQueryAssertor {
                 differences.add("In the result but not expected: " + key);
             });
         }
-        
+
         log.info("Asserting values in key-wise matching entities...");
         Sets.intersection(actualNodemap.keySet(), expectedNodeMap.keySet())
             .stream()
             .forEach(key -> {
-            
+
                          Map<String, Object> actual = actualNodemap.get(key);
                          Map<String, Object> expected = expectedNodeMap.get(key);
-            
+
                          for (Map.Entry<String, Object> entry : expected.entrySet()) {
-                
+
                              Object actualValue = actual.get(entry.getKey());
                              Object expectedValue = entry.getValue();
                              if (expectedValue instanceof VariablePlaceholder) {
@@ -221,9 +194,9 @@ public class BigQueryAssertor {
                                  differences.add(diff);
                              }
                          }
-            
+
                      }
-        
+
             );
         log.info("Asserting placeholder variables...");
         variablePlaceholderMultimap.keySet().forEach(variableName -> {
@@ -235,10 +208,37 @@ public class BigQueryAssertor {
                 log.error(diff);
             }
         });
-        
-        Assert.assertTrue(differences.stream().collect(Collectors.joining("\n")), differences.isEmpty());
     }
-    
+
+    private List<Map<String, Object>> getMapFromJson(String tableId, Schema schema, ArrayNode expectedJson, Multimap<String, VariablePlaceholder> variablePlaceholderMultimap) {
+        List<Map<String, Object>> expectedMap = new ArrayList<>();
+        Iterator<JsonNode> elements = expectedJson.elements();
+        while (elements.hasNext()) {
+            JsonNode jsonNode = elements.next();
+            Map<String, Object> objectMap = convertJsonNodeToObjectMap(tableId, jsonNode, schema.getFields(), variablePlaceholderMultimap);
+            expectedMap.add(objectMap);
+        }
+        return expectedMap;
+    }
+
+    private String getSelectQuery(AssertActionConfig assertActionConfig, String table, String tableId) {
+        String selectQuery = String.format("SELECT * FROM %s", tableId);
+        Map<String, Object> assertProperties = assertActionConfig.getProperties();
+
+        if (Boolean.TRUE.equals(assertProperties.get("excludePreviouslyInsertedRows"))) {
+            selectQuery = selectQuery + " WHERE " + table + "_INSERTED_BY != '" + InitActionService.TEST_INIT + "'";
+        }
+
+        if (assertProperties.keySet().contains(FILTER_CONDITION)) {
+            if (!selectQuery.contains("WHERE")) {
+                selectQuery = selectQuery + " WHERE " + assertProperties.get(FILTER_CONDITION);
+            } else {
+                selectQuery = selectQuery + " AND " + assertProperties.get(FILTER_CONDITION);
+            }
+        }
+        return selectQuery;
+    }
+
     private Map<List<Object>, Map<String, Object>> createKeyedMap(List<Map<String, Object>> objects, List<String> assertKeyColumns, List<String> differences, boolean actual) {
         Map<List<Object>, Map<String, Object>> keyedMap = new HashMap<>();
         objects.forEach(node -> {
@@ -322,26 +322,6 @@ public class BigQueryAssertor {
 
         }
         return map;
-    }
-    
-    @SneakyThrows
-    private String getSourceContent(AssertActionConfig assertActionConfig) {
-        
-        String sourcePath = (String) assertActionConfig.getProperties().get("sourcePath");
-        File sourceFile;
-        if (Paths.get(sourcePath).isAbsolute()) {
-            sourceFile = new File(sourcePath);
-            
-        } else {
-            sourceFile = new File(assertActionConfig.getDescriptorFolder() + sourcePath);
-        }
-        try {
-            String text = new String(Files.readAllBytes(Paths.get(sourceFile.getPath())), StandardCharsets.UTF_8);
-            JSONObject object = new JSONObject(text);
-            return String.valueOf(object.get("rows"));
-        } catch (Exception e) {
-            return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
-        }
     }
     
     @SneakyThrows

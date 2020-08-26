@@ -3,7 +3,7 @@ package ai.aliz.talendtestrunner.testconfig;
 import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.context.ContextType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ai.aliz.talendtestrunner.service.ActionConfigForBq;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -11,12 +11,10 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.ToString;
 import org.apache.commons.io.FilenameUtils;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -243,16 +241,7 @@ public class TestSuite {
                                     Preconditions.checkArgument(Files.isRegularFile(tableDataFile.toPath()),
                                                                 "The dataset folder should contain only json files for the different tables: %s",
                                                                 tableDataFile);
-                                    String tableName = FilenameUtils.getBaseName(tableDataFile.getName());
-                                    AssertActionConfig assertActionConfig = new AssertActionConfig();
-                                    assertActionConfig.setType("AssertDataEquals");
-                                    assertActionConfig.setSystem(system);
-                                    Map<String, Object> properties = addBqProperties(datasetName, tableDataFile, "json", assertActionConfig, tableName);
-                                    properties.put("assertKeyColumns",
-                                                   defaultProperties.getOrDefault("assert.assertKeyColumns", Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
-                                    properties.put("excludePreviouslyInsertedRows", defaultProperties.getOrDefault("assert.excludePreviouslyInsertedRows", false));
-                                    addAssertProperties(properties, tableDataFile);
-                                    assertActionConfigsForFolder.add(assertActionConfig);
+                                    assertActionConfigsForFolder.add(ActionConfigForBq.getAssertActionConfigForBq(defaultProperties, system, datasetName, tableDataFile));
                                 }
                             }
                             break;
@@ -261,20 +250,12 @@ public class TestSuite {
                                 Preconditions.checkArgument(Files.isRegularFile(tableDataFile.toPath()),
                                                             "The assert folder should contain only json files for the different tables: %s",
                                                             tableDataFile);
-                                AssertActionConfig assertActionConfig = new AssertActionConfig();
-                                assertActionConfig.setType("AssertTalendJobState");
-                                assertActionConfig.setSystem(system);
-                                assertActionConfig.getProperties().put("sourcePath", tableDataFile.getAbsolutePath());
-                                assertActionConfigsForFolder.add(assertActionConfig);
-
+                                assertActionConfigsForFolder.add(getAssertActionConfigForMySQL(system, tableDataFile));
                             }
                             break;
-
                         default:
                             throw new UnsupportedOperationException("Not supported context type for assert " + context.getContextType());
-
                     }
-
                 } else {
                     throw new UnsupportedOperationException("Files are not supported in assert autodetect: " + assertActionConfigPath);
                 }
@@ -285,6 +266,14 @@ public class TestSuite {
             throw new RuntimeException(e);
         }
         return assertActionConfigs;
+    }
+
+    private static AssertActionConfig getAssertActionConfigForMySQL(String system, File tableDataFile) {
+        AssertActionConfig assertActionConfig = new AssertActionConfig();
+        assertActionConfig.setType("AssertTalendJobState");
+        assertActionConfig.setSystem(system);
+        assertActionConfig.getProperties().put("sourcePath", tableDataFile.getAbsolutePath());
+        return assertActionConfig;
     }
 
     private static List<InitActionConfig> getInitActionConfigs(ContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
@@ -336,16 +325,7 @@ public class TestSuite {
                                 String datasetName = datasetFolder.getName();
                                 for (File tableJsonFile : datasetFolder.listFiles()) {
                                     Preconditions.checkArgument(tableJsonFile.isFile());
-                                    String tableJsonFileName = tableJsonFile.getName();
-                                    String extension = FilenameUtils.getExtension(tableJsonFileName);
-                                    InitActionConfig bqLoadInitActionConfig = new InitActionConfig();
-                                    bqLoadInitActionConfig.setSystem(system);
-                                    String tableName = FilenameUtils.getBaseName(tableJsonFileName);
-                                    bqLoadInitActionConfig.setType("BQLoad");
-                                    Map<String, Object> properties = addBqProperties(datasetName, tableJsonFile, extension, bqLoadInitActionConfig, tableName);
-                                    properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + context.getId() + ".noMetadatAddition", true));
-
-                                    initActionConfigs.add(bqLoadInitActionConfig);
+                                    initActionConfigs.add(ActionConfigForBq.getInitActionConfigForBq(defaultProperties, context, system, datasetName, tableJsonFile));
                                 }
                             }
                             break;
@@ -363,30 +343,10 @@ public class TestSuite {
         return initActions;
     }
 
-    @SneakyThrows
-    private static void addAssertProperties(Map<String, Object> properties, File tableDataFile) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String text = new String(Files.readAllBytes(Paths.get(tableDataFile.getPath())), StandardCharsets.UTF_8);
-        if (text.contains("assert.properties")) {
-            JSONObject object = new JSONObject(text);
-            Map<String, Object> property = objectMapper.readValue(object.get("assert.properties").toString(), Map.class);
-            property.forEach(properties::putIfAbsent);
-        }
-    }
-
     private static Context getContext(ContextLoader contextLoader, String fileName) {
         Context context = contextLoader.getContext(fileName);
         Preconditions.checkNotNull(context, "No context exists with name: %s", fileName);
         return context;
-    }
-
-    private static Map<String, Object> addBqProperties(String datasetName, File tableJsonFile, String extension, StepConfig stepConfig, String tableName) {
-        Map<String, Object> properties = stepConfig.getProperties();
-        properties.put("sourcePath", tableJsonFile.getAbsolutePath());
-        properties.put("dataset", datasetName);
-        properties.put("table", tableName);
-        properties.put("sourceFormat", extension);
-        return properties;
     }
 
     private static Path getTargetFolderPath(File testCaseFolder, String folderName) {

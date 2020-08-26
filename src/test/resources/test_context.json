@@ -1,0 +1,9 @@
+[
+  {
+    "id": "TEST_ID",
+    "contextType": "BigQuery",
+    "parameters": {
+      "project": "test_project"
+    }
+  }
+]
