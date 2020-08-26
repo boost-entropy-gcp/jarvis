@@ -1,4 +1,6 @@
-{
-  "name": "test",
-  "test": "test"
-}
+[
+  {
+    "name": "test",
+    "test": "test"
+  }
+]
