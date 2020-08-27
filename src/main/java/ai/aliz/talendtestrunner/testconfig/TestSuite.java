@@ -111,7 +111,7 @@ public class TestSuite {
     public static TestSuite parseFromJson(File testConfigFile, TestSuite parentSuite, ContextLoader contextLoader) {
         
         Gson gson = new Gson();
-        TestCase testCase = new TestCase();
+        final List<ExecutionActionConfig> executionActionConfigs = Lists.newArrayList();
         TestSuite testSuite = new TestSuite();
         testSuite.setParentSuite(parentSuite);
         if (parentSuite != null) {
@@ -133,13 +133,13 @@ public class TestSuite {
 
             if (testSuiteMap.get(EXECUTIONS_KEY) != null) {
                 List<Map<String, String>> executionActions = (List<Map<String, String>>) testSuiteMap.getOrDefault(EXECUTIONS_KEY, Collections.singletonMap("type", "noOps"));
-                List<ExecutionActionConfig> executionActionConfigs = getExecutionActionConfigs(contextLoader, executionActions);
-                testCase.getExecutionActionConfigs().addAll(executionActionConfigs);
+                executionActionConfigs.addAll(getExecutionActionConfigs(contextLoader, executionActions));
             }
 
             if (Boolean.TRUE.equals(caseAutoDetect)) {
                 List<TestCase> testCases = Files.list(Paths.get(descriptorFolder)).filter(Files::isDirectory).map(path -> {
                     File testCaseFolder = path.toFile();
+                    TestCase testCase = new TestCase();
                     testCase.setPath(testCaseFolder.getAbsolutePath());
                     testCase.setName(testCaseFolder.getName());
 
@@ -149,7 +149,7 @@ public class TestSuite {
 
                     List<AssertActionConfig> assertActionConfigs = getAssertActionConfigs(contextLoader, defaultProperties, testCaseFolder);
                     testCase.getAssertActionConfigs().addAll(assertActionConfigs);
-                    
+                    testCase.getExecutionActionConfigs().addAll(executionActionConfigs);
                     return testCase;
                 }).collect(Collectors.toList());
                 
