@@ -12,7 +12,6 @@ import java.util.Map;
 import static org.hamcrest.core.Is.is;
 
 @RunWith(JUnit4.class)
-@Ignore
 public class PlaceholderResolverTest {
 
     @Test

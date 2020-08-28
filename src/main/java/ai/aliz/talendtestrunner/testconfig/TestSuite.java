@@ -180,7 +180,7 @@ public class TestSuite {
             for (Map<String, Object> initActionMap : initActions) {
                 InitActionConfig initActionConfig = new InitActionConfig();
                 initActionConfig.setSystem((String) initActionMap.remove(SYSTEM));
-                initActionConfig.setType((String) initActionMap.remove(TYPE));
+                initActionConfig.setType(InitActionType.valueOf((String) initActionMap.remove(TYPE)));
                 initActionConfig.setDescriptorFolder(descriptorFolder + caseName + File.separator);
                 initActionConfig.getProperties().putAll(initActionMap);
 

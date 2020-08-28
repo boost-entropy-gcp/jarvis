@@ -4,6 +4,7 @@ import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.context.ContextType;
 import ai.aliz.talendtestrunner.testconfig.InitActionConfig;
+import ai.aliz.talendtestrunner.testconfig.InitActionType;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FilenameUtils;
@@ -49,7 +50,7 @@ public class InitActionConfigCreator {
                     switch (extension) {
                         case "bql":
                         case "sql":
-                            initActionConfig.setType("SQLExec");
+                            initActionConfig.setType(InitActionType.SQLExec);
                             initActionConfig.getProperties().put(SOURCE_PATH, initActionFile.toFile().getAbsolutePath());
                             break;
                         default:
@@ -92,7 +93,7 @@ public class InitActionConfigCreator {
 
     private static InitActionConfig getInitActionConfigForSFTP(Path initActionFile, String system) {
         InitActionConfig initActionConfig = new InitActionConfig();
-        initActionConfig.setType("SFTPLoad");
+        initActionConfig.setType(InitActionType.SFTPLoad);
         initActionConfig.setSystem(system);
         initActionConfig.getProperties().put(SOURCE_PATH, initActionFile.toFile().getAbsolutePath());
         return initActionConfig;

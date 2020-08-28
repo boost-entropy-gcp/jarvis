@@ -1,5 +1,6 @@
 package ai.aliz.talendtestrunner.db;
 
+import ai.aliz.talendtestrunner.service.BigQueryService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +24,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.api.client.util.Lists;
 import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.Field;
 import com.google.cloud.bigquery.FieldList;
 import com.google.cloud.bigquery.FieldValue;
@@ -34,6 +34,7 @@ import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ai.aliz.talendtestrunner.context.Context;
@@ -50,6 +51,12 @@ public class BigQueryExecutor implements QueryExecutor {
     private ExecutorServiceImpl executorService;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private BigQuery bigQuery;
+
+    @Autowired
+    private BigQueryService bigQueryService;
     
     public void executeScript(String query, Context context) {
         String[] splits = query.split(";");
@@ -91,19 +98,16 @@ public class BigQueryExecutor implements QueryExecutor {
         String completedQuery = placeholderResolver.resolve(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
-        BigQuery bigquery = createBigQueryClient(context);
+        bigQuery = bigQueryService.createBigQueryClient(context);
         try {
             log.info("Executing statement \n{}", completedQuery);
-            Iterable<FieldValueList> result = bigquery.query(queryConfig).iterateAll();
+            Iterable<FieldValueList> result = bigQuery.query(queryConfig).iterateAll();
             log.debug("Query result {}", result);
         } catch (Exception e) {
             throw new RuntimeException("Failed to execute statement: \n" + completedQuery, e);
         }
     }
-    
-    private BigQuery createBigQueryClient(Context context) {
-        return BigQueryOptions.newBuilder().setProjectId(context.getParameters().get("project")).build().getService();
-    }
+
     
     public String executeQuery(String query, Context context) {
         
@@ -118,10 +122,10 @@ public class BigQueryExecutor implements QueryExecutor {
         String completedQuery = placeholderResolver.resolve(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
-        BigQuery bigquery = createBigQueryClient(context);
+        bigQuery = bigQueryService.createBigQueryClient(context);
         try {
             log.info("Executing query {}", query);
-            TableResult queryResult = bigquery.query(queryConfig);
+            TableResult queryResult = bigQuery.query(queryConfig);
             
             return queryResult;
         } catch (Exception e) {
@@ -248,9 +252,9 @@ public class BigQueryExecutor implements QueryExecutor {
     }
     
     public Long getTableLastModifiedAt(Context context, String project, String dataset, String table) {
-        BigQuery bigquery = createBigQueryClient(context);
+        bigQuery = bigQueryService.createBigQueryClient(context);
         log.info("Getting last modified at for table: {}.{}.{}", project, dataset, table);
-        Table bqTable = bigquery.getTable(TableId.of(project, dataset, table));
+        Table bqTable = bigQuery.getTable(TableId.of(project, dataset, table));
         
         return bqTable.getLastModifiedTime();
         

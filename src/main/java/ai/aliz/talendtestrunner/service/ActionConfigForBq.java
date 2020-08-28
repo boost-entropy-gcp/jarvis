@@ -4,6 +4,7 @@ import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.helper.Helper;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
 import ai.aliz.talendtestrunner.testconfig.InitActionConfig;
+import ai.aliz.talendtestrunner.testconfig.InitActionType;
 import ai.aliz.talendtestrunner.testconfig.StepConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -30,7 +31,7 @@ public class ActionConfigForBq {
         String extension = FilenameUtils.getExtension(tableJsonFileName);
         bqLoadInitActionConfig.setSystem(system);
         String tableName = FilenameUtils.getBaseName(tableJsonFileName);
-        bqLoadInitActionConfig.setType("BQLoad");
+        bqLoadInitActionConfig.setType(InitActionType.BQLoad);
         Map<String, Object> properties = addBqProperties(datasetName, tableJsonFile, extension, bqLoadInitActionConfig, tableName);
         properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + contextId + ".noMetadatAddition", true));
         return bqLoadInitActionConfig;

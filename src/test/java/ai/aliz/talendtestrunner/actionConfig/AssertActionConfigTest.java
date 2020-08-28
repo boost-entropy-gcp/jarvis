@@ -2,6 +2,7 @@ package ai.aliz.talendtestrunner.actionConfig;
 
 import ai.aliz.talendtestrunner.IntegrationTestRunner;
 import ai.aliz.talendtestrunner.context.ContextLoader;
+import ai.aliz.talendtestrunner.helper.TestHelper;
 import ai.aliz.talendtestrunner.service.ActionConfigForBq;
 import ai.aliz.talendtestrunner.service.AssertActionConfigCreator;
 import ai.aliz.talendtestrunner.service.AssertServiceTest;
@@ -59,7 +60,7 @@ public class AssertActionConfigTest {
         AssertActionConfig assertActionConfig = assertActionConfigs.get(0);
 
 
-        assertThat(assertActionConfig.getProperties().get("sourcePath"), is(configPath + addSeparator("\\assert\\TEST_ID\\test_dataset\\assertTest.json")));
+        assertThat(assertActionConfig.getProperties().get("sourcePath"), is(configPath + TestHelper.addSeparator("\\assert\\TEST_ID\\test_dataset\\assertTest.json")));
         assertThat(assertActionConfig.getSystem(), is("TEST_ID"));
         assertThat(assertActionConfig.getType(), is("AssertDataEquals"));
     }
@@ -74,9 +75,5 @@ public class AssertActionConfigTest {
         assertThat(assertActionConfig.getProperties().get("sourcePath"), is(file.getPath()));
 
         return assertActionConfig;
-    }
-
-    private String addSeparator(String path) {
-        return path.replace('\\', File.separatorChar);
     }
 }

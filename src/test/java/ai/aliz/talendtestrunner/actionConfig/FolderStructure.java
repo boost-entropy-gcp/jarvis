@@ -1,6 +1,5 @@
 package ai.aliz.talendtestrunner.actionConfig;
 
-import ai.aliz.talendtestrunner.IntegrationTestRunner;
 import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.service.AssertServiceTest;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
@@ -9,17 +8,14 @@ import ai.aliz.talendtestrunner.testconfig.TestCase;
 import ai.aliz.talendtestrunner.testconfig.TestSuite;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
-import java.util.Properties;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -34,10 +30,7 @@ public class FolderStructure {
         TestSuite testSuite = new TestSuite();
         ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
         String contextPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test_context.json").getFile())).getPath();
-        InputStream input = IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties");
-        Properties properties = new Properties();
-        properties.load(input);
-        String configPath = properties.getProperty("test.structure.config.path");
+        String configPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test_structure").getFile())).getPath();
         contextLoader.parseContext(contextPath);
         List<TestCase> testCases = testSuite.readTestConfig(configPath, contextLoader).getTestCases();
 
