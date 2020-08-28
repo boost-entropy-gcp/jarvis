@@ -54,8 +54,8 @@ public class InitActionConfigTest {
 
         List<InitActionConfig> initActionConfigs = initActionConfigCreator.getInitActionConfigs(contextLoader, defaultP, new File(configPath));
 
-        InitActionConfig initActionConfig1 = initActionConfigs.get(0);
-        InitActionConfig initActionConfig2 = initActionConfigs.get(1);
+        InitActionConfig initActionConfig1 = initActionConfigs.stream().filter(config -> config.getType().equals("BQLoad")).findFirst().get();
+        InitActionConfig initActionConfig2 = initActionConfigs.stream().filter(config -> config.getType().equals("SQLExec")).findFirst().get();
 
         assertThat(initActionConfig1.getType(), is("BQLoad"));
         assertThat(initActionConfig1.getProperties().get("sourcePath"), is(configPath + addSeparator("\\pre\\TEST_ID\\test_dataset\\init.json")));
