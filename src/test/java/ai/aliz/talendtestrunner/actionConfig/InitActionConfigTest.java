@@ -50,10 +50,7 @@ public class InitActionConfigTest {
         ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
         String contextPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test_context.json").getFile())).getPath();
         contextLoader.parseContext(contextPath);
-        InputStream input = IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties");
-        Properties properties = new Properties();
-        properties.load(input);
-        String configPath = properties.getProperty("test.structure.config.path") + "\\test_json";
+        String configPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test_structure").getFile())).getPath() + "\\test_json";
 
         List<InitActionConfig> initActionConfigs = initActionConfigCreator.getInitActionConfigs(contextLoader, defaultP, new File(configPath));
 
