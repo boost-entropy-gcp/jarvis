@@ -1,18 +1,9 @@
 package ai.aliz.talendtestrunner.db;
 
+import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.service.BigQueryService;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
+import ai.aliz.talendtestrunner.service.ExecutorServiceImpl;
+import ai.aliz.talendtestrunner.util.PlaceholderResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BaseJsonNode;
@@ -33,14 +24,21 @@ import com.google.cloud.bigquery.QueryJobConfiguration;
 import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.service.ExecutorServiceImpl;
-import ai.aliz.talendtestrunner.service.InitActionService;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static ai.aliz.talendtestrunner.helper.Helper.TEST_INIT;
 
 @Component
 @AllArgsConstructor
@@ -246,7 +244,7 @@ public class BigQueryExecutor implements QueryExecutor {
     
     public int insertedRowCount(String tableId, String tableName, Context context) {
         
-        TableResult tableResult = executeQueryAndGetResult("SELECT COUNT(*) FROM `" + tableId + "`WHERE " + tableName + "_INSERTED_BY != '" + InitActionService.TEST_INIT + "'", context);
+        TableResult tableResult = executeQueryAndGetResult("SELECT COUNT(*) FROM `" + tableId + "`WHERE " + tableName + "_INSERTED_BY != '" + TEST_INIT + "'", context);
         long count = tableResult.getValues().iterator().next().get(0).getLongValue();
         return (int) count;
     }

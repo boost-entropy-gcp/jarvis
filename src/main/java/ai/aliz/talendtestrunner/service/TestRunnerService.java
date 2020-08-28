@@ -7,7 +7,7 @@ import ai.aliz.talendtestrunner.context.ContextType;
 import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.factory.TestStepFactory;
 import ai.aliz.talendtestrunner.service.executor.AirflowExecutor;
-import ai.aliz.talendtestrunner.service.executor.BqQueryExecutor;
+import ai.aliz.talendtestrunner.service.executor.BqScriptExecutor;
 import ai.aliz.talendtestrunner.service.executor.Executor;
 import ai.aliz.talendtestrunner.service.executor.NoOpsExecutor;
 import ai.aliz.talendtestrunner.service.executor.TalendExecutor;
@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -55,7 +56,7 @@ public class TestRunnerService {
     private static Map<ExecutionType, Class<? extends Executor>> executorMap = new HashMap<>();
     
     static {
-        executorMap.put(ExecutionType.BqQuery, BqQueryExecutor.class);
+        executorMap.put(ExecutionType.BqQuery, BqScriptExecutor.class);
         executorMap.put(ExecutionType.Airflow, AirflowExecutor.class);
         executorMap.put(ExecutionType.Talend, TalendExecutor.class);
         executorMap.put(ExecutionType.NoOps, NoOpsExecutor.class);
@@ -67,7 +68,7 @@ public class TestRunnerService {
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
     
-            Class<? extends Executor> executorClass = executorMap.get(executionActionConfig.getType());
+            Class<? extends Executor> executorClass = Objects.requireNonNull(executorMap.get(executionActionConfig.getType()));
             Executor executor = applicationContext.getBean(executorClass);
             executor.execute(executionActionConfig);
         });

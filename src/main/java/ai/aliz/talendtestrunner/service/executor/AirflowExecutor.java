@@ -9,6 +9,6 @@ public class AirflowExecutor implements Executor {
 
     @Override
     public void execute(ExecutionActionConfig config) {
-
+        throw new UnsupportedOperationException("Airflow is not implemented.");
     }
 }

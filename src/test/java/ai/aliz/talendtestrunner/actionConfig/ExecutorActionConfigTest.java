@@ -1,13 +1,12 @@
 package ai.aliz.talendtestrunner.actionConfig;
 
 import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.helper.Helper;
 import ai.aliz.talendtestrunner.helper.TestHelper;
 import ai.aliz.talendtestrunner.service.AssertServiceTest;
 import ai.aliz.talendtestrunner.service.ExecutionActionConfigCreator;
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
+import ai.aliz.talendtestrunner.testconfig.ExecutionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -42,7 +42,9 @@ public class ExecutorActionConfigTest {
 
         List<ExecutionActionConfig> executionActionConfigs = executionActionConfigCreator.getExecutionActionConfigs(contextLoader, executions);
 
-        Assert.assertThat(executionActionConfigs.get(0).getProperties().get("sourcePath"), is(TestHelper.addSeparator("C:\\test\\project\\test\\test.json")));
-        Assert.assertThat(executionActionConfigs.get(0).getType(), is("E"));
+        ExecutionActionConfig executionActionConfig = executionActionConfigs.get(0);
+        assertThat(executionActionConfig.getProperties().get("sourcePath"), is(TestHelper.addSeparator("C:\\test\\project\\test\\test.json")));
+        assertThat(executionActionConfig.getType(), is(ExecutionType.BqQuery));
+        assertThat(executionActionConfig.getExecutionContext(), is("TEST"));
     }
 }

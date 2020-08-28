@@ -10,7 +10,7 @@ import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 
 @Service
-public class BqQueryExecutor implements Executor {
+public class BqScriptExecutor implements Executor {
     
     @Autowired
     private ContextLoader contextLoader;
