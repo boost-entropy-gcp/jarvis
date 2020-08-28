@@ -1,6 +1,5 @@
 package ai.aliz.talendtestrunner.actionConfig;
 
-import ai.aliz.talendtestrunner.IntegrationTestRunner;
 import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.helper.TestHelper;
 import ai.aliz.talendtestrunner.service.ActionConfigForBq;
@@ -15,12 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
