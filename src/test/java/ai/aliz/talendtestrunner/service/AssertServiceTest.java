@@ -2,10 +2,12 @@ package ai.aliz.talendtestrunner.service;
 
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
+import com.google.cloud.bigquery.BigQuery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
@@ -14,6 +16,9 @@ import java.util.Objects;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class AssertServiceTest {
+
+    @MockBean
+    private BigQuery bigQuery;
 
     @Test
     public void testReadAssertJsonFile() {

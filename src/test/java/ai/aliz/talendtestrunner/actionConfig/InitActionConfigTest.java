@@ -8,10 +8,12 @@ import ai.aliz.talendtestrunner.service.InitActionConfigCreator;
 import ai.aliz.talendtestrunner.testconfig.InitActionConfig;
 import ai.aliz.talendtestrunner.testconfig.InitActionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.bigquery.BigQuery;
 import lombok.SneakyThrows;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
@@ -30,6 +32,9 @@ public class InitActionConfigTest {
     private ActionConfigForBq actionConfigForBq = new ActionConfigForBq();
 
     private InitActionConfigCreator initActionConfigCreator = new InitActionConfigCreator();
+
+    @MockBean
+    private BigQuery bigQuery;
 
     @Test
     public void createInitActionConfigForBqTest() {
