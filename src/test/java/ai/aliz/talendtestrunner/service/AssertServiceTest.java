@@ -18,7 +18,7 @@ public class AssertServiceTest {
     @Test
     public void testReadAssertJsonFile() {
         AssertActionConfig assertActionConfig = new AssertActionConfig();
-        String path = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("assertTest.json").getFile())).getPath();
+        String path = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test.json").getFile())).getPath();
         assertActionConfig.getProperties().put("sourcePath", path);
         String expected = "[{\"name\": \"test\", \"test\": \"test\"}]";
         String actual = TestRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig);

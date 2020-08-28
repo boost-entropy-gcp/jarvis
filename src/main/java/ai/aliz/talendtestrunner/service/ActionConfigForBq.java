@@ -1,6 +1,7 @@
 package ai.aliz.talendtestrunner.service;
 
 import ai.aliz.talendtestrunner.context.Context;
+import ai.aliz.talendtestrunner.helper.Helper;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
 import ai.aliz.talendtestrunner.testconfig.InitActionConfig;
 import ai.aliz.talendtestrunner.testconfig.StepConfig;
@@ -16,9 +17,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import static ai.aliz.talendtestrunner.helper.Helper.DATASET;
+import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_FORMAT;
+import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
+import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
+
 public class ActionConfigForBq {
 
-    public static InitActionConfig getInitActionConfigForBq(Map<String, Object> defaultProperties, Context context, String system, String datasetName, File tableJsonFile) {
+    public static InitActionConfig getInitActionConfigForBq(Map<String, Object> defaultProperties, String contextId, String system, String datasetName, File tableJsonFile) {
         InitActionConfig bqLoadInitActionConfig = new InitActionConfig();
         String tableJsonFileName = tableJsonFile.getName();
         String extension = FilenameUtils.getExtension(tableJsonFileName);
@@ -26,7 +32,7 @@ public class ActionConfigForBq {
         String tableName = FilenameUtils.getBaseName(tableJsonFileName);
         bqLoadInitActionConfig.setType("BQLoad");
         Map<String, Object> properties = addBqProperties(datasetName, tableJsonFile, extension, bqLoadInitActionConfig, tableName);
-        properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + context.getId() + ".noMetadatAddition", true));
+        properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + contextId + ".noMetadatAddition", true));
         return bqLoadInitActionConfig;
     }
 
@@ -45,10 +51,10 @@ public class ActionConfigForBq {
 
     private static Map<String, Object> addBqProperties(String datasetName, File tableJsonFile, String extension, StepConfig stepConfig, String tableName) {
         Map<String, Object> properties = stepConfig.getProperties();
-        properties.put("sourcePath", tableJsonFile.getAbsolutePath());
-        properties.put("dataset", datasetName);
-        properties.put("table", tableName);
-        properties.put("sourceFormat", extension);
+        properties.put(SOURCE_PATH, tableJsonFile.getAbsolutePath());
+        properties.put(DATASET, datasetName);
+        properties.put(TABLE, tableName);
+        properties.put(SOURCE_FORMAT, extension);
         return properties;
     }
 

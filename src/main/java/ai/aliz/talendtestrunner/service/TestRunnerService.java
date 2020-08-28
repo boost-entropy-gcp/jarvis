@@ -1,10 +1,20 @@
 package ai.aliz.talendtestrunner.service;
 
+import ai.aliz.talendtestrunner.config.AppConfig;
+import ai.aliz.talendtestrunner.context.Context;
+import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.context.ContextType;
+import ai.aliz.talendtestrunner.db.BigQueryExecutor;
+import ai.aliz.talendtestrunner.factory.TestStepFactory;
+import ai.aliz.talendtestrunner.testcase.TestCase;
+import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
+import ai.aliz.talendtestrunner.util.TestCollector;
+import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -13,23 +23,15 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
-
-import ai.aliz.talendtestrunner.config.AppConfig;
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.db.BigQueryExecutor;
-import ai.aliz.talendtestrunner.factory.TestStepFactory;
-import ai.aliz.talendtestrunner.testcase.TestCase;
-import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.util.TestCollector;
-import ai.aliz.talendtestrunner.util.TestRunnerUtil;
+import static ai.aliz.talendtestrunner.helper.Helper.PROJECT;
+import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
+import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class TestRunnerService {
-    
+
     private final ContextLoader contextLoader;
     private final TalendApiService talendApiService;
     private final TestStepFactory testStepFactory;
@@ -121,7 +123,7 @@ public class TestRunnerService {
     private void runTalendJob(ContextLoader contextLoader, ExecutionActionConfig executionActionConfig, ai.aliz.talendtestrunner.testconfig.TestCase testCase) {
         Context talendDatabaseContext = contextLoader.getContext("TalendDatabase");
 
-        String taskName = executionActionConfig.getProperties().get("sourcePath").toString();
+        String taskName = executionActionConfig.getProperties().get(SOURCE_PATH).toString();
 
         if (config.isManualJobRun()) {
 
@@ -150,8 +152,8 @@ public class TestRunnerService {
 
                 Context context = contextLoader.getContext(bqTableAssertActionConfig.getSystem());
                 String dataset = TestRunnerUtil.getDatasetName(properties, context);
-                String table =(String) properties.get("table");
-                String project = context.getParameters().get("project");
+                String table =(String) properties.get(TABLE);
+                String project = context.getParameters().get(PROJECT);
                 Long lastModifiedAt = bigQueryExecutor.getTableLastModifiedAt(context, project, dataset, table);
 
                 while (lastModifiedAt.equals(bigQueryExecutor.getTableLastModifiedAt(context, project, dataset, table))) {

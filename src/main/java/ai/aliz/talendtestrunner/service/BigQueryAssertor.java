@@ -1,16 +1,39 @@
 package ai.aliz.talendtestrunner.service;
 
+import ai.aliz.talendtestrunner.context.Context;
+import ai.aliz.talendtestrunner.db.BigQueryExecutor;
+import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
+import ai.aliz.talendtestrunner.util.TestRunnerUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.flipkart.zjsonpatch.JsonDiff;
+import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.FieldList;
+import com.google.cloud.bigquery.LegacySQLTypeName;
+import com.google.cloud.bigquery.Schema;
+import com.google.cloud.bigquery.TableResult;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,37 +54,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.flipkart.zjsonpatch.JsonDiff;
-import com.google.cloud.bigquery.Field;
-import com.google.cloud.bigquery.FieldList;
-import com.google.cloud.bigquery.LegacySQLTypeName;
-import com.google.cloud.bigquery.Schema;
-import com.google.cloud.bigquery.TableResult;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import static ai.aliz.talendtestrunner.helper.Helper.DATASET;
+import static ai.aliz.talendtestrunner.helper.Helper.PROJECT;
+import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.db.BigQueryExecutor;
-import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.util.TestRunnerUtil;
-
-import org.junit.Assert;
 
 @Service
 @Slf4j
@@ -645,14 +641,14 @@ public class BigQueryAssertor {
     }
     
     public void assertNoChange(AssertActionConfig assertActionConfig, Context context) {
-        String project = context.getParameter("project");
+        String project = context.getParameter(PROJECT);
         Map<String, Object> properties = assertActionConfig.getProperties();
-        String dataset = (String) properties.get("dataset");
+        String dataset = (String) properties.get(DATASET);
         String datasetNamePrefix = context.getParameter("datasetNamePrefix");
         if (datasetNamePrefix != null) {
             dataset = datasetNamePrefix + dataset;
         }
-        String table = (String) properties.get("table");
+        String table = (String) properties.get(TABLE);
         
         String tableId = String.format(BQ_TABLE_ID_TEMPLATE, project, dataset, table);
         

@@ -35,6 +35,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static ai.aliz.talendtestrunner.helper.Helper.DATASET;
+import static ai.aliz.talendtestrunner.helper.Helper.PROJECT;
+import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_FORMAT;
+import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
+
+
 @Service
 @Slf4j
 public class InitActionService {
@@ -75,15 +81,15 @@ public class InitActionService {
             Context context = contextLoader.getContext(system);
             switch (type) {
                 case "BQLoad": {
-                    String project = context.getParameter("project");
+                    String project = context.getParameter(PROJECT);
                     Map<String, Object> properties = initActionConfig.getProperties();
-                    String dataset = (String) properties.get("dataset");
+                    String dataset = (String) properties.get(DATASET);
 
                     String datasetNamePrefix = context.getParameter("datasetNamePrefix");
                     if (datasetNamePrefix != null) {
                         dataset = datasetNamePrefix + dataset;
                     }
-                    String table = (String) properties.get("table");
+                    String table = (String) properties.get(TABLE);
 
                     BigQuery bigQuery = BigQueryOptions.newBuilder().setProjectId(project).build().getService();
 
@@ -93,7 +99,7 @@ public class InitActionService {
 
                     FormatOptions formatOption;
 
-                    String sourceFormat = (String) properties.get("sourceFormat");
+                    String sourceFormat = (String) properties.get(SOURCE_FORMAT);
                     switch (sourceFormat) {
                         case "json": {
                             Gson gson = new Gson();

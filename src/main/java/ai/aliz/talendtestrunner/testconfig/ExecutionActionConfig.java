@@ -1,7 +1,6 @@
 package ai.aliz.talendtestrunner.testconfig;
 
 import lombok.Data;
-import lombok.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
