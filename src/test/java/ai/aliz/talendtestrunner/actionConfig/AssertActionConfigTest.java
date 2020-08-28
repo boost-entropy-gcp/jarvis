@@ -7,10 +7,12 @@ import ai.aliz.talendtestrunner.service.AssertActionConfigCreator;
 import ai.aliz.talendtestrunner.service.AssertServiceTest;
 import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.bigquery.BigQuery;
 import lombok.SneakyThrows;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
@@ -29,6 +31,9 @@ public class AssertActionConfigTest {
     private ActionConfigForBq actionConfigForBq = new ActionConfigForBq();
 
     private AssertActionConfigCreator assertActionConfigCreator = new AssertActionConfigCreator();
+
+    @MockBean
+    private BigQuery bigQuery;
 
     @Test
     public void createBqAssertActionConfigTest() {

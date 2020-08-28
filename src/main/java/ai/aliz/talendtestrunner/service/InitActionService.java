@@ -1,7 +1,6 @@
 package ai.aliz.talendtestrunner.service;
 
 import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.db.MxSQLQueryExecutor;
 import ai.aliz.talendtestrunner.service.initAction.BQLoad;

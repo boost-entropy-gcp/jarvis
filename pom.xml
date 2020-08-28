@@ -79,7 +79,6 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-bigquery</artifactId>
-            <version>1.84.0</version>
         </dependency>
 
         <dependency>
