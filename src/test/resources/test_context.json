@@ -5,5 +5,12 @@
     "parameters": {
       "project": "test_project"
     }
+  },
+  {
+    "id": "local",
+    "contextType": "LocalContext",
+    "parameters": {
+      "repositoryRoot": "C:\\test\\project"
+    }
   }
 ]

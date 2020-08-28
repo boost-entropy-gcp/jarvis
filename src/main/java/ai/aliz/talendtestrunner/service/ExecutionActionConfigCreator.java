@@ -4,6 +4,7 @@ import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import ai.aliz.talendtestrunner.testconfig.ExecutionType;
 import com.google.common.collect.Lists;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
