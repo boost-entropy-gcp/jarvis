@@ -7,9 +7,11 @@ import ai.aliz.talendtestrunner.service.ExecutionActionConfigCreator;
 import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import ai.aliz.talendtestrunner.testconfig.ExecutionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.bigquery.BigQuery;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
@@ -27,6 +29,9 @@ import static org.junit.Assert.assertThat;
 public class ExecutorActionConfigTest {
 
     private ExecutionActionConfigCreator executionActionConfigCreator = new ExecutionActionConfigCreator();
+
+    @MockBean
+    private BigQuery bigQuery;
 
     @Test
     public void testExecutorListCreation() {
