@@ -58,7 +58,8 @@ public class AssertActionConfigTest {
         List<AssertActionConfig> assertActionConfigs = assertActionConfigCreator.getAssertActionConfigs(contextLoader, defaultP, new File(configPath));
         AssertActionConfig assertActionConfig = assertActionConfigs.get(0);
 
-        assertThat(assertActionConfig.getProperties().get("sourcePath"), is(configPath + "\\assert\\TEST_ID\\test_dataset\\assertTest.json"));
+
+        assertThat(assertActionConfig.getProperties().get("sourcePath"), is(configPath + addSeparator("\\assert\\TEST_ID\\test_dataset\\assertTest.json")));
         assertThat(assertActionConfig.getSystem(), is("TEST_ID"));
         assertThat(assertActionConfig.getType(), is("AssertDataEquals"));
     }
@@ -73,5 +74,9 @@ public class AssertActionConfigTest {
         assertThat(assertActionConfig.getProperties().get("sourcePath"), is(file.getPath()));
 
         return assertActionConfig;
+    }
+
+    private String addSeparator(String path) {
+        return path.replace('\\', File.separatorChar);
     }
 }

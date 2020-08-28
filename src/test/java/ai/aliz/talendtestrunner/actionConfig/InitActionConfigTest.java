@@ -57,12 +57,16 @@ public class InitActionConfigTest {
         InitActionConfig initActionConfig1 = initActionConfigs.get(0);
         InitActionConfig initActionConfig2 = initActionConfigs.get(1);
 
-        assertThat(initActionConfig1.getProperties().get("sourcePath"), is(configPath + "\\pre\\TEST_ID\\test_dataset\\init.json"));
         assertThat(initActionConfig1.getType(), is("BQLoad"));
+        assertThat(initActionConfig1.getProperties().get("sourcePath"), is(configPath + addSeparator("\\pre\\TEST_ID\\test_dataset\\init.json")));
         assertThat(initActionConfig1.getSystem(), is("TEST_ID"));
 
-        assertThat(initActionConfig2.getProperties().get("sourcePath"), is(configPath + "\\pre\\TEST_ID.sql"));
         assertThat(initActionConfig2.getType(), is("SQLExec"));
+        assertThat(initActionConfig2.getProperties().get("sourcePath"), is(configPath + addSeparator("\\pre\\TEST_ID.sql")));
         assertThat(initActionConfig2.getSystem(), is("TEST_ID"));
+    }
+
+    private String addSeparator(String path) {
+        return path.replace('\\', File.separatorChar);
     }
 }
