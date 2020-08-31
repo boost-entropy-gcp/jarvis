@@ -48,7 +48,7 @@ public class ExecutorActionConfigTest {
         List<ExecutionActionConfig> executionActionConfigs = executionActionConfigCreator.getExecutionActionConfigs(contextLoader, executions);
 
         ExecutionActionConfig executionActionConfig = executionActionConfigs.get(0);
-        assertThat(executionActionConfig.getProperties().get("sourcePath"), is(TestHelper.addSeparator("C:\\test\\project\\test\\test.json")));
+        assertThat(executionActionConfig.getProperties().get("sourcePath"), is("C:\\test\\project\\test\\test.json"));
         assertThat(executionActionConfig.getType(), is(ExecutionType.BqQuery));
         assertThat(executionActionConfig.getExecutionContext(), is("TEST"));
     }
