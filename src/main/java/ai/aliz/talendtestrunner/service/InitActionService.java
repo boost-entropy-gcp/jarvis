@@ -18,15 +18,19 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
@@ -188,5 +192,12 @@ public class InitActionService {
     private JsonArray addTableMetadata(JsonArray jsonArray, String tableName) {
         jsonArray.iterator().forEachRemaining(e -> e.getAsJsonObject().addProperty(tableName + "_INSERTED_BY", TEST_INIT));
         return jsonArray;
+    }
+    
+    public static void main(String[] args) throws Exception {
+        InitActionService initActionService = new InitActionService();
+        JsonArray jsonArrayFromSource = initActionService.getJsonArrayFromSource(FileUtils.readFileToString(new File("x.json"), StandardCharsets.UTF_8), new Gson());
+        String ndJson = initActionService.convertToNDJson(jsonArrayFromSource);
+        FileUtils.writeStringToFile(new File("x.ndjson"), ndJson, StandardCharsets.UTF_8);
     }
 }
