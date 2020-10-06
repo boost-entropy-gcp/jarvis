@@ -297,7 +297,8 @@ public class BigQueryAssertor {
                         map.put(fieldSchema.getName(), children);
                         
                     } else {
-                        throw new UnsupportedOperationException("Primitive type in array is not supported: " + fieldSchema);
+                        Map<String, Object> childObjectMap = convertJsonNodeToObjectMap(tableId, fieldValue, fieldSchema.getSubFields(), variablePlaceHolderMap);
+                        map.put(fieldName, childObjectMap);
                     }
                     
                 } else {
