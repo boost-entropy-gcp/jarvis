@@ -1,11 +1,5 @@
 package ai.aliz.talendtestrunner.testconfig;
 
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.service.AssertActionConfigCreator;
-import ai.aliz.talendtestrunner.service.ExecutionActionConfigCreator;
-import ai.aliz.talendtestrunner.service.InitActionConfigCreator;
-import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.ToString;
@@ -21,6 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
+
+import ai.aliz.talendtestrunner.context.ContextLoader;
+import ai.aliz.talendtestrunner.service.AssertActionConfigCreator;
+import ai.aliz.talendtestrunner.service.ExecutionActionConfigCreator;
+import ai.aliz.talendtestrunner.service.InitActionConfigCreator;
 
 @Data
 @ToString(exclude = "parentSuite")
@@ -113,7 +115,6 @@ public class TestSuite {
     public static TestSuite parseFromJson(File testConfigFile, TestSuite parentSuite, ContextLoader contextLoader) {
         
         Gson gson = new Gson();
-        TestCase testCase = new TestCase();
         TestSuite testSuite = new TestSuite();
         testSuite.setParentSuite(parentSuite);
         if (parentSuite != null) {
@@ -133,15 +134,12 @@ public class TestSuite {
             
             Map<String, Object> defaultProperties = (Map<String, Object>) testSuiteMap.getOrDefault(DEFAULT_PROPERTIES_KEY, new HashMap<>());
 
-            if (testSuiteMap.get(EXECUTIONS_KEY) != null) {
-                List<Map<String, String>> executionActions = (List<Map<String, String>>) testSuiteMap.getOrDefault(EXECUTIONS_KEY, Collections.singletonMap(TYPE, "noOps"));
-                List<ExecutionActionConfig> executionActionConfigs = executionActionConfigCreator.getExecutionActionConfigs(contextLoader, executionActions);
-                testCase.getExecutionActionConfigs().addAll(executionActionConfigs);
-            }
+           
 
             if (Boolean.TRUE.equals(caseAutoDetect)) {
                 List<TestCase> testCases = Files.list(Paths.get(descriptorFolder)).filter(Files::isDirectory).map(path -> {
                     File testCaseFolder = path.toFile();
+                    TestCase testCase = new TestCase();
                     testCase.setPath(testCaseFolder.getAbsolutePath());
                     testCase.setName(testCaseFolder.getName());
 
@@ -151,7 +149,12 @@ public class TestSuite {
 
                     List<AssertActionConfig> assertActionConfigs = assertActionConfigCreator.getAssertActionConfigs(contextLoader, defaultProperties, testCaseFolder);
                     testCase.getAssertActionConfigs().addAll(assertActionConfigs);
-                    
+    
+                    if (testSuiteMap.get(EXECUTIONS_KEY) != null) {
+                        List<Map<String, String>> executionActions = (List<Map<String, String>>) testSuiteMap.getOrDefault(EXECUTIONS_KEY, Collections.singletonMap(TYPE, "noOps"));
+                        List<ExecutionActionConfig> executionActionConfigs = executionActionConfigCreator.getExecutionActionConfigs(contextLoader, executionActions);
+                        testCase.getExecutionActionConfigs().addAll(executionActionConfigs);
+                    }
                     return testCase;
                 }).collect(Collectors.toList());
                 

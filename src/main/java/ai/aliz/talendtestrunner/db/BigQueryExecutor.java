@@ -190,7 +190,15 @@ public class BigQueryExecutor implements QueryExecutor {
                         arrayNode.add(arrayElementNode);
                     }
                 } else {
-                    throw new UnsupportedOperationException("STRUCT not in an ARRAY is not supported yet. " + fieldSchema);
+                    ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
+                    baseJsonNode = objectNode;
+                    FieldValueList recordValue = fieldValue.getRecordValue();
+                    FieldList subFields = fieldSchema.getSubFields();
+                    int i = 0;
+                    for (Field arrayElementField : subFields) {
+                        createJsonNode(arrayElementField, recordValue.get(i), objectNode);
+                        i++;
+                    }
                 }
                 
             } else if (fieldSchema.getMode() == Field.Mode.REPEATED) {
