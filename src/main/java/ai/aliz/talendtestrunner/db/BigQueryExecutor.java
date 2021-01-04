@@ -1,17 +1,9 @@
 package ai.aliz.talendtestrunner.db;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
+import ai.aliz.talendtestrunner.context.Context;
+import ai.aliz.talendtestrunner.service.BigQueryService;
+import ai.aliz.talendtestrunner.service.ExecutorServiceImpl;
+import ai.aliz.talendtestrunner.util.PlaceholderResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BaseJsonNode;
@@ -23,7 +15,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.api.client.util.Lists;
 import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.Field;
 import com.google.cloud.bigquery.FieldList;
 import com.google.cloud.bigquery.FieldValue;
@@ -33,13 +24,21 @@ import com.google.cloud.bigquery.QueryJobConfiguration;
 import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.service.ExecutorServiceImpl;
-import ai.aliz.talendtestrunner.service.InitActionService;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static ai.aliz.talendtestrunner.helper.Helper.TEST_INIT;
 
 @Component
 @AllArgsConstructor
@@ -50,6 +49,12 @@ public class BigQueryExecutor implements QueryExecutor {
     private ExecutorServiceImpl executorService;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private BigQuery bigQuery;
+
+    @Autowired
+    private BigQueryService bigQueryService;
     
     public void executeScript(String query, Context context) {
         String[] splits = query.split(";");
@@ -91,18 +96,16 @@ public class BigQueryExecutor implements QueryExecutor {
         String completedQuery = placeholderResolver.resolve(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
-        BigQuery bigquery = createBigQueryClient(context);
+        bigQuery = bigQueryService.createBigQueryClient(context);
         try {
             log.info("Executing statement \n{}", completedQuery);
-            bigquery.query(queryConfig);
+            Iterable<FieldValueList> result = bigQuery.query(queryConfig).iterateAll();
+            log.debug("Query result {}", result);
         } catch (Exception e) {
             throw new RuntimeException("Failed to execute statement: \n" + completedQuery, e);
         }
     }
-    
-    private BigQuery createBigQueryClient(Context context) {
-        return BigQueryOptions.newBuilder().setProjectId(context.getParameters().get("project")).build().getService();
-    }
+
     
     public String executeQuery(String query, Context context) {
         
@@ -117,10 +120,10 @@ public class BigQueryExecutor implements QueryExecutor {
         String completedQuery = placeholderResolver.resolve(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
-        BigQuery bigquery = createBigQueryClient(context);
+        bigQuery = bigQueryService.createBigQueryClient(context);
         try {
             log.info("Executing query {}", query);
-            TableResult queryResult = bigquery.query(queryConfig);
+            TableResult queryResult = bigQuery.query(queryConfig);
             
             return queryResult;
         } catch (Exception e) {
@@ -249,15 +252,15 @@ public class BigQueryExecutor implements QueryExecutor {
     
     public int insertedRowCount(String tableId, String tableName, Context context) {
         
-        TableResult tableResult = executeQueryAndGetResult("SELECT COUNT(*) FROM `" + tableId + "`WHERE " + tableName + "_INSERTED_BY != '" + InitActionService.TEST_INIT + "'", context);
+        TableResult tableResult = executeQueryAndGetResult("SELECT COUNT(*) FROM `" + tableId + "`WHERE " + tableName + "_INSERTED_BY != '" + TEST_INIT + "'", context);
         long count = tableResult.getValues().iterator().next().get(0).getLongValue();
         return (int) count;
     }
     
     public Long getTableLastModifiedAt(Context context, String project, String dataset, String table) {
-        BigQuery bigquery = createBigQueryClient(context);
+        bigQuery = bigQueryService.createBigQueryClient(context);
         log.info("Getting last modified at for table: {}.{}.{}", project, dataset, table);
-        Table bqTable = bigquery.getTable(TableId.of(project, dataset, table));
+        Table bqTable = bigQuery.getTable(TableId.of(project, dataset, table));
         
         return bqTable.getLastModifiedTime();
         

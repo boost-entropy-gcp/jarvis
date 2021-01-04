@@ -4,9 +4,9 @@ import ai.aliz.talendtestrunner.context.Context;
 import ai.aliz.talendtestrunner.context.ContextLoader;
 import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.db.MxSQLQueryExecutor;
-import ai.aliz.talendtestrunner.service.BigQueryAssertor;
 import ai.aliz.talendtestrunner.service.SftpService;
 import ai.aliz.talendtestrunner.service.TalendJobStateChecker;
+import ai.aliz.talendtestrunner.service.assertor.BqAssertor;
 import ai.aliz.talendtestrunner.util.TestCollector;
 import com.google.common.base.Joiner;
 import lombok.SneakyThrows;
@@ -33,7 +33,7 @@ public class TestStepFactory {
     private TalendJobStateChecker talendJobStateChecker;
 
     @Autowired
-    private BigQueryAssertor bigQueryAssertor;
+    private BqAssertor bqAssertor;
 
     @Autowired
     private ContextLoader contextLoader;
@@ -76,7 +76,7 @@ public class TestStepFactory {
             return () -> talendJobStateChecker.checkJobState(fileContent, contextLoader.getContext("TalendDb"));
         } else if ("bq".equals(assertionStepFile.getParent().getParent().getFileName().toString())) {
             String qualifiedTableName = parentFolderName + "." + filename.replace(".json", "");
-            bigQueryAssertor.assertTable(qualifiedTableName, fileContent, assertionDefition.getInexactMatchFields(),
+            bqAssertor.assertTable(qualifiedTableName, fileContent, assertionDefition.getInexactMatchFields(),
                     contextLoader.getContext("BigQuery"));
         }
 
