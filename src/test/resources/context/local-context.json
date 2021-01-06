@@ -1,0 +1,9 @@
+[
+	{
+		"id": "local",
+		"contextType": "LocalContext",
+		"parameters": {
+			"repositoryRoot": "C:\\ds"
+		}
+	}
+]

@@ -1,0 +1,11 @@
+[
+	{
+		"id": "BQ",
+		"contextType": "BigQuery",
+		"parameters": {
+			"project": "nora-ambroz-sandbox",
+			"datasetNamePrefix": "core_",
+			"stagingDataset": "STAGING"
+		}
+	}
+]

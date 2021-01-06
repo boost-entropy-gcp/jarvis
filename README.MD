@@ -9,6 +9,125 @@ in the command line, then to execute use
 ```
 java -jar target/name-of-your-jar.jar "arg1" "arg2"
 ```
+
+## Context
+A context represents how the test runner can reach local and external resources that are necessary for the tests. 
+Contexts are parsed from the __contexts.json__ file in the __test\resources__ folder by the ContextLoader.
+Each context has an id which correlates to the context's type shown in the examples below.
+Valid context types are BigQuery, MySQL, MSSQL, TalendAPI, SFTP and LocalContext.
+Beside id and type, the context can have various parameters depending on its type in key-value format.  
+Let's see a valid example for a context of each type.
+
+### BigQuery
+
+```
+[
+  {
+    "id": "{same as the folder name in the assert and pre folders}",
+    "contextType": "BigQuery",
+    "parameters": {
+      "project": "scoot-edw-dev",
+      "datasetNamePrefix": "csk_",
+      "edwCoreDataset": "EDW_CORE",
+      "stagingDataset": "STAGING"
+    }
+  }
+]
+```
+For the BigQuery type the _project_ is a required parameter, while _datasetNamePrefix_ is optional.  
+Any other parameters can be used as substitution variables in SQL files (when the key is used it is replaced by the value during query execution).  
+
+### LocalContext
+
+```
+[
+  {
+    "id": "local",
+    "contextType": "LocalContext",
+    "parameters": {
+      "repositoryRoot": "{absolute path of the project folder}"
+    }
+  }
+]
+```
+The local context type requires a _repositoryRoot_ parameter, which is used for BQ script testing.
+The parameter indicates where the SQL files can be found locally, so later, in the test definition the relative path to the repository root is usable.
+
+### MySQL
+
+```
+[
+  {
+    "id": "{name of the sql file}",
+    "contextType": "MySQL",
+    "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "database": "{database}",
+      "user": "{username}",
+      "password": "{password}"
+    }
+  }
+]
+```
+The MySQL context type has parameters that describe how to connect to the MySQL DB.
+
+### MSSQL
+
+```
+[
+  {
+    "id": "{id, name of folder}",
+    "contextType": "MSSQL",
+    "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "database": "{database}",
+      "user": "{username}",
+      "password": "{password}"
+    }
+  }
+]
+```
+The MSSQL context type has parameters that describe how to connect to the MySQL DB.
+
+### SFTP
+
+```
+[
+  {
+    "id": "SFTP-password",
+    "contextType": "SFTP",
+    "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "user": "{username}",
+      "password": "{password}",
+      "remoteBasePath": "/out"
+    }
+  }
+]
+```
+The SFTP context type has parameters that describe how to connect to the MySQL DB.
+
+### TalendAPI
+
+```
+[
+  {
+    "id": "TalendAPI",
+    "contextType": "TalendAPI",
+    "parameters": {
+      "apiUrl": "{talend API url}",
+      "apiKey": "{API key}",
+      "environment": "{environment}",
+      "workspace": "{workspace}"
+    }
+  }
+]
+```
+The TalendAPI context type requires an _apiUrl_ and an _apiKey_ parameter to connect with the API, while _environment_ and _workspace_ are optional parameters that can be substituted into queries.
+
 ---
 ### Test BQ view
 

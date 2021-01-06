@@ -1,0 +1,48 @@
+[
+	{
+		"id": "BQ",
+		"contextType": "BigQuery",
+		"parameters": {
+			"project": "nora-ambroz-sandbox"
+		}
+	},
+	{
+		"id": "local",
+		"contextType": "LocalContext",
+		"parameters": {
+			"repositoryRoot": "{absolute path of the project folder}"
+		}
+	},
+	{
+		"id": "MSSQL",
+		"contextType": "MSSQL",
+		"parameters": {
+			"host": "host",
+			"port": "port",
+			"database": "database",
+			"user": "user",
+			"password": "password"
+		}
+	},
+	{
+		"id": "SFTP",
+		"contextType": "SFTP",
+		"parameters": {
+			"host": "host",
+			"port": "port",
+			"user": "user",
+			"password": "password",
+			"remoteBasePath": "/out"
+		}
+	},
+	{
+		"id": "TalendAPI",
+		"contextType": "TalendAPI",
+		"parameters": {
+			"apiUrl": "url",
+			"apiKey": "key",
+			"environment": "environment",
+			"workspace": "workspace"
+		}
+	}
+]

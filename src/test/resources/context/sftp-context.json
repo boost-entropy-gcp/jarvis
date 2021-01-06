@@ -1,0 +1,13 @@
+[
+	{
+		"id": "SFTP",
+		"contextType": "SFTP",
+		"parameters": {
+			"host": "host",
+			"port": "port",
+			"user": "user",
+			"password": "password",
+			"remoteBasePath": "/out"
+		}
+	}
+]

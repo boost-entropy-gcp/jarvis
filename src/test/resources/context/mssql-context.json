@@ -1,0 +1,13 @@
+[
+	{
+		"id": "MSSQL",
+		"contextType": "MSSQL",
+		"parameters": {
+			"host": "host",
+			"port": "port",
+			"database": "database",
+			"user": "user",
+			"password": "password"
+		}
+	}
+]
