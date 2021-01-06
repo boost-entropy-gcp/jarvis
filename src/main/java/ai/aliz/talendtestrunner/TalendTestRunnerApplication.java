@@ -9,10 +9,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 @Log4j2
 public class TalendTestRunnerApplication {
-    
+    /*
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(TalendTestRunnerApplication.class, args);
-    }
+    }*/
     
 //    @Bean
 //    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
