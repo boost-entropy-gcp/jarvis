@@ -21,127 +21,80 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest
 public class TestContextLoader {
     
+    private static final Context BQ_CONTEXT = Context.builder()
+                                                     .id("BQ")
+                                                     .contextType(ContextType.BigQuery)
+                                                     .parameter("project", "nora-ambroz-sandbox")
+                                                     .parameter("datasetNamePrefix", "core_")
+                                                     .parameter("stagingDataset", "STAGING")
+                                                     .build();
+    
+    private static final Context LOCAL_CONTEXT = Context.builder()
+                                                        .id("local")
+                                                        .contextType(ContextType.LocalContext)
+                                                        .parameter("repositoryRoot", "C:\\ds")
+                                                        .build();
+    
+    private static final Context MSSQL_CONTEXT = Context.builder()
+                                                        .id("MSSQL")
+                                                        .contextType(ContextType.MSSQL)
+                                                        .parameter("host", "host")
+                                                        .parameter("port", "port")
+                                                        .parameter("database", "database")
+                                                        .parameter("user", "user")
+                                                        .parameter("password", "password")
+                                                        .build();
+    
+    private static final Context MYSQL_CONTEXT = Context.builder()
+                                                        .id("MySQL")
+                                                        .contextType(ContextType.MySQL)
+                                                        .parameter("host", "host")
+                                                        .parameter("port", "port")
+                                                        .parameter("database", "database")
+                                                        .parameter("user", "user")
+                                                        .parameter("password", "password")
+                                                        .build();
+    
+    private static final Context SFTP_CONTEXT = Context.builder()
+                                                       .id("SFTP")
+                                                       .contextType(ContextType.SFTP)
+                                                       .parameter("host", "host")
+                                                       .parameter("port", "port")
+                                                       .parameter("user", "user")
+                                                       .parameter("password", "password")
+                                                       .parameter("remoteBasePath", "/out")
+                                                       .build();
+    
+    private static final Context TALEND_API_CONTEXT = Context.builder()
+                                                             .id("TalendAPI")
+                                                             .contextType(ContextType.TalendAPI)
+                                                             .parameter("apiUrl", "url")
+                                                             .parameter("apiKey", "key")
+                                                             .parameter("environment", "environment")
+                                                             .parameter("workspace", "workspace")
+                                                             .build();
+    
     @Autowired
     private ContextLoader contextLoader;
     
     @Test
-    public void parseBQContextJson() {
-        contextLoader.parseContext("src/test/resources/context/bq-context.json");
+    public void parseContextsJson() {
+        contextLoader.parseContext("src/test/resources/context/test-contexts.json");
         Set<Context> contexts = contextLoader.getContexts();
-        assertThat(contexts, IsCollectionWithSize.hasSize(1));
+        assertThat(contexts, IsCollectionWithSize.hasSize(6));
         
-        Context bqContext = Context.builder()
-                                   .id("BQ")
-                                   .contextType(ContextType.BigQuery)
-                                   .parameter("project", "nora-ambroz-sandbox")
-                                   .parameter("datasetNamePrefix", "core_")
-                                   .parameter("stagingDataset", "STAGING")
-                                   .build();
-        
-        assertTrue(contexts.contains(bqContext));
+        assertTrue(contexts.contains(BQ_CONTEXT));
+        assertTrue(contexts.contains(LOCAL_CONTEXT));
+        assertTrue(contexts.contains(MSSQL_CONTEXT));
+        assertTrue(contexts.contains(MYSQL_CONTEXT));
+        assertTrue(contexts.contains(SFTP_CONTEXT));
+        assertTrue(contexts.contains(TALEND_API_CONTEXT));
     }
     
     //TODO throw a meaningful exception with an appropriate error message, when a required parameter is missing
     @Test(expected = JsonMappingException.class)
     public void parseBQNoParamsContextJson() {
         contextLoader.parseContext("src/test/resources/context/bq-no-params-context.json");
-    }
-    
-    @Test
-    public void parseLocalContextJson() {
-        contextLoader.parseContext("src/test/resources/context/local-context.json");
-        Set<Context> contexts = contextLoader.getContexts();
-        assertThat(contexts, IsCollectionWithSize.hasSize(1));
-        
-        Context localContext = Context.builder()
-                                      .id("local")
-                                      .contextType(ContextType.LocalContext)
-                                      .parameter("repositoryRoot", "C:\\ds")
-                                      .build();
-        
-        assertTrue(contexts.contains(localContext));
-    }
-    
-    @Test
-    public void parseMySQLContextJson() {
-        contextLoader.parseContext("src/test/resources/context/my-sql-context.json");
-        Set<Context> contexts = contextLoader.getContexts();
-        assertThat(contexts, IsCollectionWithSize.hasSize(1));
-        
-        Context mysqlContext = Context.builder()
-                                      .id("MySQL")
-                                      .contextType(ContextType.MySQL)
-                                      .parameter("host", "host")
-                                      .parameter("port", "port")
-                                      .parameter("database", "database")
-                                      .parameter("user", "user")
-                                      .parameter("password", "password")
-                                      .build();
-        
-        assertTrue(contexts.contains(mysqlContext));
-    }
-    
-    @Test
-    public void parseMSSQLContextJson() {
-        contextLoader.parseContext("src/test/resources/context/mssql-context.json");
-        Set<Context> contexts = contextLoader.getContexts();
-        assertThat(contexts, IsCollectionWithSize.hasSize(1));
-        
-        Context mssqlContext = Context.builder()
-                                      .id("MSSQL")
-                                      .contextType(ContextType.MSSQL)
-                                      .parameter("host", "host")
-                                      .parameter("port", "port")
-                                      .parameter("database", "database")
-                                      .parameter("user", "user")
-                                      .parameter("password", "password")
-                                      .build();
-        
-        assertTrue(contexts.contains(mssqlContext));
-    }
-    
-    @Test
-    public void parseSFTPContextJson() {
-        contextLoader.parseContext("src/test/resources/context/sftp-context.json");
-        Set<Context> contexts = contextLoader.getContexts();
-        assertThat(contexts, IsCollectionWithSize.hasSize(1));
-        
-        Context sftpContext = Context.builder()
-                                     .id("SFTP")
-                                     .contextType(ContextType.SFTP)
-                                     .parameter("host", "host")
-                                     .parameter("port", "port")
-                                     .parameter("user", "user")
-                                     .parameter("password", "password")
-                                     .parameter("remoteBasePath", "/out")
-                                     .build();
-        
-        assertTrue(contexts.contains(sftpContext));
-    }
-    
-    @Test
-    public void parseTalendAPIContextJson() {
-        contextLoader.parseContext("src/test/resources/context/talend-api-context.json");
-        Set<Context> contexts = contextLoader.getContexts();
-        assertThat(contexts, IsCollectionWithSize.hasSize(1));
-        
-        Context talendAPIContext = Context.builder()
-                                          .id("TalendAPI")
-                                          .contextType(ContextType.TalendAPI)
-                                          .parameter("apiUrl", "url")
-                                          .parameter("apiKey", "key")
-                                          .parameter("environment", "environment")
-                                          .parameter("workspace", "workspace")
-                                          .build();
-        
-        assertTrue(contexts.contains(talendAPIContext));
-    }
-    
-    @Test
-    public void parseMultipleContextJson() {
-        contextLoader.parseContext("src/test/resources/context/multiple-context.json");
-        Set<Context> contexts = contextLoader.getContexts();
-        assertThat(contexts, IsCollectionWithSize.hasSize(5));
     }
     
     //TODO throw a meaningful exception with a helpful error message, when the context type is invalid
