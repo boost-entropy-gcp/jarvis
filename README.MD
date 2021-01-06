@@ -1,8 +1,18 @@
-#Test runner
+# Jarvis Test Runner
 
-###Test BQ view
+## Package
+To package the test runner application into a distributable JAR run 
+```
+mvn clean package spring-boot:repackage
+```
+in the command line, then to execute use
+```
+java -jar target/name-of-your-jar.jar "arg1" "arg2"
+```
+---
+### Test BQ view
 
-######Folder system:
+###### Folder system:
 Folder system should look like this. The test going through the folders and find the necessary files.
 
 1. test_view (= CONFIG_PATH)
@@ -62,7 +72,7 @@ testSuite.json example
 }
 ```
 
-######contexts json
+###### contexts json
 
 context.json example
 
@@ -81,16 +91,16 @@ Make contexts.json file in test/resources to define parameters for the tests.
 ]
 ```
 
-#####To run test for view:
+##### To run test for view:
 
 1. Set up the folder system with the files, pay attention of naming the folders and files, the json format and data in the json files.
 2. In IntegrationTestRunner.class set the CONTEXTS_PATH and the CONFIG_PATH. CONTEXTS_PATH is the absolute path of the contexts.json. CONFIG_PATH is the absolute path of the folder which has the test cases.
 3. Run IntegrationTestRunner.class
 
 
-###Test BQ query
+### Test BQ query
 
-######Folder system
+###### Folder system
 Same as it was at the bq view tests.
 
 1. test_view
@@ -129,7 +139,7 @@ testSuite.json example
 }
 ```
 
-######contexts json
+###### contexts json
 
 context.json example
 
@@ -155,21 +165,21 @@ Make contexts.json file in test/resources to define parameters for the tests. Lo
 ]
 ```
 
-#####To run test for BqQuery:
+##### To run test for BqQuery:
 
 1. Set up the folder system with the files, pay attention of naming the folders and files, the json format and data in the json files.
 2. In IntegrationTestRunner.class set the CONTEXTS_PATH and the CONFIG_PATH. CONTEXTS_PATH is the absolute path of the contexts.json. CONFIG_PATH is the absolute path of the folder which has the test cases.
 3. Set up the contexts.json with LocalContext and add execution to the testSuit.json. LocalContext is for read local files.
 4. Run IntegrationTestRunner.class
 
-####testSuits.json
+#### testSuits.json
 
 1. caseAutoDetect
     * boolean
         * If it's true the test will make initActionConfigs and assertActionConfigs.
         
         
-######executions:
+###### executions:
 
 1. execution
     * List of
@@ -177,7 +187,7 @@ Make contexts.json file in test/resources to define parameters for the tests. Lo
         * queryPath (path of the file for do the execution)
         * executionContext (context id)
 2. 
-######defaultProperties:
+###### defaultProperties:
 
 1. assert.excludePreviouslyInsertedRows
     * boolean
