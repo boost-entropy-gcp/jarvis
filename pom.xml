@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ai.aliz</groupId>
-    <artifactId>talend-test-runner</artifactId>
+    <artifactId>jarvis-test-runner</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>talend-test-runner</name>
-    <description>Talend Test Runner</description>
+    <name>jarvis-test-runner</name>
+    <description>Jarvis Test Runner</description>
 
     <properties>
         <java.version>1.8</java.version>
