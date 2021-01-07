@@ -11,7 +11,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import org.hamcrest.collection.IsCollectionWithSize;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertThat;
@@ -74,6 +76,8 @@ public class TestContextLoader {
                                                              .parameter("workspace", "workspace")
                                                              .build();
     
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
     @Autowired
     private ContextLoader contextLoader;
     
@@ -91,15 +95,22 @@ public class TestContextLoader {
         assertTrue(contexts.contains(TALEND_API_CONTEXT));
     }
     
-    //TODO throw a meaningful exception with an appropriate error message, when a required parameter is missing
-    @Test(expected = JsonMappingException.class)
+    @Test
     public void parseBQNoParamsContextJson() {
+        exceptionRule.expect(JsonMappingException.class);
         contextLoader.parseContext("src/test/resources/context/bq-no-params-context.json");
     }
     
-    //TODO throw a meaningful exception with a helpful error message, when the context type is invalid
-    @Test(expected = InvalidFormatException.class)
+    @Test
+    public void parseBQEmptyParamsContextJson() {
+        exceptionRule.expect(IllegalStateException.class);
+        exceptionRule.expectMessage("Context(id=BQ, contextType=BigQuery, parameters={}) is missing parameters. Required parameters for this context type: project.");
+        contextLoader.parseContext("src/test/resources/context/bq-empty-params-context.json");
+    }
+    
+    @Test
     public void parseInvalidContextJson() {
+        exceptionRule.expect(InvalidFormatException.class);
         contextLoader.parseContext("src/test/resources/context/invalid-context.json");
     }
 }

@@ -7,12 +7,13 @@ mvn clean package spring-boot:repackage
 ```
 in the command line, then to execute use
 ```
-java -jar target/name-of-your-jar.jar "arg1" "arg2"
+java -jar target/name-of-your-jar.jar --context="arg1" "arg2"
 ```
 
 ## Context
 A context represents how the test runner can reach local and external resources that are necessary for the tests. 
-Contexts are parsed from the __contexts.json__ file in the __test\resources__ folder by the ContextLoader.
+Contexts are parsed from the __contexts.json__ file by the ContextLoader.
+The path to the __context.json__ is a required parameter (```--context```) to run the application.
 Each context has an id which correlates to the context's type shown in the examples below.
 Valid context types are BigQuery, MySQL, MSSQL, TalendAPI, SFTP and LocalContext.
 Beside id and type, the context can have various parameters depending on its type in key-value format.  
