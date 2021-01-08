@@ -1,15 +1,25 @@
 # Jarvis Test Runner
 
 ## Package
-To package the test runner application into a distributable JAR run 
+To package the test runner application into a JAR run 
 ```
 mvn clean package spring-boot:repackage
 ```
-in the command line, then to execute use
+in the command line. 
+This will create three JAR files.
+The _jarvis-0.0.1-SNAPSHOT.jar_ is a distributable JAR made by Maven.
+The _jarvis-0.0.1-SNAPSHOT-spring-boot.jar_ is the previously mentioned JAR repackaged by Spring Boot to make it executable from the command line.
+The Spring Boot Maven plugin also creates a copy of the Maven JAR named _jarvis-0.0.1-SNAPSHOT.jar.original_. 
+Run the application with this command.
 ```
-java -jar target/name-of-your-jar.jar --context="arg1" "arg2"
+java -jar target/jarvis-0.0.1-SNAPSHOT-spring-boot.jar --context="arg1""arg1" "arg2"
 ```
+---
+**NOTE**
 
+The name of the JAR will be the name in the pom.xml concatenated to the version from the pom.xml by a '-'.
+
+---
 ## Context
 A context represents how the test runner can reach local and external resources that are necessary for the tests. 
 Contexts are parsed from the __contexts.json__ file by the ContextLoader.
@@ -24,19 +34,19 @@ Let's see a valid example for a context of each type.
 ```
 [
   {
-    "id": "{same as the folder name in the assert and pre folders}",
+    "id": "{id}",
     "contextType": "BigQuery",
     "parameters": {
-      "project": "scoot-edw-dev",
-      "datasetNamePrefix": "csk_",
-      "edwCoreDataset": "EDW_CORE",
-      "stagingDataset": "STAGING"
+      "project": "project_name",
+      "datasetNamePrefix": "dev_"
     }
   }
 ]
 ```
-For the BigQuery type the _project_ is a required parameter, while _datasetNamePrefix_ is optional.  
-Any other parameters can be used as substitution variables in SQL files (when the key is used it is replaced by the value during query execution).  
+For the BigQuery type the _project_ is a required parameter.  
+The _datasetNamePrefix_ is an optional parameter that can be substituted into BQ queries.
+Using dataset name prefixes is a naming convention, which allows to easily swap between similar, near exact copies of a dataset.
+For example dev_core and staging_core, where dev_ and staging_ are the dataset name prefixes.
 
 ### LocalContext
 
@@ -59,7 +69,7 @@ The parameter indicates where the SQL files can be found locally, so later, in t
 ```
 [
   {
-    "id": "{name of the sql file}",
+    "id": "{id}",
     "contextType": "MySQL",
     "parameters": {
       "host": "{db host}",
@@ -78,7 +88,7 @@ The MySQL context type has parameters that describe how to connect to the MySQL 
 ```
 [
   {
-    "id": "{id, name of folder}",
+    "id": "{id}",
     "contextType": "MSSQL",
     "parameters": {
       "host": "{db host}",
@@ -90,14 +100,14 @@ The MySQL context type has parameters that describe how to connect to the MySQL 
   }
 ]
 ```
-The MSSQL context type has parameters that describe how to connect to the MySQL DB.
+The MSSQL context type has parameters that describe how to connect to the MSSQL DB.
 
 ### SFTP
 
 ```
 [
   {
-    "id": "SFTP-password",
+    "id": "{id}",
     "contextType": "SFTP",
     "parameters": {
       "host": "{db host}",
@@ -109,7 +119,7 @@ The MSSQL context type has parameters that describe how to connect to the MySQL 
   }
 ]
 ```
-The SFTP context type has parameters that describe how to connect to the MySQL DB.
+The SFTP context type has parameters that describe how to connect to the SFTP server.
 
 ### TalendAPI
 
@@ -127,7 +137,9 @@ The SFTP context type has parameters that describe how to connect to the MySQL D
   }
 ]
 ```
-The TalendAPI context type requires an _apiUrl_ and an _apiKey_ parameter to connect with the API, while _environment_ and _workspace_ are optional parameters that can be substituted into queries.
+The TalendAPI context type requires an _apiUrl_ and an _apiKey_ parameter to connect to the API, and it also requires an _environment_ and a _workspace_ parameter.
+
+Any other parameters not listed here can be used as substitution variables in files (when the key is used it is replaced by the value during query execution).
 
 ---
 ### Test BQ view

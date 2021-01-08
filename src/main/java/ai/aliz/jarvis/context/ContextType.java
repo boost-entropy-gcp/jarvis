@@ -10,7 +10,7 @@ public enum ContextType {
     BigQuery(Sets.newHashSet("project")),
     MySQL(Sets.newHashSet("host", "port", "database", "user", "password")),
     MSSQL(Sets.newHashSet("host", "port", "database", "user", "password")),
-    TalendAPI(Sets.newHashSet("apiUrl", "apiKey")),
+    TalendAPI(Sets.newHashSet("apiUrl", "apiKey", "environment", "workspace")),
     SFTP(Sets.newHashSet("host", "port", "user", "password", "remoteBasePath")),
     LocalContext(Sets.newHashSet("repositoryRoot"));
     

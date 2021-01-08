@@ -1,26 +1,24 @@
 package ai.aliz.jarvis.context;
 
-import java.util.Set;
+import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import org.hamcrest.collection.IsCollectionWithSize;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@ContextConfiguration(classes = ContextLoaderConfig.class)
+@TestPropertySource(properties = "context=src/test/resources/context/test-contexts.json")
 public class TestContextLoader {
     
     private static final Context BQ_CONTEXT = Context.builder()
@@ -78,39 +76,37 @@ public class TestContextLoader {
     
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
-    @Autowired
-    private ContextLoader contextLoader;
     
     @Test
     public void parseContextsJson() {
-        contextLoader.parseContext("src/test/resources/context/test-contexts.json");
-        Set<Context> contexts = contextLoader.getContexts();
-        assertThat(contexts, IsCollectionWithSize.hasSize(6));
+        ContextLoader contextLoader = new ContextLoader("src/test/resources/context/test-contexts.json");
+        Map<String, Context> contextIdToContexts = contextLoader.getContextIdToContexts();
+        assertEquals(6, contextIdToContexts.size());
         
-        assertTrue(contexts.contains(BQ_CONTEXT));
-        assertTrue(contexts.contains(LOCAL_CONTEXT));
-        assertTrue(contexts.contains(MSSQL_CONTEXT));
-        assertTrue(contexts.contains(MYSQL_CONTEXT));
-        assertTrue(contexts.contains(SFTP_CONTEXT));
-        assertTrue(contexts.contains(TALEND_API_CONTEXT));
+        assertTrue(contextIdToContexts.containsValue(BQ_CONTEXT));
+        assertTrue(contextIdToContexts.containsValue(LOCAL_CONTEXT));
+        assertTrue(contextIdToContexts.containsValue(MSSQL_CONTEXT));
+        assertTrue(contextIdToContexts.containsValue(MYSQL_CONTEXT));
+        assertTrue(contextIdToContexts.containsValue(SFTP_CONTEXT));
+        assertTrue(contextIdToContexts.containsValue(TALEND_API_CONTEXT));
     }
     
     @Test
     public void parseBQNoParamsContextJson() {
-        exceptionRule.expect(JsonMappingException.class);
-        contextLoader.parseContext("src/test/resources/context/bq-no-params-context.json");
+        exceptionRule.expect(IllegalStateException.class);
+        new ContextLoader("src/test/resources/context/bq-no-params-context.json");
     }
     
     @Test
     public void parseBQEmptyParamsContextJson() {
         exceptionRule.expect(IllegalStateException.class);
         exceptionRule.expectMessage("Context(id=BQ, contextType=BigQuery, parameters={}) is missing parameters. Required parameters for this context type: project.");
-        contextLoader.parseContext("src/test/resources/context/bq-empty-params-context.json");
+        new ContextLoader("src/test/resources/context/bq-empty-params-context.json");
     }
     
     @Test
     public void parseInvalidContextJson() {
         exceptionRule.expect(InvalidFormatException.class);
-        contextLoader.parseContext("src/test/resources/context/invalid-context.json");
+        new ContextLoader("src/test/resources/context/invalid-context.json");
     }
 }
