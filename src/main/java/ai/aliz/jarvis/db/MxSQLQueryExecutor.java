@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.context.ContextType;
-import ai.aliz.jarvis.util.PlaceholderResolver;
+import ai.aliz.jarvis.util.TestRunnerUtil;
 
 @Component
 @AllArgsConstructor
@@ -37,8 +37,6 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     
     private static final String My_CONNECTION_STRING_PATTERN =
             "jdbc:mysql://{{host}}:{{port}}/{{database}}?user={{user}}&password={{password}}";
-    
-    private PlaceholderResolver placeholderResolver;
     
     private Map<Context, Connection> connectionMap = Maps.newHashMap();
     
@@ -73,7 +71,7 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     
     private <T> T doWithStatement(String query, Context context, Function<PreparedStatement, T> statementAction) {
         Connection connection = getConnectionForContext(context);
-        String completedQuery = placeholderResolver.resolve(query, context.getParameters());
+        String completedQuery = TestRunnerUtil.resolvePlaceholders(query, context.getParameters());
         
         try {
             log.info("Executing query {}", completedQuery);
@@ -88,7 +86,7 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     private Connection getConnectionForContext(Context context) {
         Connection connection = connectionMap.get(context);
         if (connection == null) {
-            String connectionUrl = placeholderResolver.resolve(getConnectionPattern(context), context.getParameters());
+            String connectionUrl = TestRunnerUtil.resolvePlaceholders(getConnectionPattern(context), context.getParameters());
             try {
                 connection = DriverManager.getConnection(connectionUrl);
                 connectionMap.put(context, connection);

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.json.Json;
@@ -48,7 +49,7 @@ public class TestRunnerUtil {
         return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
     }
     
-    public String getDatasetName(Map<String, Object> properties, Context context) {
+    public String getDatasetNameFromConfigProperties(Map<String, Object> properties, Context context) {
         String dataset = (String) properties.get("dataset");
         String datasetNamePrefix = context.getParameter("datasetNamePrefix");
         if (datasetNamePrefix != null) {
@@ -56,6 +57,16 @@ public class TestRunnerUtil {
         }
         
         return dataset;
+    }
+    
+    public String resolvePlaceholders(String pattern, Map<String, String> parameters) {
+        String result = pattern;
+        Iterator<Map.Entry<String, String>> parameterIterator = parameters.entrySet().iterator();
+        while (parameterIterator.hasNext()) {
+            Map.Entry<String, String> kv = parameterIterator.next();
+            result = result.replace("{{" + kv.getKey() + "}}", kv.getValue());
+        }
+        return result;
     }
 }
 

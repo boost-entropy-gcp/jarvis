@@ -38,8 +38,8 @@ import org.springframework.stereotype.Component;
 
 import ai.aliz.jarvis.service.BigQueryService;
 import ai.aliz.jarvis.service.ExecutorServiceWrapper;
-import ai.aliz.jarvis.util.PlaceholderResolver;
 import ai.aliz.jarvis.context.Context;
+import ai.aliz.jarvis.util.TestRunnerUtil;
 
 import static ai.aliz.talendtestrunner.helper.Helper.TEST_INIT;
 
@@ -48,7 +48,6 @@ import static ai.aliz.talendtestrunner.helper.Helper.TEST_INIT;
 @Slf4j
 public class BigQueryExecutor implements QueryExecutor {
     
-    private PlaceholderResolver placeholderResolver;
     private ExecutorServiceWrapper executorService;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -82,21 +81,14 @@ public class BigQueryExecutor implements QueryExecutor {
     }
     
     private List<Runnable> statementsToRunnables(Context context, List<String> statements) {
-        List<Runnable> statementRunnables = statements.stream()
-                                                      .map(statement -> new Runnable() {
-                                                          @Override
-                                                          public void run() {
-                                                              executeStatement(statement, context);
-                                                          }
-                                                      })
-                                                      .collect(Collectors.toList());
-        
-        return statementRunnables;
+        return statements.stream()
+                         .map(statement -> (Runnable) () -> executeStatement(statement, context))
+                         .collect(Collectors.toList());
     }
     
     @Override
     public void executeStatement(String query, Context context) {
-        String completedQuery = placeholderResolver.resolve(query, context.getParameters());
+        String completedQuery = TestRunnerUtil.resolvePlaceholders(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
         bigQuery = bigQueryService.createBigQueryClient(context);
@@ -120,7 +112,7 @@ public class BigQueryExecutor implements QueryExecutor {
     }
     
     public TableResult executeQueryAndGetResult(String query, Context context) {
-        String completedQuery = placeholderResolver.resolve(query, context.getParameters());
+        String completedQuery = TestRunnerUtil.resolvePlaceholders(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
         bigQuery = bigQueryService.createBigQueryClient(context);
