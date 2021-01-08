@@ -5,7 +5,9 @@ import lombok.SneakyThrows;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,30 +20,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContextLoader {
     
-    private final ObjectMapper objectMapper;
-    
-    public ContextLoader(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-    
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Getter
-    private Set<Context> contexts;
+    private final Map<String, Context> contextIdToContexts = new HashMap<>();
     
-    @SneakyThrows
-    public void parseContext(String contextPath) {
-        TypeReference<Set<Context>> typeReference = new TypeReference<Set<Context>>() {};
-        
-        contexts = objectMapper.readValue(Files.asCharSource(new File(contextPath), StandardCharsets.UTF_8).read(), typeReference);
-        validateContexts();
+    public ContextLoader(String contextPath) {
+        parseContext(contextPath);
     }
     
     public Context getContext(String contextId) {
-        return contexts.stream().filter(c -> Objects.equals(c.getId(), contextId)).findAny().orElseThrow(
-                () -> new IllegalStateException("Could not find context with id " + contextId)
-        );
+        return Optional.of(contextIdToContexts.get(contextId)).orElseThrow(() -> new IllegalStateException("Could not find context with id " + contextId));
     }
     
-    private void validateContexts() {
+    @SneakyThrows
+    private void parseContext(String contextPath) {
+        TypeReference<Set<Context>> typeReference = new TypeReference<Set<Context>>() {};
+        
+        Set<Context> contexts = objectMapper.readValue(Files.asCharSource(new File(contextPath), StandardCharsets.UTF_8).read(), typeReference);
+        validateContexts(contexts);
+        contexts.forEach(context -> contextIdToContexts.put(context.getId(), context));
+    }
+    
+    private void validateContexts(Set<Context> contexts) {
         String errors = contexts.stream()
                                 .filter(context -> !context.getParameters().keySet().containsAll(context.getContextType().getRequiredParameters()))
                                 .map(context -> context.toString() + " is missing parameters. " +

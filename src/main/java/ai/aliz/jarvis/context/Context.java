@@ -2,7 +2,9 @@ package ai.aliz.jarvis.context;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Singular;
+import lombok.Value;
 import lombok.experimental.Delegate;
 
 import java.util.HashMap;
