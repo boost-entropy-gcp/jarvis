@@ -2,10 +2,10 @@ package ai.aliz.jarvis.context;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import org.junit.Rule;
@@ -17,7 +17,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@ContextConfiguration(classes = ContextLoaderConfig.class)
+@TestPropertySource(properties = "context=src/test/resources/context/test-contexts.json")
 public class TestContextLoader {
     
     private static final Context BQ_CONTEXT = Context.builder()
@@ -92,7 +93,7 @@ public class TestContextLoader {
     
     @Test
     public void parseBQNoParamsContextJson() {
-        exceptionRule.expect(JsonMappingException.class);
+        exceptionRule.expect(IllegalStateException.class);
         new ContextLoader("src/test/resources/context/bq-no-params-context.json");
     }
     

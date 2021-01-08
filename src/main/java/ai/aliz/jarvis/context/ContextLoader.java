@@ -5,27 +5,25 @@ import lombok.SneakyThrows;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class ContextLoader {
     
     private final ObjectMapper objectMapper = new ObjectMapper();
-    @Getter
-    private final Map<String, Context> contextIdToContexts = new HashMap<>();
     
-    public ContextLoader(String contextPath) {
-        parseContext(contextPath);
+    @Getter
+    private Map<String, Context> contextIdToContexts;
+    
+    ContextLoader(String contextPath) {
+        contextIdToContexts = parseContexts(contextPath).stream().collect(Collectors.toMap(Context::getId, Function.identity()));
     }
     
     public Context getContext(String contextId) {
@@ -33,12 +31,12 @@ public class ContextLoader {
     }
     
     @SneakyThrows
-    private void parseContext(String contextPath) {
+    private Set<Context> parseContexts(String contextPath) {
         TypeReference<Set<Context>> typeReference = new TypeReference<Set<Context>>() {};
         
         Set<Context> contexts = objectMapper.readValue(Files.asCharSource(new File(contextPath), StandardCharsets.UTF_8).read(), typeReference);
         validateContexts(contexts);
-        contexts.forEach(context -> contextIdToContexts.put(context.getId(), context));
+        return contexts;
     }
     
     private void validateContexts(Set<Context> contexts) {
