@@ -1,6 +1,7 @@
 package ai.aliz.jarvis.db;
 
 import lombok.AllArgsConstructor;
+import lombok.Lombok;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -40,15 +42,12 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     
     private Map<Context, Connection> connectionMap = Maps.newHashMap();
     
-    
+    @Override
     public void executeScript(String query, Context context) {
-        String[] splits = query.split(";");
-        for (String split : splits) {
-            String trimmed = split.trim();
-            if (!trimmed.isEmpty()) {
-                executeStatement(trimmed, context);
-            }
-        }
+        Arrays.stream(query.split(";"))
+              .map(String::trim)
+              .filter(e -> !e.isEmpty())
+              .forEach(e -> executeStatement(e, context));
     }
     
     @PreDestroy
@@ -60,26 +59,29 @@ public class MxSQLQueryExecutor implements QueryExecutor {
                 log.error("Error while closing connection", e);
             }
         }
-        
     }
     
     @Override
     @SneakyThrows
     public void executeStatement(String query, Context context) {
-        doWithStatement(query, context, preparedStatement -> executeStatement(preparedStatement));
+        doWithStatement(query, context, this::executeStatement);
+    }
+    
+    @Override
+    public String executeQuery(String query, Context context) {
+        return doWithStatement(query, context, this::queryStatementForJsonResult);
     }
     
     private <T> T doWithStatement(String query, Context context, Function<PreparedStatement, T> statementAction) {
         Connection connection = getConnectionForContext(context);
         String completedQuery = TestRunnerUtil.resolvePlaceholders(query, context.getParameters());
-        
         try {
             log.info("Executing query {}", completedQuery);
             PreparedStatement preparedStatement = connection.prepareStatement(completedQuery);
             return statementAction.apply(preparedStatement);
         } catch (Exception e) {
-            log.error("Failed to executeStatement query: " + completedQuery, e);
-            throw new RuntimeException(e);
+            log.error("Failed to execute statement query: " + completedQuery, e);
+            throw Lombok.sneakyThrow(e);
         }
     }
     
@@ -114,18 +116,13 @@ public class MxSQLQueryExecutor implements QueryExecutor {
         }
     }
     
-    @Override
-    public String executeQuery(String query, Context context) {
-        return doWithStatement(query, context, this::queryStatementForJsonResult);
-    }
-    
     @SneakyThrows
     private String queryStatementForJsonResult(PreparedStatement statement) {
         ResultSet resultSet = statement.executeQuery();
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();
         
-        Gson gson = new GsonBuilder().create();
+        Gson gson = new Gson();
         JsonArray result = new JsonArray();
         
         while (resultSet.next()) {
@@ -135,10 +132,8 @@ public class MxSQLQueryExecutor implements QueryExecutor {
                 Object columnValue = resultSet.getObject(i);
                 objectForRow.add(columnName, gson.toJsonTree(columnValue));
             }
-            
             result.add(objectForRow);
         }
-        
         return gson.toJson(result);
     }
 }

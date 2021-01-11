@@ -1,8 +1,9 @@
-package ai.aliz.jarvis.service;
+package ai.aliz.jarvis.service.shared.platform;
 
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -23,20 +24,27 @@ import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.util.JarvisConstants;
 
+import static ai.aliz.jarvis.util.JarvisConstants.HOST;
+import static ai.aliz.jarvis.util.JarvisConstants.PASSWORD;
+import static ai.aliz.jarvis.util.JarvisConstants.PORT;
+import static ai.aliz.jarvis.util.JarvisConstants.REMOTE_BASE_PATH;
+import static ai.aliz.jarvis.util.JarvisConstants.SFTP;
+import static ai.aliz.jarvis.util.JarvisConstants.USER;
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 
 @Service
-@Log4j2
+@Slf4j
 public class SFTPService {
     
-    public static final String MODIFIED_AT_MARKER_PART = "_MODTIME_";
+    private static final String MODIFIED_AT_MARKER_PART = "_MODTIME_";
     
     private Set<Context> alreadyUsed = Sets.newHashSet();
     
     public void loadFilesToSftp(InitActionConfig initActionConfig, Context sftpContext) {
         ChannelSftp channelSftp = setupJsch(sftpContext);
-        String remoteBasePath = sftpContext.getParameter("remoteBasePath");
+        String remoteBasePath = sftpContext.getParameter(REMOTE_BASE_PATH);
         cleanup(channelSftp, remoteBasePath);
         
         String localRootFolderPath = (String) initActionConfig.getProperties().get(SOURCE_PATH);
@@ -48,7 +56,6 @@ public class SFTPService {
     
     @SneakyThrows
     private void loadFolder(File localFolder, String remotePath, ChannelSftp channelSftp) {
-        
         Preconditions.checkArgument(localFolder.isDirectory(), "%s is not a directory", localFolder);
         
         for (File child : localFolder.listFiles()) {
@@ -59,7 +66,6 @@ public class SFTPService {
                 loadFolder(child, remoteChildPath, channelSftp);
             }
         }
-        
     }
     
     @SneakyThrows
@@ -72,7 +78,7 @@ public class SFTPService {
             String fileName = localFile.getFileName().toString();
             
             SFTPService.RemoteFileMeta remoteFileMeta = prepareRemoteFileMeta(fileName);
-            String remoteBasePath = sftpContext.getParameter("remoteBasePath");
+            String remoteBasePath = sftpContext.getParameter(REMOTE_BASE_PATH);
             String fileRemotePath = remoteBasePath + "/" +
                     remoteFileMeta.getFilename();
             
@@ -130,27 +136,26 @@ public class SFTPService {
         return remoteFileMeta;
     }
     
-    @Data
-    private static class RemoteFileMeta {
-        
-        private String filename;
-        private Integer modifiedAtEpochSeconds;
-    }
-    
     @SneakyThrows
     private ChannelSftp setupJsch(Context sftpContext) {
         JSch jsch = new JSch();
-        Session jschSession = jsch.getSession(sftpContext.getParameter("user"), sftpContext.getParameter("host"));
+        Session jschSession = jsch.getSession(sftpContext.getParameter(USER), sftpContext.getParameter(HOST));
         
         java.util.Properties config = new java.util.Properties();
         config.put("StrictHostKeyChecking", "no");
         jschSession.setConfig(config);
-        jschSession.setPassword(sftpContext.getParameter("password"));
-        jschSession.setPort(Integer.parseInt(sftpContext.getParameter("port")));
+        jschSession.setPassword(sftpContext.getParameter(PASSWORD));
+        jschSession.setPort(Integer.parseInt(sftpContext.getParameter(PORT)));
         
         jschSession.connect();
-        ChannelSftp channel = (ChannelSftp) jschSession.openChannel("sftp");
+        ChannelSftp channel = (ChannelSftp) jschSession.openChannel(SFTP);
         channel.connect();
         return channel;
+    }
+    
+    @Data
+    private static class RemoteFileMeta {
+        private String filename;
+        private Integer modifiedAtEpochSeconds;
     }
 }

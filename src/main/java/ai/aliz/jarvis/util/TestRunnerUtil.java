@@ -22,13 +22,16 @@ import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.testconfig.AssertActionConfig;
 import ai.aliz.jarvis.testconfig.StepConfig;
 
+import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
+import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_PATH;
+
 @UtilityClass
 public class TestRunnerUtil {
     
     @SneakyThrows
     public String getSourceContentFromConfigProperties(StepConfig stepConfig) {
         
-        String sourcePath = (String) stepConfig.getProperties().get("sourcePath");
+        String sourcePath = (String) stepConfig.getProperties().get(SOURCE_PATH);
         File sourceFile;
         if (Paths.get(sourcePath).isAbsolute()) {
             sourceFile = new File(sourcePath);
@@ -50,12 +53,11 @@ public class TestRunnerUtil {
     }
     
     public String getDatasetNameFromConfigProperties(Map<String, Object> properties, Context context) {
-        String dataset = (String) properties.get("dataset");
+        String dataset = (String) properties.get(DATASET);
         String datasetNamePrefix = context.getParameter("datasetNamePrefix");
         if (datasetNamePrefix != null) {
             dataset = datasetNamePrefix + dataset;
         }
-        
         return dataset;
     }
     

@@ -11,19 +11,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+import static ai.aliz.jarvis.util.JarvisConstants.CONTEXT_TYPE;
+import static ai.aliz.jarvis.util.JarvisConstants.ID;
+import static ai.aliz.jarvis.util.JarvisConstants.PARAMETERS;
+
 @Value
 @Builder
 @JsonDeserialize(builder = Context.ContextBuilder.class)
 public class Context {
     
-    @JsonProperty("id")
+    @JsonProperty(ID)
     private String id;
     
-    @JsonProperty("contextType")
+    @JsonProperty(CONTEXT_TYPE)
     private ContextType contextType;
     
     @Singular
-    @JsonProperty("parameters")
+    @JsonProperty(PARAMETERS)
     private Map<String, String> parameters;
     
     @JsonPOJOBuilder(withPrefix = "")

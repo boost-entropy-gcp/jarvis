@@ -1,10 +1,10 @@
-package ai.aliz.jarvis.service.initiator;
+package ai.aliz.jarvis.service.init.initiator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.ContextLoader;
-import ai.aliz.jarvis.service.SFTPService;
+import ai.aliz.jarvis.service.shared.platform.SFTPService;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
 
 @Service

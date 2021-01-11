@@ -1,10 +1,12 @@
-package ai.aliz.jarvis.service;
+package ai.aliz.jarvis.service.shared;
 
 import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -19,33 +21,39 @@ import ai.aliz.jarvis.testconfig.InitActionConfig;
 import ai.aliz.jarvis.testconfig.InitActionType;
 import ai.aliz.jarvis.testconfig.StepConfig;
 
-import static ai.aliz.jarvis.helper.Helper.DATASET;
-import static ai.aliz.jarvis.helper.Helper.SOURCE_FORMAT;
-import static ai.aliz.jarvis.helper.Helper.SOURCE_PATH;
-import static ai.aliz.jarvis.helper.Helper.TABLE;
+import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
+import static ai.aliz.jarvis.util.JarvisConstants.JSON_FORMAT;
+import static ai.aliz.jarvis.util.JarvisConstants.NO_METADAT_ADDITION;
+import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_FORMAT;
+import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_PATH;
+import static ai.aliz.jarvis.util.JarvisConstants.TABLE;
 
-public class ActionConfigForBq {
+@UtilityClass
+public class ActionConfigUtil {
+    
+    //BigQuery
     
     public static InitActionConfig getInitActionConfigForBq(Map<String, Object> defaultProperties, String contextId, String system, String datasetName, File tableJsonFile) {
         InitActionConfig bqLoadInitActionConfig = new InitActionConfig();
+        bqLoadInitActionConfig.setSystem(system);
+        bqLoadInitActionConfig.setType(InitActionType.BQLoad);
+        
         String tableJsonFileName = tableJsonFile.getName();
         String extension = FilenameUtils.getExtension(tableJsonFileName);
-        bqLoadInitActionConfig.setSystem(system);
         String tableName = FilenameUtils.getBaseName(tableJsonFileName);
-        bqLoadInitActionConfig.setType(InitActionType.BQLoad);
         Map<String, Object> properties = addBqProperties(datasetName, tableJsonFile, extension, bqLoadInitActionConfig, tableName);
-        properties.put("noMetadatAddition", defaultProperties.getOrDefault("init." + contextId + ".noMetadatAddition", true));
+        properties.put(NO_METADAT_ADDITION, defaultProperties.getOrDefault("init." + contextId + "." + NO_METADAT_ADDITION, true));
         return bqLoadInitActionConfig;
     }
     
     public static AssertActionConfig getAssertActionConfigForBq(Map<String, Object> defaultProperties, String system, String datasetName, File tableDataFile) {
         AssertActionConfig assertActionConfig = new AssertActionConfig();
-        String tableName = FilenameUtils.getBaseName(tableDataFile.getName());
-        assertActionConfig.setType("AssertDataEquals");
         assertActionConfig.setSystem(system);
-        Map<String, Object> properties = addBqProperties(datasetName, tableDataFile, "json", assertActionConfig, tableName);
-        properties.put("assertKeyColumns",
-                       defaultProperties.getOrDefault("assert.assertKeyColumns", Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
+        assertActionConfig.setType("AssertDataEquals");
+        
+        String tableName = FilenameUtils.getBaseName(tableDataFile.getName());
+        Map<String, Object> properties = addBqProperties(datasetName, tableDataFile, JSON_FORMAT, assertActionConfig, tableName);
+        properties.put("assertKeyColumns", defaultProperties.getOrDefault("assert.assertKeyColumns", Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
         properties.put("excludePreviouslyInsertedRows", defaultProperties.getOrDefault("assert.excludePreviouslyInsertedRows", false));
         addAssertProperties(properties, tableDataFile);
         return assertActionConfig;
@@ -69,5 +77,15 @@ public class ActionConfigForBq {
             Map<String, Object> property = objectMapper.readValue(object.get("assert.properties").toString(), Map.class);
             property.forEach(properties::putIfAbsent);
         }
+    }
+    
+    //SFTP
+    
+    public static InitActionConfig getInitActionConfigForSFTP(Path initActionFile, String system) {
+        InitActionConfig initActionConfig = new InitActionConfig();
+        initActionConfig.setType(InitActionType.SFTPLoad);
+        initActionConfig.setSystem(system);
+        initActionConfig.getProperties().put(SOURCE_PATH, initActionFile.toFile().getAbsolutePath());
+        return initActionConfig;
     }
 }

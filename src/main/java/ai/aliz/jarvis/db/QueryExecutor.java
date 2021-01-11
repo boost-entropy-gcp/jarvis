@@ -7,4 +7,6 @@ public interface QueryExecutor {
     void executeStatement(String query, Context context);
     
     String executeQuery(String query, Context context);
+    
+    void executeScript(String query, Context context);
 }

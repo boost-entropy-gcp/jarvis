@@ -1,4 +1,4 @@
-package ai.aliz.jarvis.service.initiator;
+package ai.aliz.jarvis.service.init.initiator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,17 +24,18 @@ public class SQLExecInitiator implements Initiator {
     
     @Override
     public void doInitAction(InitActionConfig config) {
-        doSqlInitAction(config, contextLoader.getContext(config.getSystem()));
+        doInitActionInner(config, contextLoader.getContext(config.getSystem()));
     }
     
-    public void doSqlInitAction(InitActionConfig initActionConfig, Context context) {
+    private void doInitActionInner(InitActionConfig initActionConfig, Context context) {
+        String sourceContent = TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig);
         switch (context.getContextType()) {
             case MSSQL:
             case MySQL:
-                mxSQLQueryExecutor.executeScript(TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig), context);
+                mxSQLQueryExecutor.executeScript(sourceContent, context);
                 break;
             case BigQuery:
-                bigQueryExecutor.executeScript(TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig), context);
+                bigQueryExecutor.executeScript(sourceContent, context);
                 break;
             default:
                 throw new UnsupportedOperationException("Not supported context type: " + context.getContextType());

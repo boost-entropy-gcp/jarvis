@@ -1,4 +1,4 @@
-package ai.aliz.jarvis.service;
+package ai.aliz.jarvis.service.shared;
 
 import lombok.SneakyThrows;
 
