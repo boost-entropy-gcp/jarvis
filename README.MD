@@ -12,7 +12,7 @@ The _jarvis-0.0.1-SNAPSHOT-spring-boot.jar_ is the previously mentioned JAR repa
 The Spring Boot Maven plugin also creates a copy of the Maven JAR named _jarvis-0.0.1-SNAPSHOT.jar.original_. 
 Run the application with this command.
 ```
-java -jar target/jarvis-0.0.1-SNAPSHOT-spring-boot.jar "arg1" "arg2"
+java -jar target/jarvis-0.0.1-SNAPSHOT-spring-boot.jar --context="arg1""arg1" "arg2"
 ```
 ---
 **NOTE**
@@ -20,6 +20,127 @@ java -jar target/jarvis-0.0.1-SNAPSHOT-spring-boot.jar "arg1" "arg2"
 The name of the JAR will be the name in the pom.xml concatenated to the version from the pom.xml by a '-'.
 
 ---
+## Context
+A context represents how the test runner can reach local and external resources that are necessary for the tests. 
+Contexts are parsed from the __contexts.json__ file by the ContextLoader.
+The path to the __context.json__ is a required parameter (```--context```) to run the application.
+Each context has an id which correlates to the context's type shown in the examples below.
+Valid context types are BigQuery, MySQL, MSSQL, TalendAPI, SFTP and LocalContext.
+Beside id and type, the context can have various parameters depending on its type in key-value format.  
+Let's see a valid example for a context of each type.
+
+### BigQuery
+
+```
+[
+  {
+    "id": "{id}",
+    "contextType": "BigQuery",
+    "parameters": {
+      "project": "project_name",
+      "datasetNamePrefix": "dev_"
+    }
+  }
+]
+```
+For the BigQuery type the _project_ is a required parameter.  
+The _datasetNamePrefix_ is an optional parameter that can be substituted into BQ queries.
+Using dataset name prefixes is a naming convention, which allows to easily swap between similar, near exact copies of a dataset.
+For example dev_core and staging_core, where dev_ and staging_ are the dataset name prefixes.
+
+### LocalContext
+
+```
+[
+  {
+    "id": "local",
+    "contextType": "LocalContext",
+    "parameters": {
+      "repositoryRoot": "{absolute path of the project folder}"
+    }
+  }
+]
+```
+The local context type requires a _repositoryRoot_ parameter, which is used for BQ script testing.
+The parameter indicates where the SQL files can be found locally, so later, in the test definition the relative path to the repository root is usable.
+
+### MySQL
+
+```
+[
+  {
+    "id": "{id}",
+    "contextType": "MySQL",
+    "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "database": "{database}",
+      "user": "{username}",
+      "password": "{password}"
+    }
+  }
+]
+```
+The MySQL context type has parameters that describe how to connect to the MySQL DB.
+
+### MSSQL
+
+```
+[
+  {
+    "id": "{id}",
+    "contextType": "MSSQL",
+    "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "database": "{database}",
+      "user": "{username}",
+      "password": "{password}"
+    }
+  }
+]
+```
+The MSSQL context type has parameters that describe how to connect to the MSSQL DB.
+
+### SFTP
+
+```
+[
+  {
+    "id": "{id}",
+    "contextType": "SFTP",
+    "parameters": {
+      "host": "{db host}",
+      "port": "{db port}",
+      "user": "{username}",
+      "password": "{password}",
+      "remoteBasePath": "/out"
+    }
+  }
+]
+```
+The SFTP context type has parameters that describe how to connect to the SFTP server.
+
+### TalendAPI
+
+```
+[
+  {
+    "id": "TalendAPI",
+    "contextType": "TalendAPI",
+    "parameters": {
+      "apiUrl": "{talend API url}",
+      "apiKey": "{API key}",
+      "environment": "{environment}",
+      "workspace": "{workspace}"
+    }
+  }
+]
+```
+The TalendAPI context type requires an _apiUrl_ and an _apiKey_ parameter to connect to the API, and it also requires an _environment_ and a _workspace_ parameter.
+
+Any other parameters not listed here can be used as substitution variables in files (when the key is used it is replaced by the value during query execution).
+
 ---
 ### Test BQ view
 
