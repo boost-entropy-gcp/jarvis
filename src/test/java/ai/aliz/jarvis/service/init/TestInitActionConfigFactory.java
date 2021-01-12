@@ -57,11 +57,6 @@ public class TestInitActionConfigFactory {
     }
     
     @Test
-    public void testGetInitActionConfigsEmptyFolder() {
-        assertTrue(initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/init/empty")).isEmpty());
-    }
-    
-    @Test
     public void testGetInitActionConfigsSQLExecFromBQL() {
         String relativeFilePath = "src/test/resources/init/bql/pre/bql.bql";
         File file = new File(relativeFilePath);
