@@ -20,7 +20,7 @@ import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.context.ContextLoader;
 import ai.aliz.jarvis.context.ContextType;
 import ai.aliz.jarvis.service.shared.ActionConfigUtil;
-import ai.aliz.jarvis.service.shared.ActionCreatorHelperService;
+import ai.aliz.jarvis.service.shared.ActionFactoryHelperService;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
 import ai.aliz.jarvis.testconfig.InitActionType;
 
@@ -32,10 +32,10 @@ import static ai.aliz.jarvis.util.JarvisConstants.SQL_FORMAT;
 @Service
 public class InitActionConfigFactory {
     
-    private ActionCreatorHelperService actionCreatorHelperService = new ActionCreatorHelperService();
+    private ActionFactoryHelperService actionFactoryHelperService = new ActionFactoryHelperService();
     
     public List<InitActionConfig> getInitActionConfigs(ContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
-        Path preFolder = actionCreatorHelperService.getTargetFolderPath(testCaseFolder, PRE);
+        Path preFolder = actionFactoryHelperService.getTargetFolderPath(testCaseFolder, PRE);
         List<InitActionConfig> initActions;
         try {
             initActions = Files.list(preFolder).flatMap(initActionFile -> {
@@ -63,7 +63,7 @@ public class InitActionConfigFactory {
                     }
                     initActionConfigs.add(initActionConfig);
                 } else {
-                    Context context = actionCreatorHelperService.getContext(contextLoader, fileName);
+                    Context context = actionFactoryHelperService.getContext(contextLoader, fileName);
                     String system = fileName;
                     
                     ContextType contextType = context.getContextType();

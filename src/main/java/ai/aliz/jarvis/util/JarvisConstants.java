@@ -5,7 +5,6 @@ public interface JarvisConstants {
     String SOURCE_PATH = "sourcePath";
     String SOURCE_FORMAT = "sourceFormat";
     String TEST_INIT = "test_init";
-    String NO_METADAT_ADDITION = "noMetadatAddition";
     String SFTP = "sftp";
     
     //Extensions
@@ -13,7 +12,7 @@ public interface JarvisConstants {
     String BQL_FORMAT = "bql";
     String SQL_FORMAT = "sql";
     
-    //Application params
+    //Application parameters
     //absolute path to the json file describing the contexts
     String CONTEXT = "context";
     
@@ -25,7 +24,7 @@ public interface JarvisConstants {
     //Folder
     String PRE = "pre";
     
-    //MxSQL/SFTP params
+    //MxSQL/SFTP
     String HOST = "host";
     String USER = "user";
     String PASSWORD = "password";
@@ -33,15 +32,19 @@ public interface JarvisConstants {
     String DATABASE = "database";
     String REMOTE_BASE_PATH = "remoteBasePath";
     
-    //BQ params
+    //BQ
     String PROJECT = "project";
     String TABLE = "table";
     String DATASET = "dataset";
+    String DATASET_NAME_PREFIX = "datasetNamePrefix";
+    String NO_METADAT_ADDITION = "noMetadatAddition";
+    String ASSERT_KEY_COLUMNS = "assertKeyColumns";
+    String EXCLUDE_PREVIOUSLY_INSERTED_ROWS = "excludePreviouslyInsertedRows";
     
-    //Local params
+    //Local
     String REPOSITORY_ROOT = "repositoryRoot";
     
-    //Talend params
+    //Talend
     String API_URL = "apiUrl";
     String API_KEY = "apiKey";
     String ENVIRONMENT = "environment";

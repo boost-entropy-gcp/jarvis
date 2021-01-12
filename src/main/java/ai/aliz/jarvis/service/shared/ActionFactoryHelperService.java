@@ -13,7 +13,7 @@ import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.context.ContextLoader;
 
 @Service
-public class ActionCreatorHelperService {
+public class ActionFactoryHelperService {
     
     public Context getContext(ContextLoader contextLoader, String fileName) {
         Context context = contextLoader.getContext(fileName);

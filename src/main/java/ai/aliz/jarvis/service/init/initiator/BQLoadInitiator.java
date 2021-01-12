@@ -34,7 +34,7 @@ import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.context.ContextLoader;
 import ai.aliz.jarvis.service.init.InitActionService;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
-import ai.aliz.jarvis.util.TestRunnerUtil;
+import ai.aliz.jarvis.util.JarvisUtil;
 
 import static ai.aliz.jarvis.util.JarvisConstants.JSON_FORMAT;
 import static ai.aliz.jarvis.util.JarvisConstants.NO_METADAT_ADDITION;
@@ -64,7 +64,7 @@ public class BQLoadInitiator implements Initiator {
         Preconditions.checkArgument(sourceFormat.equalsIgnoreCase(JSON_FORMAT), "Unsupported format: " + sourceFormat);
         
         String table = (String) properties.get(TABLE);
-        String sourceContent = TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig);
+        String sourceContent = JarvisUtil.getSourceContentFromConfigProperties(initActionConfig);
         
         JsonArray jsonArray = getJsonArrayFromSource(sourceContent);
         Boolean noMetadatAddition = (Boolean) properties.get(NO_METADAT_ADDITION);
@@ -74,7 +74,7 @@ public class BQLoadInitiator implements Initiator {
         sourceContent = convertToNDJson(jsonArray);
         
         String project = context.getParameter(PROJECT);
-        String dataset = TestRunnerUtil.getDatasetNameFromConfigProperties(properties, context);
+        String dataset = JarvisUtil.getDatasetNameFromConfigProperties(properties, context);
         TableId tableId = TableId.of(project, dataset, table);
         WriteChannelConfiguration writeChannelConfiguration = WriteChannelConfiguration.newBuilder(tableId)
                                                                                        .setWriteDisposition(JobInfo.WriteDisposition.WRITE_TRUNCATE)

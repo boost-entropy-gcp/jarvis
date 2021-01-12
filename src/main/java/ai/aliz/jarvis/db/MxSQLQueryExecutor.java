@@ -19,7 +19,6 @@ import javax.annotation.PreDestroy;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.context.ContextType;
-import ai.aliz.jarvis.util.TestRunnerUtil;
+import ai.aliz.jarvis.util.JarvisUtil;
 
 @Component
 @AllArgsConstructor
@@ -74,7 +73,7 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     
     private <T> T doWithStatement(String query, Context context, Function<PreparedStatement, T> statementAction) {
         Connection connection = getConnectionForContext(context);
-        String completedQuery = TestRunnerUtil.resolvePlaceholders(query, context.getParameters());
+        String completedQuery = JarvisUtil.resolvePlaceholders(query, context.getParameters());
         try {
             log.info("Executing query {}", completedQuery);
             PreparedStatement preparedStatement = connection.prepareStatement(completedQuery);
@@ -88,7 +87,7 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     private Connection getConnectionForContext(Context context) {
         Connection connection = connectionMap.get(context);
         if (connection == null) {
-            String connectionUrl = TestRunnerUtil.resolvePlaceholders(getConnectionPattern(context), context.getParameters());
+            String connectionUrl = JarvisUtil.resolvePlaceholders(getConnectionPattern(context), context.getParameters());
             try {
                 connection = DriverManager.getConnection(connectionUrl);
                 connectionMap.put(context, connection);

@@ -21,7 +21,9 @@ import ai.aliz.jarvis.testconfig.InitActionConfig;
 import ai.aliz.jarvis.testconfig.InitActionType;
 import ai.aliz.jarvis.testconfig.StepConfig;
 
+import static ai.aliz.jarvis.util.JarvisConstants.ASSERT_KEY_COLUMNS;
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
+import static ai.aliz.jarvis.util.JarvisConstants.EXCLUDE_PREVIOUSLY_INSERTED_ROWS;
 import static ai.aliz.jarvis.util.JarvisConstants.JSON_FORMAT;
 import static ai.aliz.jarvis.util.JarvisConstants.NO_METADAT_ADDITION;
 import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_FORMAT;
@@ -53,8 +55,8 @@ public class ActionConfigUtil {
         
         String tableName = FilenameUtils.getBaseName(tableDataFile.getName());
         Map<String, Object> properties = addBqProperties(datasetName, tableDataFile, JSON_FORMAT, assertActionConfig, tableName);
-        properties.put("assertKeyColumns", defaultProperties.getOrDefault("assert.assertKeyColumns", Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
-        properties.put("excludePreviouslyInsertedRows", defaultProperties.getOrDefault("assert.excludePreviouslyInsertedRows", false));
+        properties.put(ASSERT_KEY_COLUMNS, defaultProperties.getOrDefault("assert." + ASSERT_KEY_COLUMNS, Lists.newArrayList(tableName + "_BID", tableName + "_VALID_FROM")));
+        properties.put(EXCLUDE_PREVIOUSLY_INSERTED_ROWS, defaultProperties.getOrDefault("assert." + EXCLUDE_PREVIOUSLY_INSERTED_ROWS, false));
         addAssertProperties(properties, tableDataFile);
         return assertActionConfig;
     }

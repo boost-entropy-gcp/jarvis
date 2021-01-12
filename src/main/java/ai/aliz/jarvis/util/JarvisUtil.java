@@ -23,10 +23,11 @@ import ai.aliz.jarvis.testconfig.AssertActionConfig;
 import ai.aliz.jarvis.testconfig.StepConfig;
 
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
+import static ai.aliz.jarvis.util.JarvisConstants.DATASET_NAME_PREFIX;
 import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_PATH;
 
 @UtilityClass
-public class TestRunnerUtil {
+public class JarvisUtil {
     
     @SneakyThrows
     public String getSourceContentFromConfigProperties(StepConfig stepConfig) {
@@ -54,7 +55,7 @@ public class TestRunnerUtil {
     
     public String getDatasetNameFromConfigProperties(Map<String, Object> properties, Context context) {
         String dataset = (String) properties.get(DATASET);
-        String datasetNamePrefix = context.getParameter("datasetNamePrefix");
+        String datasetNamePrefix = context.getParameter(DATASET_NAME_PREFIX);
         if (datasetNamePrefix != null) {
             dataset = datasetNamePrefix + dataset;
         }

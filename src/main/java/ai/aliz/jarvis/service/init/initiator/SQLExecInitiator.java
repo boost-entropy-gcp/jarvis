@@ -8,7 +8,7 @@ import ai.aliz.jarvis.context.ContextLoader;
 import ai.aliz.jarvis.db.BigQueryExecutor;
 import ai.aliz.jarvis.db.MxSQLQueryExecutor;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
-import ai.aliz.jarvis.util.TestRunnerUtil;
+import ai.aliz.jarvis.util.JarvisUtil;
 
 @Service
 public class SQLExecInitiator implements Initiator {
@@ -28,7 +28,7 @@ public class SQLExecInitiator implements Initiator {
     }
     
     private void doInitActionInner(InitActionConfig initActionConfig, Context context) {
-        String sourceContent = TestRunnerUtil.getSourceContentFromConfigProperties(initActionConfig);
+        String sourceContent = JarvisUtil.getSourceContentFromConfigProperties(initActionConfig);
         switch (context.getContextType()) {
             case MSSQL:
             case MySQL:

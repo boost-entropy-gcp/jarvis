@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 import ai.aliz.jarvis.service.shared.platform.BigQueryService;
 import ai.aliz.jarvis.service.shared.ExecutorServiceWrapper;
 import ai.aliz.jarvis.context.Context;
-import ai.aliz.jarvis.util.TestRunnerUtil;
+import ai.aliz.jarvis.util.JarvisUtil;
 
 import static ai.aliz.talendtestrunner.helper.Helper.TEST_INIT;
 
@@ -118,7 +118,7 @@ public class BigQueryExecutor implements QueryExecutor {
     }
     
     private TableResult executeQueryAndGetResult(String query, Context context) {
-        String completedQuery = TestRunnerUtil.resolvePlaceholders(query, context.getParameters());
+        String completedQuery = JarvisUtil.resolvePlaceholders(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
         BigQuery bigQuery = getBigQueryClient(context);
