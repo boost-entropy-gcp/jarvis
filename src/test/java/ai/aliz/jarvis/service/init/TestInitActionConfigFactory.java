@@ -1,6 +1,8 @@
 package ai.aliz.jarvis.service.init;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import org.junit.runner.RunWith;
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
 import static ai.aliz.jarvis.util.JarvisConstants.JSON_FORMAT;
 import static ai.aliz.jarvis.util.JarvisConstants.NO_METADAT_ADDITION;
+import static ai.aliz.jarvis.util.JarvisConstants.PRE;
 import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_FORMAT;
 import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_PATH;
 import static ai.aliz.jarvis.util.JarvisConstants.TABLE;
@@ -45,9 +48,10 @@ public class TestInitActionConfigFactory {
     public void testGetInitActionConfigsMissingFolder() {
         String relativePath = "src/test/resources/init/invalid";
         File file = new File(relativePath);
+        Path preFolderPath = Paths.get(file.getAbsolutePath(), PRE);
         
         exceptionRule.expect(IllegalArgumentException.class);
-        exceptionRule.expectMessage("pre folder does not exists " + file.getAbsolutePath() + "\\pre");
+        exceptionRule.expectMessage("pre folder does not exists " + preFolderPath.toString());
     
         initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File(relativePath));
     }
