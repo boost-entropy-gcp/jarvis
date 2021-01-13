@@ -2,7 +2,6 @@ package ai.aliz.jarvis.service.shared.platform;
 
 import lombok.Data;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -24,15 +23,14 @@ import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
-import ai.aliz.jarvis.util.JarvisConstants;
 
 import static ai.aliz.jarvis.util.JarvisConstants.HOST;
 import static ai.aliz.jarvis.util.JarvisConstants.PASSWORD;
 import static ai.aliz.jarvis.util.JarvisConstants.PORT;
 import static ai.aliz.jarvis.util.JarvisConstants.REMOTE_BASE_PATH;
 import static ai.aliz.jarvis.util.JarvisConstants.SFTP;
+import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_PATH;
 import static ai.aliz.jarvis.util.JarvisConstants.USER;
-import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 
 @Service
 @Slf4j

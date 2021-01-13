@@ -1,7 +1,7 @@
 package ai.aliz.jarvis.util;
 
 public interface JarvisConstants {
-    //shared
+    //Shared
     String SOURCE_PATH = "sourcePath";
     String SOURCE_FORMAT = "sourceFormat";
     String TEST_INIT = "test_init";
@@ -13,7 +13,7 @@ public interface JarvisConstants {
     String SQL_FORMAT = "sql";
     
     //Application parameters
-    //absolute path to the json file describing the contexts
+    /* absolute path to the json file describing the contexts */
     String CONTEXT = "context";
     
     //Context

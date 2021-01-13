@@ -1,5 +1,6 @@
 package ai.aliz.jarvis.service.init.initiator;
 
+import lombok.Lombok;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
@@ -87,7 +88,7 @@ public class BQLoadInitiator implements Initiator {
             IOUtils.copy(byteArrayInputStream, stream);
         } catch (IOException e) {
             log.error(e.getMessage());
-            return;
+            throw Lombok.sneakyThrow(e);
         }
     
         Job job = writer.getJob();
@@ -95,7 +96,7 @@ public class BQLoadInitiator implements Initiator {
             job = job.waitFor();
         } catch (InterruptedException e) {
             log.error(e.getMessage());
-            return;
+            throw Lombok.sneakyThrow(e);
         }
         if (job.getStatus().getError() != null || job.getStatus().getExecutionErrors() != null && !job.getStatus().getExecutionErrors().isEmpty()) {
             throw new IllegalStateException(String.format("Failed to execute load job for %s. Error: %s)", initActionConfig, job.getStatus().toString()));

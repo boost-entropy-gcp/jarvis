@@ -6,7 +6,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
-import ai.aliz.talendtestrunner.config.AppConfig;
+import ai.aliz.jarvis.config.AppConfig;
 
 @SpringBootApplication
 public class JarvisApplication {

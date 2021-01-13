@@ -43,7 +43,7 @@ import ai.aliz.jarvis.service.shared.ExecutorServiceWrapper;
 import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.util.JarvisUtil;
 
-import static ai.aliz.talendtestrunner.helper.Helper.TEST_INIT;
+import static ai.aliz.jarvis.util.JarvisConstants.TEST_INIT;
 
 @Component
 @AllArgsConstructor
