@@ -51,9 +51,6 @@ public class BQLoadInitiator implements Initiator {
     @Autowired
     private ContextLoader contextLoader;
     
-    @Autowired
-    private InitActionService initActionService;
-    
     @Override
     public void doInitAction(InitActionConfig config) {
         doInitActionInner(config, contextLoader.getContext(config.getSystem()));

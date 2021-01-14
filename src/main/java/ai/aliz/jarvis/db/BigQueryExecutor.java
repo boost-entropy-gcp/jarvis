@@ -77,9 +77,8 @@ public class BigQueryExecutor implements QueryExecutor {
         Arrays.stream(query.split(";"))
               .map(String::trim)
               .filter(e -> !e.isEmpty())
-              .map(String::toUpperCase)
               .forEach(e -> {
-                  if (e.contains("DELETE FROM")) {
+                  if (e.toUpperCase().contains("DELETE FROM")) {
                       deletes.add(e);
                   } else {
                       inserts.add(e);
