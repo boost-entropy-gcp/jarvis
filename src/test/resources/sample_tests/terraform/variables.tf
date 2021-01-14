@@ -1,6 +1,5 @@
 variable "project" {
   type = string
-  default = "bertalan-bodroghelyi-sandbox"
 }
 
 variable "location" {

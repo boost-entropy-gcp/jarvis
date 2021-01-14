@@ -57,7 +57,7 @@ public class AssertActionConfigTest {
         ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
         String contextPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test_context.json").getFile())).getPath();
         contextLoader.parseContext(contextPath);
-        String configPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test_structure").getFile())).getPath() + File.separatorChar + "test_json";
+        String configPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("sample_tests").getFile())).getPath() + File.separatorChar + "test_json";
         List<AssertActionConfig> assertActionConfigs = assertActionConfigCreator.getAssertActionConfigs(contextLoader, defaultP, new File(configPath));
         AssertActionConfig assertActionConfig = assertActionConfigs.get(0);
 

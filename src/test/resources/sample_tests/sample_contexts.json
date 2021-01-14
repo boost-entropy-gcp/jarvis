@@ -1,16 +1,18 @@
 [
   {
-    "id": "TEST_ID",
+    "id": "test_bq",
     "contextType": "BigQuery",
     "parameters": {
-      "project": "test_project"
+      "project": "TODO",
+      "datasetNamePrefix": ""
     }
   },
   {
     "id": "local",
     "contextType": "LocalContext",
     "parameters": {
-      "repositoryRoot": "C:\\test\\project"
+      "repositoryRoot": "TODO"
     }
   }
+  
 ]

@@ -30,7 +30,7 @@ public class FolderStructure {
         TestSuite testSuite = new TestSuite();
         ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
         String contextPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test_context.json").getFile())).getPath();
-        String configPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test_structure").getFile())).getPath();
+        String configPath = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("sample_tests").getFile())).getPath();
         contextLoader.parseContext(contextPath);
         List<TestCase> testCases = testSuite.readTestConfig(configPath, contextLoader).getTestCases();
 
