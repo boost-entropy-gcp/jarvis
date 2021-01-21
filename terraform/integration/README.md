@@ -1,20 +1,20 @@
 # Test environment setup for Jarvis
 
 With this configurations terraform is able to provide the necessary infrastructure to run the integration tests of the Jarvis project.
-It creates resources in BigQuery, Cloud SQL (MSSQL, MySQL, PostgreSQL) and GCE.
+It creates resources in BigQuery, Cloud SQL (MSSQL, MySQL, PostgreSQL) and GCE (SFTP server).
 
 ## Prerequisites
 1. Create a GCP project.
 2. Create a bucket for the backend ( '${project_name}_tf' ).
-3. Set the name of the bucket in the environments/dev/main.tf file.
-4. Set the name of the project in the environments/dev/main.tf file.
+3. Set the name of the bucket in the main/main.tf file.
+4. Set the name of the project in the main/variables.tf file.
 
 ## Dependencies
 
 [gcloud cli](https://cloud.google.com/sdk/gcloud/)  
 [sqlcmd](https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup-tools?view=sql-server-2017)
 [mysql](https://docs.oracle.com/javacomponents/advanced-management-console-2/install-guide/mysql-database-installation-and-configuration-advanced-management-console.htm#JSAMI116)
-[psql]()  
+[psql](https://www.postgresql.org/docs/11/tutorial-install.html)  
 
 These will be used to execute a few commands locally, so do not forget to add them to PATH.
 

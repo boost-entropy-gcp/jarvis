@@ -7,32 +7,32 @@ terraform {
 
 module "bq" {
   source  = "../modules/bq"
-  project = "nora-ambroz-sandbox"
-  region  = "europe-west1"
+  project = var.project
+  region  = var.region
 }
 
 module "mssql" {
   source  = "../modules/mssql"
-  project = "nora-ambroz-sandbox"
-  region  = "europe-west1"
+  project = var.project
+  region  = var.region
 }
 
 module "mysql" {
   source  = "../modules/mysql"
-  project = "nora-ambroz-sandbox"
-  region  = "europe-west1"
+  project = var.project
+  region  = var.region
 }
 
 module "postgresql" {
   source  = "../modules/postgresql"
-  project = "nora-ambroz-sandbox"
-  region  = "europe-west1"
+  project = var.project
+  region  = var.region
 }
 
 module "sftp" {
   source  = "../modules/sftp"
-  project = "nora-ambroz-sandbox"
-  region  = "europe-west1"
+  project = var.project
+  region  = var.region
 }
 
 output "bq_dataset" {

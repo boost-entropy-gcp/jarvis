@@ -3,7 +3,7 @@ variable "project" {
   default = "nora-ambroz-sandbox"
 }
 
-variable "location" {
+variable "region" {
   type = string
   default = "europe-west1"
 }
