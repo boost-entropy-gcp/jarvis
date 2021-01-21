@@ -16,5 +16,16 @@
 			"user": "admin",
 			"password": "nG29k0IrcSCY"
 		}
+	},
+	{
+		"id": "MySQL",
+		"contextType": "MySQL",
+		"parameters": {
+			"host": "34.77.231.35",
+			"port": "1433",
+			"database": "JarvisMySQL",
+			"user": "admin",
+			"password": "nG29k0IrcSCY"
+		}
 	}
 ]

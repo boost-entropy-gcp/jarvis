@@ -6,14 +6,12 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.base.Preconditions;
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @TestPropertySource(properties = "context=src/test/resources/integration/integration-contexts.json")
-public class TestInitActionServiceIntegrationMSSQL {
+public class TestInitActionServiceMSSQLIntegration {
     
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
