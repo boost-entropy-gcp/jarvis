@@ -62,7 +62,7 @@ resource "null_resource" "jarvis_ms_db" {
     google_sql_user.mssql_db_user
   ]
   triggers = {
-    file_hash = "${filemd5("${path.module}/jarvis-mssql/db.sql")}"
+    file_hash = filemd5("${path.module}/jarvis-mssql/db.sql")
   }
   provisioner "local-exec" {
     command = "sqlcmd -S ${google_sql_database_instance.mssql_cloudsql.public_ip_address},1433 -d master -U ${google_sql_user.mssql_db_user.name} -P ${random_string.db_password.result} -i ${path.module}/jarvis-mssql/db.sql"
@@ -75,7 +75,7 @@ resource "null_resource" "jarvis_ms_table" {
     google_sql_user.mssql_db_user
   ]
   triggers = {
-    file_hash = "${filemd5("${path.module}/jarvis-mssql/table.sql")}"
+    file_hash = filemd5("${path.module}/jarvis-mssql/table.sql")
     db        = null_resource.jarvis_ms_db.id
   }
   provisioner "local-exec" {
@@ -83,10 +83,26 @@ resource "null_resource" "jarvis_ms_table" {
   }
 }
 
-output "database" {
-  value = {
-    ip : google_sql_database_instance.mssql_cloudsql.public_ip_address,
-    username : google_sql_user.mssql_db_user.name,
-    password : random_string.db_password.result
-  }
+resource "local_file" "mssql-context" {
+  depends_on = [
+    google_sql_database_instance.mssql_cloudsql,
+    null_resource.jarvis_ms_db,
+    google_sql_user.mssql_db_user
+  ]
+  filename = "${path.module}/../../../../src/test/resources/integration/mssql-context.json"
+  content = <<EOT
+  [
+    {
+  		"id": "MSSQL",
+  		"contextType": "MSSQL",
+  		"parameters": {
+  			"host": "${google_sql_database_instance.mssql_cloudsql.public_ip_address}",
+  			"port": "1433",
+  			"database": "JarvisMSDB",
+  			"user": "${google_sql_user.mssql_db_user.name}",
+  			"password": "${random_string.db_password.result}"
+  		}
+  	}
+  ]
+  EOT
 }

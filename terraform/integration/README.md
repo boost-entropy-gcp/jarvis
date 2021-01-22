@@ -6,8 +6,9 @@ It creates resources in BigQuery, Cloud SQL (MSSQL, MySQL, PostgreSQL) and GCE (
 ## Prerequisites
 1. Create a GCP project.
 2. Create a bucket for the backend ( '${project_name}_tf' ).
-3. Set the name of the bucket in the main/main.tf file.
-4. Set the name of the project in the main/variables.tf file.
+3. Create a service account and add BigQuery, Cloud SQL and GCE admin roles.
+4. Set the name of the bucket in the main/main.tf file.
+5. Set the name of the project and service account in the main/variables.tf file.
 
 ## Dependencies
 

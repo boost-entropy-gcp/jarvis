@@ -67,7 +67,7 @@ resource "null_resource" "jarvis_my_sql_table" {
     google_sql_user.mysql_db_user
   ]
   triggers = {
-    file_hash = "${filemd5("${path.module}/jarvis-mysql/table.sql")}"
+    file_hash = filemd5("${path.module}/jarvis-mysql/table.sql")
     db        = google_sql_database.my_sql_database.id
   }
   provisioner "local-exec" {
@@ -75,10 +75,26 @@ resource "null_resource" "jarvis_my_sql_table" {
   }
 }
 
-output "database" {
-  value = {
-    ip : google_sql_database_instance.mysql_cloudsql.public_ip_address,
-    username : google_sql_user.mysql_db_user.name,
-    password : random_string.db_password.result
-  }
+resource "local_file" "mysql-context" {
+  depends_on = [
+    google_sql_database_instance.mysql_cloudsql,
+    null_resource.jarvis_my_sql_table,
+    google_sql_user.mysql_db_user
+  ]
+  filename = "${path.module}/../../../../src/test/resources/integration/mysql-context.json"
+  content = <<EOT
+  [
+    {
+  		"id": "MySQL",
+  		"contextType": "MySQL",
+  		"parameters": {
+  			"host": "${google_sql_database_instance.mysql_cloudsql.public_ip_address}",
+  			"port": "1433",
+  			"database": "${google_sql_database.my_sql_database.name}",
+  			"user": "${google_sql_user.mysql_db_user.name}",
+  			"password": "${random_string.db_password.result}"
+  		}
+  	}
+  ]
+  EOT
 }

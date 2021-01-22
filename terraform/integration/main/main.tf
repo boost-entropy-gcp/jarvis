@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "${project_name}_tf"
+    bucket = "nora-ambroz-sandbox_tf"
     prefix = "jarvis-test"
   }
 }
@@ -30,28 +30,8 @@ module "postgresql" {
 }
 
 module "sftp" {
-  source  = "../modules/sftp"
-  project = var.project
-  region  = var.region
-}
-
-resource "local_file" "integration-contexts" {
-  content     = "right here"
-  filename    = "${path.module}/integration-contexts.json"
-}
-
-output "bq_dataset" {
-  value = module.bq.dataset
-}
-
-output "mssql_database" {
-  value = module.mssql.database
-}
-
-output "mysql_database" {
-  value = module.mysql.database
-}
-
-output "postgresql_database" {
-  value = module.postgresql.database
+  source     = "../modules/sftp"
+  project    = var.project
+  region     = var.region
+  sftp_user  = var.user
 }
