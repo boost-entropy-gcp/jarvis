@@ -21,23 +21,25 @@ These will be used to execute a few commands locally, so do not forget to add th
 ##Usage
 Make sure you have all the dependencies mentioned above in the **Dependencies** installed.
 
-1. From the current (terraform) directory, navigate to the `main` folder. 
-   In a command prompt do an init:  
+1. From the current (`integration`) directory, navigate to the `main` folder. 
+   In the command prompt do an init:  
    `terraform init`
    
 2. If the environment already exists, you'll have to mark the previous instance as tainted, so that terraform destroys them on apply:  
    `terraform taint module.mssql.google_sql_database_instance.mssql_cloudsql`  
    `terraform taint module.mysql.google_sql_database_instance.mysql_cloudsql`  
    For the full list of resources use the `terraform state list` command and taint what you want recreate.
+   Alternatively you can run a full cleanup with `terraform destroy`.
 
-2. Run apply:   
+3. Run apply:   
    `terraform apply`  
    If everything seems okay, accept the suggested changes. 
    The whole apply process takes quite a bit of time, don't worry. 
     
-3. After the process is finished, terraform prints the username, password and the IP address (host) of the freshly created environment.
-   (Should not change at recreation, if you followed these steps.) 
-   Use them to connect to the database in the integrations tests.
+4. After the process is finished, terraform outputs the attributes of the freshly created environment as a useable context JSON file to `src/test/resources/integration/integration-contexts.json`.
+   Use this file in the integrations tests to connect to the resources.
+   
+5. When the development is finished or paused for a while, then run `terraform destroy` to reduce GCP costs.
    
  ---
  **NOTE**

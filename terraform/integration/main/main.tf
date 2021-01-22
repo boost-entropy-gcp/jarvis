@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "nora-ambroz-sandbox_tf"
+    bucket = "${project_name}_tf"
     prefix = "jarvis-test"
   }
 }
