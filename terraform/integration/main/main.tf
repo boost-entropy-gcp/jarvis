@@ -35,6 +35,11 @@ module "sftp" {
   region  = var.region
 }
 
+resource "local_file" "integration-contexts" {
+  content     = "right here"
+  filename    = "${path.module}/integration-contexts.json"
+}
+
 output "bq_dataset" {
   value = module.bq.dataset
 }

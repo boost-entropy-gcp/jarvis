@@ -2,18 +2,18 @@ terraform {
   backend "gcs" {}
 }
 
-data "template_file" "pub_key" {
-    template = "${file("~/.ssh/id_rsa.pub")}"
-}
-
 resource "google_compute_instance" "sftp" {
   name         = "jarvis-test-sftp"
   machine_type = "f1-micro"
   zone         = var.sftp_zone
   boot_disk {
     initialize_params {
-      image = "centos-7-v20201216"
+      image = "debian-cloud/debian-9"
     }
+  }
+  metadata_startup_script = "${file("${path.module}/jarvis-sftp/startup.sh")}"
+  metadata = {
+    enable-oslogin = "TRUE"
   }
   network_interface {
     network = "default"
@@ -21,8 +21,11 @@ resource "google_compute_instance" "sftp" {
   }
 }
 
-resource "google_compute_project_metadata" "metadata" {
-  metadata = {
-    ssh-keys = "${data.template_file.pub_key.template}"
-  }
+resource "google_project_iam_binding" "service-account-access" {
+  project = var.project
+  role    = "roles/compute.osAdminLogin"
+
+  members = [
+    "serviceAccount:jarvis-tests@nora-ambroz-sandbox.iam.gserviceaccount.com"
+  ]
 }

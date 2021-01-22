@@ -19,11 +19,12 @@ data "http" "executor_ip" {
 }
 
 resource "google_sql_database_instance" "postgresql_cloudsql" {
-  provider         = google-beta
-  project          = var.project
-  name             = "${var.project}-test-postgresql-${random_id.db_name_suffix.hex}"
-  database_version = "POSTGRES_11"
-  region           = var.sql_region
+  provider            = google-beta
+  project             = var.project
+  name                = "${var.project}-test-postgresql-${random_id.db_name_suffix.hex}"
+  database_version    = "POSTGRES_11"
+  region              = var.sql_region
+  deletion_protection = false
 
   settings {
     tier = "db-f1-micro"
@@ -47,11 +48,12 @@ resource "google_sql_database_instance" "postgresql_cloudsql" {
   root_password = random_string.db_password.result
 }
 
-resource "google_sql_user" "db_user" {
-  project  = var.project
-  name     = "admin"
-  instance = google_sql_database_instance.postgresql_cloudsql.name
-  password = random_string.db_password.result
+resource "google_sql_user" "psql_db_user" {
+  project         = var.project
+  name            = var.user_name
+  instance        = google_sql_database_instance.postgresql_cloudsql.name
+  password        = random_string.db_password.result
+  deletion_policy = "ABANDON"
 }
 
 resource "google_sql_database" "postgre_sql_database" {
@@ -60,19 +62,23 @@ resource "google_sql_database" "postgre_sql_database" {
 }
 
 resource "null_resource" "jarvis_postgre_sql_table" {
-  depends_on = [ "google_sql_database.postgre_sql_database" ]
+  depends_on = [
+      google_sql_database_instance.postgresql_cloudsql,
+      google_sql_database.postgre_sql_database,
+      google_sql_user.psql_db_user
+    ]
   provisioner "local-exec" {
     environment = {
       PGPASSWORD = random_string.db_password.result
     }
-    command = "psql -d ${google_sql_database.postgre_sql_database.name} -U admin -h ${google_sql_database_instance.postgresql_cloudsql.public_ip_address} -f ${path.module}/jarvis-postgre/table.sql"
+    command = "psql -d ${google_sql_database.postgre_sql_database.name} -U ${google_sql_user.psql_db_user.name} -h ${google_sql_database_instance.postgresql_cloudsql.public_ip_address} -f ${path.module}/jarvis-postgre/table.sql"
   }
 }
 
 output "database" {
   value = {
     ip : google_sql_database_instance.postgresql_cloudsql.public_ip_address,
-    username : google_sql_user.db_user.name,
+    username : google_sql_user.psql_db_user.name,
     password : random_string.db_password.result
   }
 }

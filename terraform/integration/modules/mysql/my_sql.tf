@@ -19,11 +19,12 @@ data "http" "executor_ip" {
 }
 
 resource "google_sql_database_instance" "mysql_cloudsql" {
-  provider         = google-beta
-  project          = var.project
-  name             = "${var.project}-test-mysql-${random_id.db_name_suffix.hex}"
-  database_version = "MYSQL_8_0"
-  region           = var.sql_region
+  provider            = google-beta
+  project             = var.project
+  name                = "${var.project}-test-mysql-${random_id.db_name_suffix.hex}"
+  database_version    = "MYSQL_8_0"
+  region              = var.sql_region
+  deletion_protection = false
 
   settings {
     tier = "db-f1-micro"
@@ -47,11 +48,12 @@ resource "google_sql_database_instance" "mysql_cloudsql" {
   root_password = random_string.db_password.result
 }
 
-resource "google_sql_user" "db_user" {
-  project  = var.project
-  name     = "admin"
-  instance = google_sql_database_instance.mysql_cloudsql.name
-  password = random_string.db_password.result
+resource "google_sql_user" "mysql_db_user" {
+  project         = var.project
+  name            = var.user_name
+  instance        = google_sql_database_instance.mysql_cloudsql.name
+  password        = random_string.db_password.result
+  deletion_policy = "ABANDON"
 }
 
 resource "google_sql_database" "my_sql_database" {
@@ -61,21 +63,22 @@ resource "google_sql_database" "my_sql_database" {
 
 resource "null_resource" "jarvis_my_sql_table" {
   depends_on = [
-    google_sql_database.my_sql_database
+    google_sql_database.my_sql_database,
+    google_sql_user.mysql_db_user
   ]
   triggers = {
     file_hash = "${filemd5("${path.module}/jarvis-mysql/table.sql")}"
     db        = google_sql_database.my_sql_database.id
   }
   provisioner "local-exec" {
-    command = "mysql -u admin -p${random_string.db_password.result} -h ${google_sql_database_instance.mysql_cloudsql.public_ip_address} > ${path.module}/jarvis-mysql/table.sql --binary-mode"
+    command = "mysql -u ${google_sql_user.mysql_db_user.name} -p${random_string.db_password.result} -h ${google_sql_database_instance.mysql_cloudsql.public_ip_address} > ${path.module}/jarvis-mysql/table.sql --binary-mode"
   }
 }
 
 output "database" {
   value = {
     ip : google_sql_database_instance.mysql_cloudsql.public_ip_address,
-    username : google_sql_user.db_user.name,
+    username : google_sql_user.mysql_db_user.name,
     password : random_string.db_password.result
   }
 }

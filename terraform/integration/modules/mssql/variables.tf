@@ -14,3 +14,7 @@ variable "sql_region" {
   default = "europe-west1"
 }
 
+variable "user_name" {
+  type    = string
+  default = "mssql_admin"
+}
