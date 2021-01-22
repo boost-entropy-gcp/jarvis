@@ -142,6 +142,63 @@ The TalendAPI context type requires an _apiUrl_ and an _apiKey_ parameter to con
 Any other parameters not listed here can be used as substitution variables in files (when the key is used it is replaced by the value during query execution).
 
 ---
+## Actions
+When the application runs, it completes three phases (also called actions). 
+The first is the __initiation__ phase, the next is the test __execution__ and finally comes the __assertion__.
+This order never changes and each phase starts only after the previous has finished.
+This part of the documentation details the role of each action and how the events can be customized during the steps.
+
+### Initiation Action
+The initiation action prepares the environment for the upcoming test execution. 
+During this phase the test runner can automatically create the prerequisites of the test.
+For example, it can load data or clean up after a previous run.
+If the initiation is correctly set up, then every condition will be provided to repeat the test.
+
+If the __testSuite.json__ allows autodetect, then Jarvis parses the configuration for the initiation actions from the folder structure of the test case.
+There are two different valid folder structures, that Jarvis can detect.
+
+* folder with test cases (any name)
+  * test_case_1
+    * pre
+        * _{context id}_
+            * files
+    * assert
+  * test_case_2
+  * testSuite.json
+  
+The top-level folder can have any name, and the absolute path to it is one of the necessary parameters to run the application.
+Every test case should have its own folder, but there isn't any naming convention enforced here.
+In the case folder there must be a __'pre'__ and an __'assert'__ folder. 
+The content of the 'pre' folder dictates what happens during the initiation phase, while the 'assert' folder controls the assertion action.
+The next folder under it must be named the same as the corresponding context's id.
+Within that the files can have any name.
+
+The initiation action can execute SQL/BQL scripts on BQ, SQL Server, MySQL or PostgreSQL.
+It can also upload any file to SFTP server.
+
+It is also possible to upload the contents of a JSON file to BQ, but in this case the folder structure needs to be a bit different.
+
+* folder with test cases (any name)
+  * test_case_1
+    * pre
+        * _{context id}_
+            * _{dataset name}_
+              * _{table}_.json
+    * assert
+  * test_case_2
+  * testSuite.json
+ 
+ Here in the '_{context id}_' folder there can be other folders that have the name of BigQuery datasets.
+ The files in a '_{dataset name}_' folder are named as the target '_{table}_'.
+ The JSON content will be uploaded to the table and dataset specified here.
+ 
+ If the initiation is unnecessary it can be skipped by leaving the 'pre' folder empty.
+
+### Execution Action
+
+### Assertion Action
+
+---
 ### Test BQ view
 
 ###### Folder system:

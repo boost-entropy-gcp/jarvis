@@ -1,0 +1,34 @@
+[
+	{
+		"id": "bql",
+		"contextType": "BigQuery",
+		"parameters": {
+			"project": "project"
+		}
+	},
+	{
+		"id": "sql",
+		"contextType": "BigQuery",
+		"parameters": {
+			"project": "project"
+		}
+	},
+	{
+		"id": "bq",
+		"contextType": "BigQuery",
+		"parameters": {
+			"project": "project"
+		}
+	},
+	{
+		"id": "sftp",
+		"contextType": "SFTP",
+		"parameters": {
+			"host": "host",
+			"port": "port",
+			"user": "user",
+			"password": "password",
+			"remoteBasePath": "/out"
+		}
+	}
+]

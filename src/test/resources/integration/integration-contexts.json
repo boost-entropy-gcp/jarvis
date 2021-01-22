@@ -1,0 +1,31 @@
+[
+	{
+		"id": "BQ",
+		"contextType": "BigQuery",
+		"parameters": {
+			"project": "nora-ambroz-sandbox"
+		}
+	},
+	{
+		"id": "MSSQL",
+		"contextType": "MSSQL",
+		"parameters": {
+			"host": "34.77.231.35",
+			"port": "1433",
+			"database": "JarvisMSDB",
+			"user": "admin",
+			"password": "nG29k0IrcSCY"
+		}
+	},
+	{
+		"id": "MySQL",
+		"contextType": "MySQL",
+		"parameters": {
+			"host": "34.77.231.35",
+			"port": "1433",
+			"database": "JarvisMySQL",
+			"user": "admin",
+			"password": "nG29k0IrcSCY"
+		}
+	}
+]

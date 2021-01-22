@@ -1,0 +1,75 @@
+package ai.aliz.jarvis.util;
+
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
+
+import java.io.File;
+import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.JsonStructure;
+import javax.json.JsonValue;
+
+import org.apache.commons.io.IOUtils;
+
+import ai.aliz.jarvis.context.Context;
+import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.testconfig.StepConfig;
+
+import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
+import static ai.aliz.jarvis.util.JarvisConstants.DATASET_NAME_PREFIX;
+import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_PATH;
+
+@UtilityClass
+public class JarvisUtil {
+    
+    @SneakyThrows
+    public String getSourceContentFromConfigProperties(StepConfig stepConfig) {
+        
+        String sourcePath = (String) stepConfig.getProperties().get(SOURCE_PATH);
+        File sourceFile;
+        if (Paths.get(sourcePath).isAbsolute()) {
+            sourceFile = new File(sourcePath);
+            
+        } else {
+            sourceFile = new File(stepConfig.getDescriptorFolder() + sourcePath);
+        }
+        
+        if (stepConfig.getClass().equals(AssertActionConfig.class)) {
+            JsonReader jsonReader = Json.createReader(new FileReader(sourceFile));
+            JsonStructure jsonStructure = jsonReader.read();
+            if (jsonStructure.getValueType().equals(JsonValue.ValueType.OBJECT)) {
+                JsonObject object = jsonStructure.asJsonObject();
+                return String.valueOf(object.get("rows"));
+            }
+            jsonReader.close();
+        }
+        return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
+    }
+    
+    public String getDatasetNameFromConfigProperties(Map<String, Object> properties, Context context) {
+        String dataset = (String) properties.get(DATASET);
+        String datasetNamePrefix = context.getParameter(DATASET_NAME_PREFIX);
+        if (datasetNamePrefix != null) {
+            dataset = datasetNamePrefix + dataset;
+        }
+        return dataset;
+    }
+    
+    public String resolvePlaceholders(String pattern, Map<String, String> parameters) {
+        String result = pattern;
+        Iterator<Map.Entry<String, String>> parameterIterator = parameters.entrySet().iterator();
+        while (parameterIterator.hasNext()) {
+            Map.Entry<String, String> kv = parameterIterator.next();
+            result = result.replace("{{" + kv.getKey() + "}}", kv.getValue());
+        }
+        return result;
+    }
+}
+

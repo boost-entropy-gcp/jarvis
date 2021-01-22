@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import static ai.aliz.jarvis.util.JarvisConstants.CONTEXT;
+
 @Configuration
 public class ContextLoaderConfig {
     
@@ -13,6 +15,6 @@ public class ContextLoaderConfig {
     
     @Bean
     public ContextLoader contextLoader() {
-        return new ContextLoader(env.getProperty("context"));
+        return new ContextLoader(env.getProperty(CONTEXT));
     }
 }
