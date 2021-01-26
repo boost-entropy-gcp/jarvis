@@ -29,9 +29,12 @@ module "postgresql" {
   region  = var.region
 }
 
+// TODO
+/*
 module "sftp" {
   source     = "../modules/sftp"
   project    = var.project
   region     = var.region
   sftp_user  = var.user
 }
+*/

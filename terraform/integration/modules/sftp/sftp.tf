@@ -14,8 +14,8 @@ resource "google_container_cluster" "sftp_server" {
   initial_node_count = 1
 
   node_config {
-    preemptible  = true
-    machine_type = "g1-small"
+    preemptible  = false
+    machine_type = "n1-standard-1"
 
     metadata = {
       disable-legacy-endpoints = "true"
