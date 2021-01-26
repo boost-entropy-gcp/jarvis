@@ -40,14 +40,13 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = "context=src/test/resources/integration/integration-contexts.json")
+@TestPropertySource(properties = "context=src/test/resources/integration/bq-context.json")
 public class TestInitActionServiceBQIntegration {
     
     /*
     PREREQUISITES
-     * The test requires an existing GCP project with BQ.
-     * The name of the project must be in the integration-contexts.json.
-     * The project must have an empty dataset named jarvis_test.
+     * The test requires an existing GCP project with BQ API enabled.
+     * To provide resources for this test, apply the Terraform configurations in the integration folder.
     */
     
     private static final String DATASET_NAME = "jarvis_test";

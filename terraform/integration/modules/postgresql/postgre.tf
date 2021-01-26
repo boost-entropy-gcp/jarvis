@@ -75,10 +75,26 @@ resource "null_resource" "jarvis_postgre_sql_table" {
   }
 }
 
-output "database" {
-  value = {
-    ip : google_sql_database_instance.postgresql_cloudsql.public_ip_address,
-    username : google_sql_user.psql_db_user.name,
-    password : random_string.db_password.result
-  }
+resource "local_file" "psql-context" {
+  depends_on = [
+    google_sql_database_instance.postgresql_cloudsql,
+    null_resource.jarvis_postgre_sql_table,
+    google_sql_user.psql_db_user
+  ]
+  filename = "${path.module}/../../../../src/test/resources/integration/psql-context.json"
+  content = <<EOT
+  [
+    {
+  		"id": "PostgreSQL",
+  		"contextType": "PostgreSQL",
+  		"parameters": {
+  			"host": "${google_sql_database_instance.postgresql_cloudsql.public_ip_address}",
+  			"port": "5432",
+  			"database": "${google_sql_database.postgre_sql_database.name}",
+  			"user": "${google_sql_user.psql_db_user.name}",
+  			"password": "${random_string.db_password.result}"
+  		}
+  	}
+  ]
+  EOT
 }

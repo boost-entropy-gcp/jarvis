@@ -71,7 +71,7 @@ resource "null_resource" "jarvis_my_sql_table" {
     db        = google_sql_database.my_sql_database.id
   }
   provisioner "local-exec" {
-    command = "mysql -u ${google_sql_user.mysql_db_user.name} -p${random_string.db_password.result} -h ${google_sql_database_instance.mysql_cloudsql.public_ip_address} > ${path.module}/jarvis-mysql/table.sql --binary-mode"
+    command = "mysql -u ${google_sql_user.mysql_db_user.name} -p${random_string.db_password.result} -h ${google_sql_database_instance.mysql_cloudsql.public_ip_address} < ${path.module}/jarvis-mysql/table.sql --binary-mode"
   }
 }
 
@@ -89,7 +89,7 @@ resource "local_file" "mysql-context" {
   		"contextType": "MySQL",
   		"parameters": {
   			"host": "${google_sql_database_instance.mysql_cloudsql.public_ip_address}",
-  			"port": "1433",
+  			"port": "3306",
   			"database": "${google_sql_database.my_sql_database.name}",
   			"user": "${google_sql_user.mysql_db_user.name}",
   			"password": "${random_string.db_password.result}"

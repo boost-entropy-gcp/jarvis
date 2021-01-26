@@ -40,8 +40,8 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = "context=src/test/resources/integration/mssql-context.json")
-public class TestInitActionServiceMSSQLIntegration {
+@TestPropertySource(properties = "context=src/test/resources/integration/psql-context.json")
+public class TestInitActionServicePostgreSQLIntegration {
     
      /*
     PREREQUISITES
@@ -63,11 +63,11 @@ public class TestInitActionServiceMSSQLIntegration {
     @BeforeClass
     @SneakyThrows
     public static void init() {
-        Map<String, String> mssqlParameters = new ContextLoader("src/test/resources/integration/mssql-context.json").getContext("MSSQL").getParameters();
-        CONNECTION = DriverManager.getConnection("jdbc:sqlserver://" + mssqlParameters.get(HOST) + ":" + mssqlParameters.get(PORT) +
-                                                         ";databaseName=" + mssqlParameters.get(DATABASE) +
-                                                         ";user=" + mssqlParameters.get(USER) +
-                                                         ";password=" + mssqlParameters.get(PASSWORD));
+        Map<String, String> mysqlParameters = new ContextLoader("src/test/resources/integration/psql-context.json").getContext("PostgreSQL").getParameters();
+        CONNECTION = DriverManager.getConnection("jdbc:postgresql://" + mysqlParameters.get(HOST) + ":" + mysqlParameters.get(PORT) +
+                                                         "/" + mysqlParameters.get(DATABASE) +
+                                                         "?user=" + mysqlParameters.get(USER) +
+                                                         "&password=" + mysqlParameters.get(PASSWORD));
     }
     
     @Test
@@ -77,9 +77,8 @@ public class TestInitActionServiceMSSQLIntegration {
         String validationQuery = "SELECT * FROM test";
         ResultSet firstState = statement.executeQuery(validationQuery);
         Preconditions.checkArgument(!firstState.isBeforeFirst());
-        
         try {
-            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/mssql-script"));
+            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/psql-script"));
             actionService.run(actionConfigs);
             
             ResultSet resultSet = statement.executeQuery(validationQuery);
@@ -95,9 +94,10 @@ public class TestInitActionServiceMSSQLIntegration {
     @SneakyThrows
     public void testInvalidScript() {
         exceptionRule.expect(ExecutionException.class);
-        exceptionRule.expectMessage("Invalid object name 'invalid'.");
+        exceptionRule.expectMessage("org.postgresql.util.PSQLException: ERROR: relation \"invalid\" does not exist\n" +
+                                            "  Position: 13");
         
-        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/mssql-script-invalid"));
+        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/psql-script-invalid"));
         actionService.run(actionConfigs);
     }
     

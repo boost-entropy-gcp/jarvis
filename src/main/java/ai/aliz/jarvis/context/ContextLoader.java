@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;
 
 public class ContextLoader {
@@ -22,7 +23,8 @@ public class ContextLoader {
     @Getter
     private Map<String, Context> contextIdToContexts;
     
-    ContextLoader(String contextPath) {
+    @VisibleForTesting
+    public ContextLoader(String contextPath) {
         contextIdToContexts = parseContexts(contextPath).stream().collect(Collectors.toMap(Context::getId, Function.identity()));
     }
     

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.context.ContextLoader;
 import ai.aliz.jarvis.db.BigQueryExecutor;
-import ai.aliz.jarvis.db.MxSQLQueryExecutor;
+import ai.aliz.jarvis.db.JDBCSQLQueryExecutor;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
 import ai.aliz.jarvis.util.JarvisUtil;
 
@@ -17,7 +17,7 @@ public class SQLExecInitiator implements Initiator {
     private ContextLoader contextLoader;
     
     @Autowired
-    private MxSQLQueryExecutor mxSQLQueryExecutor;
+    private JDBCSQLQueryExecutor JDBCSQLQueryExecutor;
     
     @Autowired
     private BigQueryExecutor bigQueryExecutor;
@@ -31,8 +31,9 @@ public class SQLExecInitiator implements Initiator {
         String sourceContent = JarvisUtil.getSourceContentFromConfigProperties(initActionConfig);
         switch (context.getContextType()) {
             case MSSQL:
+            case PostgreSQL:
             case MySQL:
-                mxSQLQueryExecutor.executeScript(sourceContent, context);
+                JDBCSQLQueryExecutor.executeScript(sourceContent, context);
                 break;
             case BigQuery:
                 bigQueryExecutor.executeScript(sourceContent, context);

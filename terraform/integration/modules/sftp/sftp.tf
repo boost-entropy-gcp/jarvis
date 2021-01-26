@@ -15,7 +15,7 @@ resource "google_container_cluster" "sftp_server" {
 
   node_config {
     preemptible  = true
-    machine_type = "f1-micro"
+    machine_type = "g1-small"
 
     metadata = {
       disable-legacy-endpoints = "true"
@@ -40,7 +40,7 @@ resource "kubernetes_secret" "sftp_public_key" {
   }
 
   data = {
-    "scoot-sftp.pub" = file(local.sftp_public_key_path)
+    "sftp.pub" = file(local.sftp_public_key_path)
   }
 }
 
@@ -64,7 +64,7 @@ resource "kubernetes_pod" "sftp_server_pod" {
       }
 
       volume_mount {
-        mount_path = "/home/scoot-sftp-user/.ssh/keys/"
+        mount_path = "/home/sftp-user/.ssh/keys/"
         name       = "sftp-public-key-volume"
       }
 
@@ -115,7 +115,7 @@ resource "local_file" "sftp-context" {
   		"id": "SFTP",
   		"contextType": "SFTP",
   		"parameters": {
-  			"host": "${kubernetes_service.sftp_service.load_balancer_ingress[0].ip}",
+  			"host": "${kubernetes_service.sftp_service.spec[0].cluster_ip}",
   			"port": "2222",
   			"user": "${var.sftp_user}",
   			"password": "${random_string.sftp_password.result}",

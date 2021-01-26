@@ -23,6 +23,7 @@ public enum ContextType {
     BigQuery(Sets.newHashSet(PROJECT)),
     MySQL(Sets.newHashSet(HOST, PORT, DATABASE, USER, PASSWORD)),
     MSSQL(Sets.newHashSet(HOST, PORT, DATABASE, USER, PASSWORD)),
+    PostgreSQL(Sets.newHashSet(HOST, PORT, DATABASE, USER, PASSWORD)),
     TalendAPI(Sets.newHashSet(API_URL, API_KEY, ENVIRONMENT, WORKSPACE)),
     SFTP(Sets.newHashSet(HOST, PORT, USER, PASSWORD, REMOTE_BASE_PATH)),
     LocalContext(Sets.newHashSet(REPOSITORY_ROOT));
