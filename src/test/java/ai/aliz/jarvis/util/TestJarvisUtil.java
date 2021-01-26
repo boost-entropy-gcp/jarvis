@@ -5,7 +5,9 @@ import java.util.Map;
 
 import ai.aliz.jarvis.context.Context;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -15,6 +17,9 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class TestJarvisUtil {
+    
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
     
     @Test
     public void testResolvePlaceholders() {
@@ -31,7 +36,10 @@ public class TestJarvisUtil {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("table", "REPLACED_TABLE");
         parameters.put("value", "1");
-        assertEquals("select * from REPLACED_TABLE where {{column}}=1;", JarvisUtil.resolvePlaceholders(query, parameters));
+        
+        exceptionRule.expect(IllegalStateException.class);
+        exceptionRule.expectMessage("Some placeholders have not been resolved in: 'select * from REPLACED_TABLE where {{column}}=1;'");
+        JarvisUtil.resolvePlaceholders(query, parameters);
     }
     
     @Test

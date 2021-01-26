@@ -1,5 +1,6 @@
 package ai.aliz.jarvis.config;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,8 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties
-@Getter
-@Setter
+@Data
 public class AppConfig {
     
     private String baseTestFolder;
