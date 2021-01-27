@@ -18,3 +18,7 @@ variable "user_name" {
   type    = string
   default = "mssql_admin"
 }
+
+variable "local_ip" {
+  type    = string
+}

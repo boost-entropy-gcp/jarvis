@@ -18,3 +18,7 @@ variable "user_name" {
   type    = string
   default = "mysql_admin"
 }
+
+variable "local_ip" {
+  type    = string
+}

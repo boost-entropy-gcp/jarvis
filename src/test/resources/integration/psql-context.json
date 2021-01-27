@@ -3,11 +3,11 @@
   		"id": "PostgreSQL",
   		"contextType": "PostgreSQL",
   		"parameters": {
-  			"host": "34.77.133.98",
+  			"host": "35.205.163.241",
   			"port": "5432",
   			"database": "JarvisPostgreSQLDB",
   			"user": "psql_admin",
-  			"password": "k0UxFA62zZzV"
+  			"password": "s7U46NlSpMlP"
   		}
   	}
   ]

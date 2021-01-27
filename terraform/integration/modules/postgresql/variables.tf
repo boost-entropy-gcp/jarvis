@@ -18,3 +18,7 @@ variable "user_name" {
   type    = string
   default = "psql_admin"
 }
+
+variable "local_ip" {
+  type    = string
+}

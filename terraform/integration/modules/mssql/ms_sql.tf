@@ -14,10 +14,6 @@ resource "random_id" "db_name_suffix" {
   byte_length = 4
 }
 
-data "http" "executor_ip" {
-  url = "http://ipv4.icanhazip.com"
-}
-
 resource "google_sql_database_instance" "mssql_cloudsql" {
   provider            = google-beta
   project             = var.project
@@ -36,7 +32,7 @@ resource "google_sql_database_instance" "mssql_cloudsql" {
 
       authorized_networks {
         name  = "terraform-init"
-        value = "${chomp(data.http.executor_ip.body)}/32" //if you just update the database make sure that your IP is whitelisted on the Cloud Console: https://cloud.google.com/sql/docs/mysql/authorize-networks
+        value = var.local_ip
       }
     }
   }
@@ -105,4 +101,8 @@ resource "local_file" "mssql-context" {
   	}
   ]
   EOT
+}
+
+output "mssql_instance_id" {
+  value       = google_sql_database_instance.mssql_cloudsql.name
 }

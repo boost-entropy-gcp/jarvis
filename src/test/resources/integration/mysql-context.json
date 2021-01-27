@@ -3,11 +3,11 @@
   		"id": "MySQL",
   		"contextType": "MySQL",
   		"parameters": {
-  			"host": "35.240.23.224",
+  			"host": "146.148.11.67",
   			"port": "3306",
   			"database": "JarvisMySQLDB",
   			"user": "mysql_admin",
-  			"password": "fEoEN9rHCe4V"
+  			"password": "7nZevvRTAumw"
   		}
   	}
   ]
