@@ -52,13 +52,11 @@ module "sftp" {
 resource "local_file" "db_authorization" {
   filename = "${path.module}/../../../.github/workflows/db_authorization.json"
   content = <<EOT
-  [
-    {
+   {
   		"mssql": "${module.mssql.mssql_instance_id}",
   		"mysql": "${module.mysql.mysql_instance_id}",
   		"psql": "${module.postgresql.psql_instance_id}",
   		"authorized": "${chomp(data.http.executor_ip.body)}/32"
-  	}
-  ]
+   }
   EOT
 }
