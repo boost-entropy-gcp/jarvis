@@ -33,14 +33,14 @@ jobs:
       id: authorized_networks
       uses: notiz-dev/github-action-json-property@release
       with:
-        path: 'db_authorization.json'
+        path: './.github/workflows/db_authorization.json'
         prop_path: 'authorized'
 
     - name: Get MSSQL DB instance ID
       id: mssql_id
       uses: notiz-dev/github-action-json-property@release
       with:
-        path: 'db_authorization.json'
+        path: './.github/workflows/db_authorization.json'
         prop_path: 'mssql'
     - name: Authorize network on MSSQL DB instance
       run: gcloud sql instances patch ${{steps.mssql_id.outputs.prop}} --authorized-networks=${{steps.actions_runner_ip.outputs.ipv4}},${{steps.authorized_networks.outputs.prop}}
@@ -49,7 +49,7 @@ jobs:
       id: mysql_id
       uses: notiz-dev/github-action-json-property@release
       with:
-        path: 'db_authorization.json'
+        path: './.github/workflows/db_authorization.json'
         prop_path: 'mysql'
     - name: Authorize network on MySQL DB instance
       run: gcloud sql instances patch ${{steps.mysql_id.outputs.prop}} --authorized-networks=${{steps.actions_runner_ip.outputs.ipv4}},${{steps.authorized_networks.outputs.prop}}
@@ -58,7 +58,7 @@ jobs:
       id: psql_id
       uses: notiz-dev/github-action-json-property@release
       with:
-        path: 'db_authorization.json'
+        path: './.github/workflows/db_authorization.json'
         prop_path: 'psql'
     - name: Authorize network on PostgreSQL DB instance
       run: gcloud sql instances patch ${{steps.psql_id.outputs.prop}} --authorized-networks=${{steps.actions_runner_ip.outputs.ipv4}},${{steps.authorized_networks.outputs.prop}}
