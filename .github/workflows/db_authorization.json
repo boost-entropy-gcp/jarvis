@@ -1,8 +1,6 @@
-  [
-    {
-  		"mssql": "nora-ambroz-sandbox-test-mssql-88bff03e",
-  		"mysql": "nora-ambroz-sandbox-test-mysql-7287e905",
-  		"psql": "nora-ambroz-sandbox-test-postgresql-3b8a420f",
-  		"authorized": "86.101.38.235/32"
-  	}
-  ]
+{
+	"mssql": "nora-ambroz-sandbox-test-mssql-88bff03e",
+	"mysql": "nora-ambroz-sandbox-test-mysql-7287e905",
+	"psql": "nora-ambroz-sandbox-test-postgresql-3b8a420f",
+	"authorized": "86.101.38.235/32"
+}
