@@ -35,7 +35,7 @@ import java.util.Objects;
 @SpringBootTest
 public class BigQueryExecutorTest {
     private static final String API_URL = "apiUrl";
-    private static final String CONTEXT_PATH = new File(Objects.requireNonNull(BigQueryExecutorTest.class.getClassLoader().getResource("test-contexts.json")).getFile()).getPath();
+    private static final String CONTEXT_PATH = new File(Objects.requireNonNull(BigQueryExecutorTest.class.getClassLoader().getResource("test_context.json")).getFile()).getPath();
 
     @Autowired
     private BigQueryExecutor bigQueryExecutor;
@@ -56,7 +56,7 @@ public class BigQueryExecutorTest {
         Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
         Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
         contextLoader.parseContext(CONTEXT_PATH);
-        Context bqContext = contextLoader.getContext("test");
+        Context bqContext = contextLoader.getContext("TEST_ID");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
         Assert.assertEquals("[{\"test_id\":\"1\",\"test\":\"test\"}]", result);
     }

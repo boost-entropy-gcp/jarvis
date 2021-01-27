@@ -41,4 +41,6 @@ resource "google_bigquery_table" "test_view" {
     query = data.template_file.test_view_tpl.rendered
     use_legacy_sql = false
   }
+
+  depends_on = [google_bigquery_table.test1, google_bigquery_table.test2]
 }
