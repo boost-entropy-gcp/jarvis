@@ -69,6 +69,9 @@ public class JarvisUtil {
             Map.Entry<String, String> kv = parameterIterator.next();
             result = result.replace("{{" + kv.getKey() + "}}", kv.getValue());
         }
+        if (result.matches("^.*\\{\\{.*?}}.*$")) {
+            throw new IllegalStateException("Some placeholders have not been resolved in: '" + result + "'");
+        }
         return result;
     }
 }

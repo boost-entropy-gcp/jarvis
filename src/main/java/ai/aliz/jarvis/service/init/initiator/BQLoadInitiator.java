@@ -8,21 +8,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
+import java.time.Clock;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.google.cloud.RetryOption;
 import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.BigQueryError;
 import com.google.cloud.bigquery.BigQueryOptions;
+import com.google.cloud.bigquery.CopyJobConfiguration;
+import com.google.cloud.bigquery.ExtractJobConfiguration;
 import com.google.cloud.bigquery.FormatOptions;
 import com.google.cloud.bigquery.Job;
 import com.google.cloud.bigquery.JobInfo;
+import com.google.cloud.bigquery.LoadJobConfiguration;
 import com.google.cloud.bigquery.TableDataWriteChannel;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.WriteChannelConfiguration;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,6 +38,7 @@ import com.google.gson.JsonElement;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.Duration;
 
 import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.context.ContextLoader;
@@ -50,6 +59,8 @@ public class BQLoadInitiator implements Initiator {
     
     @Autowired
     private ContextLoader contextLoader;
+    
+    private static final Clock clock = Clock.systemUTC();
     
     @Override
     public void doInitAction(InitActionConfig config) {
@@ -87,16 +98,30 @@ public class BQLoadInitiator implements Initiator {
             log.error(e.getMessage());
             throw Lombok.sneakyThrow(e);
         }
-    
+        
         Job job = writer.getJob();
-        try {
-            job = job.waitFor();
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-            throw Lombok.sneakyThrow(e);
+        final Stopwatch sw = Stopwatch.createStarted();
+        final Job completedJob;
+        if (job.isDone()) {
+            completedJob = job.reload();
+        } else {
+            log.info("Waiting for job {}...", job.getJobId());
+            try {
+                completedJob = job.waitFor(
+                        RetryOption.maxRetryDelay(Duration.ofSeconds(1)),
+                        RetryOption.initialRetryDelay(Duration.ofSeconds(1)),
+                        RetryOption.totalTimeout(Duration.ofMillis(Math.max(clock.instant().plus(30, ChronoUnit.MINUTES).toEpochMilli() - clock.millis(), 1L))));
+            } catch (InterruptedException e) {
+                log.error("Error during job in " + sw, e);
+                throw Lombok.sneakyThrow(e);
+            }
         }
-        if (job.getStatus().getError() != null || job.getStatus().getExecutionErrors() != null && !job.getStatus().getExecutionErrors().isEmpty()) {
-            throw new IllegalStateException(String.format("Failed to execute load job for %s. Error: %s)", initActionConfig, job.getStatus().toString()));
+        
+        if (completedJob.getStatus().getError() == null && completedJob.isDone()) {
+            log.info("Query job finished successfully ({}) in {}", completedJob.getJobId().getJob(), sw);
+        } else {
+            String errors = completedJob.getStatus().getExecutionErrors().stream().map(BigQueryError::toString).collect(Collectors.joining("\n"));
+            throw new IllegalStateException(String.format("Failed to execute load job for %s. Error: %s)", initActionConfig, errors));
         }
     }
     

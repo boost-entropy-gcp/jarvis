@@ -32,6 +32,7 @@ public class TestSuite {
     public static final String EXECUTIONS_KEY = "executions";
     public static final String DEFAULT_PROPERTIES_KEY = "defaultProperties";
     public static final String PROPERTIES_KEY = "properties";
+    //TODO: add default value true
     public static final String CASE_AUTO_DETECT_KEY = "caseAutoDetect";
     public static final String TEST_CASES_KEY = "testCases";
     public static final String SYSTEM = "system";

@@ -59,8 +59,7 @@ public class BigQueryExecutor implements QueryExecutor {
     
     @Override
     public void executeStatement(String query, Context context) {
-        TableResult queryResult = executeQueryAndGetResult(query, context);
-        log.debug("Query result {}", queryResult.iterateAll());
+        executeQueryAndGetResult(query, context);
     }
     
     @Override
@@ -74,6 +73,7 @@ public class BigQueryExecutor implements QueryExecutor {
     public void executeScript(String query, Context context) {
         List<String> deletes = Lists.newArrayList();
         List<String> inserts = Lists.newArrayList();
+        //TODO handle ; in the middle of strings ("SELECT ';' AS col1;") and in comments ("-- comment here; and some more")
         Arrays.stream(query.split(";"))
               .map(String::trim)
               .filter(e -> !e.isEmpty())
@@ -100,7 +100,7 @@ public class BigQueryExecutor implements QueryExecutor {
     
     public Long getTableLastModifiedAt(Context context, String project, String dataset, String table) {
         BigQuery bigQuery = getBigQueryClient(context);
-        log.info("Getting last modified at for table: {}.{}.{}", project, dataset, table);
+        log.debug("Getting last modified at for table: {}.{}.{}", project, dataset, table);
         Table bqTable = bigQuery.getTable(TableId.of(project, dataset, table));
         
         return bqTable.getLastModifiedTime();
@@ -122,7 +122,7 @@ public class BigQueryExecutor implements QueryExecutor {
         
         BigQuery bigQuery = getBigQueryClient(context);
         try {
-            log.info("Executing {}", query);
+            log.info("Executing query: '{}' \n completed as: '{}'", query, completedQuery);
             return bigQuery.query(queryConfig);
         } catch (Exception e) {
             log.error("Failed to execute: " + completedQuery, e);
