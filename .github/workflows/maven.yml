@@ -63,19 +63,6 @@ jobs:
     - name: Authorize network on PostgreSQL DB instance
       run: gcloud sql instances patch ${{steps.psql_id.outputs.prop}} --authorized-networks=${{steps.actions_runner_ip.outputs.ipv4}},${{steps.authorized_networks.outputs.prop}} --quiet
 
-    - name: Get SFTP host IP
-      id: sftp_host
-      uses: notiz-dev/github-action-json-property@release
-      with:
-        path: './.github/workflows/authorization.json'
-        prop_path: 'sftp'
-    - name: Install SSH key
-      uses: shimataro/ssh-key-action@v2
-      with:
-        key: ${{secrets.SSH_KEY}}
-        name: id_rsa
-        known_hosts: ${{steps.sftp_host.outputs.prop}}
-
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
