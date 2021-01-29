@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -29,7 +30,11 @@ public class ContextLoader {
     }
     
     public Context getContext(String contextId) {
-        return Optional.of(contextIdToContexts.get(contextId)).orElseThrow(() -> new IllegalStateException("Could not find context with id " + contextId));
+        Context context = contextIdToContexts.get(contextId);
+        if (Objects.isNull(context)) {
+            throw new IllegalStateException("Could not find context with id " + contextId);
+        }
+        return context;
     }
     
     @SneakyThrows

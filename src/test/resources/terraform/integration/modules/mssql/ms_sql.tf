@@ -85,7 +85,7 @@ resource "local_file" "mssql-context" {
     null_resource.jarvis_ms_db,
     google_sql_user.mssql_db_user
   ]
-  filename = "${path.module}/../../../../src/test/resources/integration/mssql-context.json"
+  filename = "${path.module}/../../../../../../../src/test/resources/integration/mssql-context.json"
   content = <<EOT
   [
     {

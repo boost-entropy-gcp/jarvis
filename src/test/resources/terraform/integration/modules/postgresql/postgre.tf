@@ -77,7 +77,7 @@ resource "local_file" "psql-context" {
     null_resource.jarvis_postgre_sql_table,
     google_sql_user.psql_db_user
   ]
-  filename = "${path.module}/../../../../src/test/resources/integration/psql-context.json"
+  filename = "${path.module}/../../../../../../../src/test/resources/integration/psql-context.json"
   content = <<EOT
   [
     {

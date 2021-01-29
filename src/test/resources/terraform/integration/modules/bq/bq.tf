@@ -8,7 +8,7 @@ resource "google_bigquery_dataset" "jarvis_test" {
 }
 
 resource "local_file" "bq-context" {
-  filename = "${path.module}/../../../../src/test/resources/integration/bq-context.json"
+  filename = "${path.module}/../../../../../../../../src/test/resources/integration/bq-context.json"
   content = <<EOT
     [
   	  {

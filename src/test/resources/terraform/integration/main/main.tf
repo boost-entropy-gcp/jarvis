@@ -38,19 +38,17 @@ module "postgresql" {
   //authorizes the local IP, if you just update the database make sure that your IP is whitelisted on the Cloud Console: https://cloud.google.com/sql/docs/mysql/authorize-networks
   local_ip = "${chomp(data.http.executor_ip.body)}/32"
 }
-
-// TODO
 /*
 module "sftp" {
   source     = "../modules/sftp"
   project    = var.project
   region     = var.region
-  sftp_user  = var.user
 }
 */
 
-resource "local_file" "db_authorization" {
-  filename = "${path.module}/../../../.github/workflows/db_authorization.json"
+//TODO add "sftp": "${module.sftp.sftp-host}"
+resource "local_file" "authorization" {
+  filename = "${path.module}/../../../../../../.github/workflows/authorization.json"
   content = <<EOT
    {
   		"mssql": "${module.mssql.mssql_instance_id}",

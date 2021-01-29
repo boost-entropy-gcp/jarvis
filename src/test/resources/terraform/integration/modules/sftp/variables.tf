@@ -4,11 +4,6 @@ variable "project" {
 variable "region" {
 }
 
-variable "sftp_user" {
-  type    = string
-  default = "jarvis-tests@nora-ambroz-sandbox.iam.gserviceaccount.com"
-}
-
 provider "google" {
   project = var.project
   zone    = var.region
@@ -16,6 +11,8 @@ provider "google" {
 
 locals  {
   sftp_zone = "${var.region}-b"
+  sftp_user = "sftp-user"
   sftp_public_key_path = "${path.module}/jarvis-sftp/id_rsa.pub"
-  init_script_path     = "${path.module}/jarvis-sftp/init_script.sh"
+  sftp_private_key_path = "${path.module}/jarvis-sftp/id_rsa"
+  init_script = "${path.module}/jarvis-sftp/init-script.sh"
 }

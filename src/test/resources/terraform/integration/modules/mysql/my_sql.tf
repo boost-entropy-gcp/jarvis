@@ -77,7 +77,7 @@ resource "local_file" "mysql-context" {
     null_resource.jarvis_my_sql_table,
     google_sql_user.mysql_db_user
   ]
-  filename = "${path.module}/../../../../src/test/resources/integration/mysql-context.json"
+  filename = "${path.module}/../../../../../../../src/test/resources/integration/mysql-context.json"
   content = <<EOT
   [
     {

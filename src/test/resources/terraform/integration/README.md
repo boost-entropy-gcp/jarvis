@@ -1,7 +1,7 @@
 # Test environment setup for Jarvis
 
 With this configurations Terraform is able to provide the necessary infrastructure to run the integration tests of the Jarvis project.
-It creates resources in BigQuery, Cloud SQL (MSSQL, MySQL, PostgreSQL) and GCE (SFTP server, still TODO).
+It creates resources in BigQuery, Cloud SQL (MSSQL, MySQL, PostgreSQL) and GCE (SFTP server).
 
 ## Prerequisites
 1. Create a GCP project.
@@ -16,7 +16,6 @@ It creates resources in BigQuery, Cloud SQL (MSSQL, MySQL, PostgreSQL) and GCE (
 [sqlcmd](https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup-tools?view=sql-server-2017)  
 [mysql](https://docs.oracle.com/javacomponents/advanced-management-console-2/install-guide/mysql-database-installation-and-configuration-advanced-management-console.htm#JSAMI116)  
 [psql](https://www.postgresql.org/docs/11/tutorial-install.html)   
-[kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) (only if SFTP gets done)
 
 These will be used to execute a few commands locally, so do not forget to add them to PATH.
 
@@ -45,9 +44,16 @@ Make sure you have all the dependencies mentioned above in the **Dependencies** 
 5. When the development is finished or paused for a longer period, then run `terraform destroy` to reduce GCP costs.
    
  ---
- **NOTE**
+**NOTE**
  
- If you swap to a new GCP project, do not forget to create a service account that has BigQuery and Cloud SQL admin roles.
- Then add/change the new project and SA at the [GitHub Secrets](https://github.com/aliz-ai/jarvis/settings/secrets/actions).
- Without this step the GitHub Actions Maven CI will fail.
- ---
+If you swap to a new GCP project, do not forget to create a service account that has BigQuery, GCE and Cloud SQL admin roles.
+Then add/change the new project and SA at the [GitHub Secrets](https://github.com/aliz-ai/jarvis/settings/secrets/actions).
+Without this step the GitHub Actions Maven CI will fail.
+---
+**NOTE 2**
+  
+To replace the SFTP server's public key, copy the key file to the `terraform/integration/modules/sftp/jarvis-stfp` folder.
+Then add/change the SSH_KEY at the [GitHub Secrets](https://github.com/aliz-ai/jarvis/settings/secrets/actions).
+Please use PEM format (begins with -----BEGIN RSA PRIVATE KEY-----) instead of the OPENSSH format (begins with -----BEGIN OPENSSH PRIVATE KEY-----) or else GitHub Actions will not be able to use it due to the VM's OpenSSH version.
+//TODO remove the SSH key based authentication and use only passwords
+---
