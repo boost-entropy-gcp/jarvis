@@ -2,12 +2,14 @@ package ai.aliz.jarvis.db;
 
 import lombok.AllArgsConstructor;
 import lombok.Lombok;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -73,17 +75,16 @@ public class BigQueryExecutor implements QueryExecutor {
     public void executeScript(String query, Context context) {
         List<String> deletes = Lists.newArrayList();
         List<String> inserts = Lists.newArrayList();
-        //TODO handle ; in the middle of strings ("SELECT ';' AS col1;") and in comments ("-- comment here; and some more")
-        Arrays.stream(query.split(";"))
-              .map(String::trim)
-              .filter(e -> !e.isEmpty())
-              .forEach(e -> {
-                  if (e.toUpperCase().contains("DELETE FROM")) {
-                      deletes.add(e);
-                  } else {
-                      inserts.add(e);
-                  }
-              });
+        splitScriptIntoStatements(query)
+                .stream()
+                .map(String::toUpperCase)
+                .forEach(e -> {
+                    if (e.contains("DELETE FROM")) {
+                        deletes.add(e);
+                    } else {
+                        inserts.add(e);
+                    }
+                });
         
         List<Runnable> deleteRunnables = statementsToRunnables(context, deletes);
         List<Runnable> insertRunnables = statementsToRunnables(context, inserts);
@@ -237,5 +238,132 @@ public class BigQueryExecutor implements QueryExecutor {
     static Instant getInstantFromMicros(Long microsSinceEpoch) {
         return Instant.ofEpochSecond(TimeUnit.MICROSECONDS.toSeconds(microsSinceEpoch),
                                      TimeUnit.MICROSECONDS.toNanos(Math.floorMod(microsSinceEpoch, TimeUnit.SECONDS.toMicros(1))));
+    }
+    
+    /**
+     * Splits a SQL script into its statements. Take this example: <br>
+     * <pre>
+     *     INSERT INTO a (ID, VALUE) VALUES (1, 'A');
+     *     SELECT * FROM a;
+     * </pre>
+     * The method would return two statements: <code>INSERT INTO a (ID, VALUE) VALUES (1, 'A')</code> and <code>SELECT * FROM a</code>.
+     * <p>
+     * This method also strips away all comments from the script, leaving only the actual SQL behind.
+     *
+     * @param script The SQL script as a string.
+     * @return a list of SQL statements.
+     */
+    private List<String> splitScriptIntoStatements(@NonNull String script) {
+        List<String> statements = new ArrayList<>();
+        if (script.length() == 0) {
+            return statements;
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        // whether we're in the middle of a ', " or `
+        boolean inConstant = false;
+        // the character bordering the constant
+        char constantStart = 0;
+        
+        // if we have started a -- comment in code
+        boolean dashDashStarted = false;
+        // if we activated single line comment
+        boolean inSingleLineComment = false;
+        
+        // whether we just started /* or */
+        boolean slashStarStarted = false;
+        
+        // if we activated multi line comment
+        boolean inMultiLineComment = false;
+        
+        for (char token : script.toCharArray()) {
+            if (inConstant) {
+                // if we're in a constant, output no matter what; at the end, clear flag
+                sb.append(token);
+                if (token == constantStart) {
+                    inConstant = false;
+                    constantStart = 0;
+                }
+            } else if (inSingleLineComment) {
+                // if we are at the end of the line, clear flag; otherwise don't output anything
+                if (token == '\n') {
+                    sb.append(token);
+                    inSingleLineComment = false;
+                }
+            } else if (inMultiLineComment) {
+                if (slashStarStarted) {
+                    // clear this flag no matter what
+                    slashStarStarted = false;
+                    if (token == '/') {
+                        // detected '*/' -> stop comment mode
+                        inMultiLineComment = false;
+                        sb.append("\n");
+                    }
+                }
+                if (token == '*') {
+                    // might be a start of '*/'
+                    slashStarStarted = true;
+                }
+            } else if (dashDashStarted) {
+                // clear flag no matter what
+                dashDashStarted = false;
+                if (token == '-') {
+                    // '--' detected -> comment
+                    inSingleLineComment = true;
+                } else {
+                    // not '--' -> have to output the previous '-' as well as this token
+                    sb.append('-').append(token);
+                }
+            } else if (slashStarStarted) {
+                // clear flag no matter what
+                slashStarStarted = false;
+                if (token == '*') {
+                    // '/*' detected; multi line comment
+                    inMultiLineComment = true;
+                } else {
+                    // not '/*' -> have to output '/' and current token
+                    sb.append('/').append(token);
+                }
+            } else {
+                // at this point we can assume all flags are false; any flag should be handled prior to this branch
+                switch (token) {
+                    case '-':
+                        dashDashStarted = true;
+                        break;
+                    case '#':
+                        inSingleLineComment = true;
+                        break;
+                    case '/':
+                        slashStarStarted = true;
+                        break;
+                    case '\'':
+                    case '"':
+                    case '`':
+                        inConstant = true;
+                        constantStart = token;
+                        sb.append(token);
+                        break;
+                    case ';':
+                        // save this statement, and start a new one
+                        String statement = sb.toString().trim();
+                        if (statement.length() > 0) {
+                            statements.add(statement);
+                        }
+                        sb.setLength(0);
+                        break;
+                    default:
+                        sb.append(token);
+                        break;
+                }
+            }
+        }
+        
+        String statement = sb.toString().trim();
+        if (statement.length() > 0) {
+            statements.add(statement);
+        }
+        
+        return statements;
     }
 }
