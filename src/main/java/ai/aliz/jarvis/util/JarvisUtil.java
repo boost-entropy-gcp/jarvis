@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -28,6 +29,8 @@ import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_PATH;
 
 @UtilityClass
 public class JarvisUtil {
+    
+    private static final Pattern MISSING_PLACEHOLDER_REGEX = Pattern.compile("^.*\\{\\{.*?}}.*$");
     
     @SneakyThrows
     public String getSourceContentFromConfigProperties(StepConfig stepConfig) {
@@ -69,7 +72,8 @@ public class JarvisUtil {
             Map.Entry<String, String> kv = parameterIterator.next();
             result = result.replace("{{" + kv.getKey() + "}}", kv.getValue());
         }
-        if (result.matches("^.*\\{\\{.*?}}.*$")) {
+        
+        if (MISSING_PLACEHOLDER_REGEX.matcher(result).matches()) {
             throw new IllegalStateException("Some placeholders have not been resolved in: '" + result + "'");
         }
         return result;
