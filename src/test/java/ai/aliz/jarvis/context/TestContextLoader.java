@@ -13,6 +13,19 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
+import static ai.aliz.jarvis.util.JarvisConstants.API_KEY;
+import static ai.aliz.jarvis.util.JarvisConstants.API_URL;
+import static ai.aliz.jarvis.util.JarvisConstants.DATABASE;
+import static ai.aliz.jarvis.util.JarvisConstants.DATASET_NAME_PREFIX;
+import static ai.aliz.jarvis.util.JarvisConstants.ENVIRONMENT;
+import static ai.aliz.jarvis.util.JarvisConstants.HOST;
+import static ai.aliz.jarvis.util.JarvisConstants.PASSWORD;
+import static ai.aliz.jarvis.util.JarvisConstants.PORT;
+import static ai.aliz.jarvis.util.JarvisConstants.PROJECT;
+import static ai.aliz.jarvis.util.JarvisConstants.REMOTE_BASE_PATH;
+import static ai.aliz.jarvis.util.JarvisConstants.REPOSITORY_ROOT;
+import static ai.aliz.jarvis.util.JarvisConstants.USER;
+import static ai.aliz.jarvis.util.JarvisConstants.WORKSPACE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -24,54 +37,54 @@ public class TestContextLoader {
     private static final Context BQ_CONTEXT = Context.builder()
                                                      .id("BQ")
                                                      .contextType(ContextType.BigQuery)
-                                                     .parameter("project", "nora-ambroz-sandbox")
-                                                     .parameter("datasetNamePrefix", "core_")
+                                                     .parameter(PROJECT, "nora-ambroz-sandbox")
+                                                     .parameter(DATASET_NAME_PREFIX, "core_")
                                                      .parameter("stagingDataset", "STAGING")
                                                      .build();
     
     private static final Context LOCAL_CONTEXT = Context.builder()
                                                         .id("local")
                                                         .contextType(ContextType.LocalContext)
-                                                        .parameter("repositoryRoot", "C:\\ds")
+                                                        .parameter(REPOSITORY_ROOT, "C:\\ds")
                                                         .build();
     
     private static final Context MSSQL_CONTEXT = Context.builder()
                                                         .id("MSSQL")
                                                         .contextType(ContextType.MSSQL)
-                                                        .parameter("host", "host")
-                                                        .parameter("port", "port")
-                                                        .parameter("database", "database")
-                                                        .parameter("user", "user")
-                                                        .parameter("password", "password")
+                                                        .parameter(HOST, "host")
+                                                        .parameter(PORT, "port")
+                                                        .parameter(DATABASE, "database")
+                                                        .parameter(USER, "user")
+                                                        .parameter(PASSWORD, "password")
                                                         .build();
     
     private static final Context MYSQL_CONTEXT = Context.builder()
                                                         .id("MySQL")
                                                         .contextType(ContextType.MySQL)
-                                                        .parameter("host", "host")
-                                                        .parameter("port", "port")
-                                                        .parameter("database", "database")
-                                                        .parameter("user", "user")
-                                                        .parameter("password", "password")
+                                                        .parameter(HOST, "host")
+                                                        .parameter(PORT, "port")
+                                                        .parameter(DATABASE, "database")
+                                                        .parameter(USER, "user")
+                                                        .parameter(PASSWORD, "password")
                                                         .build();
     
     private static final Context SFTP_CONTEXT = Context.builder()
                                                        .id("SFTP")
                                                        .contextType(ContextType.SFTP)
-                                                       .parameter("host", "host")
-                                                       .parameter("port", "port")
-                                                       .parameter("user", "user")
-                                                       .parameter("password", "password")
-                                                       .parameter("remoteBasePath", "/out")
+                                                       .parameter(HOST, "host")
+                                                       .parameter(PORT, "port")
+                                                       .parameter(USER, "user")
+                                                       .parameter(PASSWORD, "password")
+                                                       .parameter(REMOTE_BASE_PATH, "/out")
                                                        .build();
     
     private static final Context TALEND_API_CONTEXT = Context.builder()
                                                              .id("TalendAPI")
                                                              .contextType(ContextType.TalendAPI)
-                                                             .parameter("apiUrl", "url")
-                                                             .parameter("apiKey", "key")
-                                                             .parameter("environment", "environment")
-                                                             .parameter("workspace", "workspace")
+                                                             .parameter(API_URL, "url")
+                                                             .parameter(API_KEY, "key")
+                                                             .parameter(ENVIRONMENT, "environment")
+                                                             .parameter(WORKSPACE, "workspace")
                                                              .build();
     
     @Rule
