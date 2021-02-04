@@ -1,0 +1,13 @@
+  [
+    {
+  		"id": "MSSQL",
+  		"contextType": "MSSQL",
+  		"parameters": {
+  			"host": "35.187.59.147",
+  			"port": "1433",
+  			"database": "JarvisMSDB",
+  			"user": "mssql_admin",
+  			"password": "Nn0mhQ3AJ7t2"
+  		}
+  	}
+  ]

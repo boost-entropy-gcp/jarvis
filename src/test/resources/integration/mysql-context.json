@@ -1,0 +1,13 @@
+  [
+    {
+  		"id": "MySQL",
+  		"contextType": "MySQL",
+  		"parameters": {
+  			"host": "35.241.217.177",
+  			"port": "3306",
+  			"database": "JarvisMySQLDB",
+  			"user": "mysql_admin",
+  			"password": "g7TzDpu5Kmgx"
+  		}
+  	}
+  ]

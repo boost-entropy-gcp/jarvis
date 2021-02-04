@@ -31,13 +31,16 @@ import ai.aliz.jarvis.util.JarvisUtil;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class MxSQLQueryExecutor implements QueryExecutor {
+public class JDBCSQLQueryExecutor implements QueryExecutor {
     
     private static final String MSSQL_CONNECTION_STRING_PATTERN =
             "jdbc:sqlserver://{{host}}:{{port}};databaseName={{database}};user={{user}};password={{password}}";
     
     private static final String MYSQL_CONNECTION_STRING_PATTERN =
             "jdbc:mysql://{{host}}:{{port}}/{{database}}?user={{user}}&password={{password}}";
+    
+    private static final String POSTGRE_CONNECTION_STRING_PATTERN =
+            "jdbc:postgresql://{{host}}:{{port}}/{{database}}?user={{user}}&password={{password}}";
     
     private Map<Context, Connection> connectionMap = Maps.newHashMap();
     
@@ -108,6 +111,8 @@ public class MxSQLQueryExecutor implements QueryExecutor {
         switch (contextType) {
             case MySQL:
                 return MYSQL_CONNECTION_STRING_PATTERN;
+            case PostgreSQL:
+            return POSTGRE_CONNECTION_STRING_PATTERN;
             case MSSQL:
                 return MSSQL_CONNECTION_STRING_PATTERN;
             default:

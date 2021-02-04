@@ -12,9 +12,65 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Public IP
+      id: actions_runner_ip
+      uses: haythem/public-ip@v1.2
+
+    - name: Get authorized networks added by Terraform
+      id: authorized_networks
+      uses: notiz-dev/github-action-json-property@release
+      with:
+        path: './.github/workflows/authorization.json'
+        prop_path: 'authorized'
+
+    - name: Get MSSQL DB instance ID
+      id: mssql_id
+      uses: notiz-dev/github-action-json-property@release
+      with:
+        path: './.github/workflows/authorization.json'
+        prop_path: 'mssql'
+    - name: Authorize network on MSSQL DB instance
+      run: gcloud sql instances patch ${{steps.mssql_id.outputs.prop}} --authorized-networks=${{steps.actions_runner_ip.outputs.ipv4}},${{steps.authorized_networks.outputs.prop}} --quiet
+
+    - name: Get MySQL DB instance ID
+      id: mysql_id
+      uses: notiz-dev/github-action-json-property@release
+      with:
+        path: './.github/workflows/authorization.json'
+        prop_path: 'mysql'
+    - name: Authorize network on MySQL DB instance
+      run: gcloud sql instances patch ${{steps.mysql_id.outputs.prop}} --authorized-networks=${{steps.actions_runner_ip.outputs.ipv4}},${{steps.authorized_networks.outputs.prop}} --quiet
+
+    - name: Get PostgreSQL DB instance ID
+      id: psql_id
+      uses: notiz-dev/github-action-json-property@release
+      with:
+        path: './.github/workflows/authorization.json'
+        prop_path: 'psql'
+    - name: Authorize network on PostgreSQL DB instance
+      run: gcloud sql instances patch ${{steps.psql_id.outputs.prop}} --authorized-networks=${{steps.actions_runner_ip.outputs.ipv4}},${{steps.authorized_networks.outputs.prop}} --quiet
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+
+    - name: Remove runner IP from MSSQL DB instance
+      run: gcloud sql instances patch ${{steps.mssql_id.outputs.prop}} --authorized-networks=${{steps.authorized_networks.outputs.prop}} --quiet
+
+    - name: Remove runner IP from MySQL DB instance
+      run: gcloud sql instances patch ${{steps.mysql_id.outputs.prop}} --authorized-networks=${{steps.authorized_networks.outputs.prop}} --quiet
+
+    - name: Remove runner IP from PostgreSQL DB instance
+      run: gcloud sql instances patch ${{steps.psql_id.outputs.prop}} --authorized-networks=${{steps.authorized_networks.outputs.prop}} --quiet

@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;
 
 public class ContextLoader {
@@ -22,12 +24,17 @@ public class ContextLoader {
     @Getter
     private Map<String, Context> contextIdToContexts;
     
-    ContextLoader(String contextPath) {
+    @VisibleForTesting
+    public ContextLoader(String contextPath) {
         contextIdToContexts = parseContexts(contextPath).stream().collect(Collectors.toMap(Context::getId, Function.identity()));
     }
     
     public Context getContext(String contextId) {
-        return Optional.of(contextIdToContexts.get(contextId)).orElseThrow(() -> new IllegalStateException("Could not find context with id " + contextId));
+        Context context = contextIdToContexts.get(contextId);
+        if (Objects.isNull(context)) {
+            throw new IllegalStateException("Could not find context with id " + contextId);
+        }
+        return context;
     }
     
     @SneakyThrows

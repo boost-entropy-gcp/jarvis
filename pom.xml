@@ -75,6 +75,11 @@
             <version>8.0.17</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.18</version>
+        </dependency>
 
         <dependency>
             <groupId>com.google.cloud</groupId>

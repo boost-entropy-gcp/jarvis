@@ -60,9 +60,6 @@ public class BQLoadInitiator implements Initiator {
     @Autowired
     private ContextLoader contextLoader;
     
-    @Autowired
-    private InitActionService initActionService;
-    
     private static final Clock clock = Clock.systemUTC();
     
     @Override
