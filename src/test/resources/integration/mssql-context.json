@@ -3,11 +3,11 @@
   		"id": "MSSQL",
   		"contextType": "MSSQL",
   		"parameters": {
-  			"host": "35.187.59.147",
+  			"host": "104.199.77.71",
   			"port": "1433",
   			"database": "JarvisMSDB",
   			"user": "mssql_admin",
-  			"password": "Nn0mhQ3AJ7t2"
+  			"password": "xQO18y1roTAk"
   		}
   	}
   ]
