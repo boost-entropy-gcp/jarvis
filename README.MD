@@ -6,13 +6,12 @@ To package the test runner application into a JAR run
 mvn clean package spring-boot:repackage
 ```
 in the command line. 
-This will create three JAR files.
-The _jarvis-0.0.1-SNAPSHOT.jar_ is a distributable JAR made by Maven.
-The _jarvis-0.0.1-SNAPSHOT-spring-boot.jar_ is the previously mentioned JAR repackaged by Spring Boot to make it executable from the command line.
-The Spring Boot Maven plugin also creates a copy of the Maven JAR named _jarvis-0.0.1-SNAPSHOT.jar.original_. 
+This will create 2 JAR files.
+The _target/jarvis_ is the JAR repackaged by Spring Boot to make the application executable from the command line.
+The _target/jarvis.jar.original_ is a distributable JAR made by Maven. 
 Run the application with this command.
 ```
-java -jar target/jarvis-0.0.1-SNAPSHOT-spring-boot.jar --context="arg1""arg1" "arg2"
+java -jar target/jarvis.jar --context="arg1""arg1" "arg2"
 ```
 ---
 **NOTE**
