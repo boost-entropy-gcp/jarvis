@@ -1,10 +1,10 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.context.ContextType;
-import ai.aliz.talendtestrunner.testconfig.InitActionConfig;
-import ai.aliz.talendtestrunner.testconfig.InitActionType;
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.TestContextType;
+import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.testconfig.InitActionType;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FilenameUtils;
@@ -27,7 +27,7 @@ public class InitActionConfigCreator {
 
     private ActionConfigForBq actionConfigForBq = new ActionConfigForBq();
 
-    public List<InitActionConfig> getInitActionConfigs(ContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
+    public List<InitActionConfig> getInitActionConfigs(TestContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
         Path preFolder = actionCreatorHelperService.getTargetFolderPath(testCaseFolder, "pre");
         List<InitActionConfig> initActions = null;
         try {
@@ -59,10 +59,10 @@ public class InitActionConfigCreator {
                     }
                     initActionConfigs.add(initActionConfig);
                 } else {
-                    Context context = actionCreatorHelperService.getContext(contextLoader, fileName);
+                    TestContext context = actionCreatorHelperService.getContext(contextLoader, fileName);
                     String system = fileName;
 
-                    ContextType contextType = context.getContextType();
+                    TestContextType contextType = context.getContextType();
                     switch (contextType) {
                         case SFTP:
                             initActionConfigs.add(getInitActionConfigForSFTP(initActionFile, system));

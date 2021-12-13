@@ -23,11 +23,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.context.ContextLoader;
-import ai.aliz.jarvis.service.init.InitActionConfigFactory;
-import ai.aliz.jarvis.service.init.InitActionService;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.service.initaction.InitActionService;
 import ai.aliz.jarvis.service.shared.platform.BigQueryService;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.testconfig.InitActionConfigFactory;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,12 +55,13 @@ public class TestInitActionServiceBQIntegration {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
     
-    private final InitActionConfigFactory initActionConfigFactory = new InitActionConfigFactory();
+    @Autowired
+    private InitActionConfigFactory initActionConfigFactory;
     
     @Autowired
     private InitActionService actionService;
     @Autowired
-    private ContextLoader contextLoader;
+    private TestContextLoader contextLoader;
     @Autowired
     private BigQueryService bigQueryService;
     
@@ -79,7 +80,7 @@ public class TestInitActionServiceBQIntegration {
         Preconditions.checkArgument(Objects.isNull(bigQuery.getTable(tableId)));
         
         try {
-            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/bq-script"));
+            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/bq-script"));
             actionService.run(actionConfigs);
             
             assertTrue(bigQuery.getTable(tableId).exists());
@@ -96,7 +97,7 @@ public class TestInitActionServiceBQIntegration {
         Preconditions.checkNotNull(bigQuery.getTable(tableId));
         
         try {
-            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/bq-json"));
+            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/bq-json"));
             actionService.run(actionConfigs);
             
             TableResult result = bigQuery.getTable(tableId).list();
@@ -113,7 +114,7 @@ public class TestInitActionServiceBQIntegration {
     public void testInvalidScript() {
         exceptionRule.expect(ExecutionException.class);
         
-        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/bq-script-invalid"));
+        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/bq-script-invalid"));
         actionService.run(actionConfigs);
     }
     
@@ -121,7 +122,7 @@ public class TestInitActionServiceBQIntegration {
     public void testMissingTableJSONInsert() {
         exceptionRule.expect(ExecutionException.class);
         
-        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/bq-json-missing-table"));
+        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/bq-json-missing-table"));
         actionService.run(actionConfigs);
     }
 }

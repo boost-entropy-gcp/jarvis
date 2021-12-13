@@ -10,7 +10,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -40,9 +39,9 @@ import com.google.cloud.bigquery.TableResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.service.shared.platform.BigQueryService;
 import ai.aliz.jarvis.service.shared.ExecutorServiceWrapper;
-import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.util.JarvisUtil;
 
 import static ai.aliz.jarvis.util.JarvisConstants.TEST_INIT;
@@ -60,19 +59,19 @@ public class BigQueryExecutor implements QueryExecutor {
     private BigQueryService bigQueryService;
     
     @Override
-    public void executeStatement(String query, Context context) {
+    public void executeStatement(String query, TestContext context) {
         executeQueryAndGetResult(query, context);
     }
     
     @Override
-    public String executeQuery(String query, Context context) {
+    public String executeQuery(String query, TestContext context) {
         TableResult queryResult = executeQueryAndGetResult(query, context);
         ArrayNode result = bigQueryResultToJsonArrayNode(queryResult);
         return result.toString();
     }
     
     @Override
-    public void executeScript(String query, Context context) {
+    public void executeScript(String query, TestContext context) {
         List<String> deletes = Lists.newArrayList();
         List<String> inserts = Lists.newArrayList();
         splitScriptIntoStatements(query)
@@ -91,13 +90,13 @@ public class BigQueryExecutor implements QueryExecutor {
         executorService.executeRunnablesInParallel(insertRunnables, 60, TimeUnit.SECONDS);
     }
     
-    public int insertedRowCount(String tableId, String tableName, Context context) {
+    public int insertedRowCount(String tableId, String tableName, TestContext context) {
         TableResult tableResult = executeQueryAndGetResult("SELECT COUNT(*) FROM `" + tableId + "`WHERE " + tableName + "_INSERTED_BY != '" + TEST_INIT + "'", context);
         long count = tableResult.getValues().iterator().next().get(0).getLongValue();
         return (int) count;
     }
     
-    public Long getTableLastModifiedAt(Context context, String project, String dataset, String table) {
+    public Long getTableLastModifiedAt(TestContext context, String project, String dataset, String table) {
         BigQuery bigQuery = getBigQueryClient(context);
         log.debug("Getting last modified at for table: {}.{}.{}", project, dataset, table);
         Table bqTable = bigQuery.getTable(TableId.of(project, dataset, table));
@@ -105,17 +104,17 @@ public class BigQueryExecutor implements QueryExecutor {
         return bqTable.getLastModifiedTime();
     }
     
-    private BigQuery getBigQueryClient(Context context) {
+    private BigQuery getBigQueryClient(TestContext context) {
         return bigQueryService.createBigQueryClient(context);
     }
     
-    private List<Runnable> statementsToRunnables(Context context, List<String> statements) {
+    private List<Runnable> statementsToRunnables(TestContext context, List<String> statements) {
         return statements.stream()
                          .map(statement -> (Runnable) () -> executeStatement(statement, context))
                          .collect(Collectors.toList());
     }
     
-    private TableResult executeQueryAndGetResult(String query, Context context) {
+    private TableResult executeQueryAndGetResult(String query, TestContext context) {
         String completedQuery = JarvisUtil.resolvePlaceholders(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         

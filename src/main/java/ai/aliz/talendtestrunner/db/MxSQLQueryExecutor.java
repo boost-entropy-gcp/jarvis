@@ -1,19 +1,9 @@
 package ai.aliz.talendtestrunner.db;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextType;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -22,6 +12,19 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.function.Function;
+import javax.annotation.PreDestroy;
+
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.springframework.stereotype.Component;
+
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextType;
+import ai.aliz.talendtestrunner.util.PlaceholderResolver;
 
 @Component
 @AllArgsConstructor
@@ -36,10 +39,10 @@ public class MxSQLQueryExecutor implements QueryExecutor {
 
     private PlaceholderResolver placeholderResolver;
 
-    private Map<Context, Connection> connectionMap = Maps.newHashMap();
+    private Map<TestContext, Connection> connectionMap = Maps.newHashMap();
 
 
-    public void executeScript(String query, Context context) {
+    public void executeScript(String query, TestContext context) {
         String[] splits = query.split(";");
         for (String split : splits) {
             String trimmed = split.trim();
@@ -63,11 +66,11 @@ public class MxSQLQueryExecutor implements QueryExecutor {
 
     @Override
     @SneakyThrows
-    public void executeStatement(String query, Context context) {
+    public void executeStatement(String query, TestContext context) {
         doWithStatement(query, context, preparedStatement -> executeStatement(preparedStatement));
     }
 
-    private <T> T doWithStatement(String query, Context context, Function<PreparedStatement, T> statementAction) {
+    private <T> T doWithStatement(String query, TestContext context, Function<PreparedStatement, T> statementAction) {
         Connection connection = getConnectionForContext(context);
         String completedQuery = placeholderResolver.resolve(query, context.getParameters());
 
@@ -81,7 +84,7 @@ public class MxSQLQueryExecutor implements QueryExecutor {
         }
     }
 
-    private Connection getConnectionForContext(Context context) {
+    private Connection getConnectionForContext(TestContext context) {
         Connection connection = connectionMap.get(context);
         if (connection == null) {
             String connectionUrl = placeholderResolver.resolve(getConnectionPattern(context), context.getParameters());
@@ -100,8 +103,8 @@ public class MxSQLQueryExecutor implements QueryExecutor {
         return preparedStatement.execute();
     }
 
-    private String getConnectionPattern(Context context) {
-        ContextType contextType = context.getContextType();
+    private String getConnectionPattern(TestContext context) {
+        TestContextType contextType = context.getContextType();
         switch (contextType) {
             case MySQL:
                 return My_CONNECTION_STRING_PATTERN;
@@ -113,7 +116,7 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     }
 
     @Override
-    public String executeQuery(String query, Context context) {
+    public String executeQuery(String query, TestContext context) {
         return doWithStatement(query, context, this::queryStatementForJsonResult);
     }
 

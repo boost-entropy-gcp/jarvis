@@ -4,12 +4,10 @@ import lombok.SneakyThrows;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.base.Preconditions;
@@ -19,9 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.context.ContextLoader;
-import ai.aliz.jarvis.service.init.InitActionConfigFactory;
-import ai.aliz.jarvis.service.init.InitActionService;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.testconfig.InitActionConfigFactory;
+import ai.aliz.jarvis.service.initaction.InitActionService;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
 
 import org.junit.BeforeClass;
@@ -30,11 +28,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
-import static ai.aliz.jarvis.util.JarvisConstants.DATABASE;
-import static ai.aliz.jarvis.util.JarvisConstants.HOST;
-import static ai.aliz.jarvis.util.JarvisConstants.PASSWORD;
-import static ai.aliz.jarvis.util.JarvisConstants.PORT;
-import static ai.aliz.jarvis.util.JarvisConstants.USER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -52,23 +45,24 @@ public class TestInitActionServiceMySQLIntegration {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
     
-    private final InitActionConfigFactory initActionConfigFactory = new InitActionConfigFactory();
+    @Autowired
+    private InitActionConfigFactory initActionConfigFactory;
     private static Connection CONNECTION;
     
     @Autowired
     private InitActionService actionService;
     @Autowired
-    private ContextLoader contextLoader;
+    private TestContextLoader contextLoader;
     
     @BeforeClass
     @SneakyThrows
     public static void init() {
-        Map<String, String> mysqlParameters = new ContextLoader("src/test/resources/integration/mysql-context.json").getContext("MySQL").getParameters();
-        CONNECTION = DriverManager.getConnection("jdbc:mysql://" + mysqlParameters.get(HOST) +
-                                                         ":" + mysqlParameters.get(PORT) +
-                                                         "/" + mysqlParameters.get(DATABASE) +
-                                                         "?user=" + mysqlParameters.get(USER) +
-                                                         "&password=" + mysqlParameters.get(PASSWORD));
+//        Map<String, String> mysqlParameters = new ContextLoader("src/test/resources/integration/mysql-context.json").getContext("MySQL").getParameters();
+//        CONNECTION = DriverManager.getConnection("jdbc:mysql://" + mysqlParameters.get(HOST) +
+//                                                         ":" + mysqlParameters.get(PORT) +
+//                                                         "/" + mysqlParameters.get(DATABASE) +
+//                                                         "?user=" + mysqlParameters.get(USER) +
+//                                                         "&password=" + mysqlParameters.get(PASSWORD));
     }
     
     @Test
@@ -80,7 +74,7 @@ public class TestInitActionServiceMySQLIntegration {
         Preconditions.checkArgument(!firstState.isBeforeFirst());
         
         try {
-            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/mysql-script"));
+            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/mysql-script"));
             actionService.run(actionConfigs);
             
             ResultSet resultSet = statement.executeQuery(validationQuery);
@@ -98,7 +92,7 @@ public class TestInitActionServiceMySQLIntegration {
         exceptionRule.expect(ExecutionException.class);
         exceptionRule.expectMessage("Table 'JarvisMySQLDB.invalid' doesn't exist");
         
-        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/mysql-script-invalid"));
+        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/mysql-script-invalid"));
         actionService.run(actionConfigs);
     }
 }

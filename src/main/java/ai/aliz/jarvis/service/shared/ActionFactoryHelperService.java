@@ -9,14 +9,14 @@ import com.google.common.base.Preconditions;
 
 import org.springframework.stereotype.Service;
 
-import ai.aliz.jarvis.context.Context;
-import ai.aliz.jarvis.context.ContextLoader;
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextLoader;
 
 @Service
 public class ActionFactoryHelperService {
     
-    public Context getContext(ContextLoader contextLoader, String fileName) {
-        Context context = contextLoader.getContext(fileName);
+    public TestContext getContext(TestContextLoader contextLoader, String fileName) {
+        TestContext context = contextLoader.getContext(fileName);
         Preconditions.checkNotNull(context, "No context exists with name: %s", fileName);
         return context;
     }

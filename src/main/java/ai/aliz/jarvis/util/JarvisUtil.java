@@ -19,7 +19,7 @@ import javax.json.JsonValue;
 
 import org.apache.commons.io.IOUtils;
 
-import ai.aliz.jarvis.context.Context;
+import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.testconfig.AssertActionConfig;
 import ai.aliz.jarvis.testconfig.StepConfig;
 
@@ -56,7 +56,7 @@ public class JarvisUtil {
         return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
     }
     
-    public String getDatasetNameFromConfigProperties(Map<String, Object> properties, Context context) {
+    public String getDatasetNameFromConfigProperties(Map<String, Object> properties, TestContext context) {
         String dataset = (String) properties.get(DATASET);
         String datasetNamePrefix = context.getParameter(DATASET_NAME_PREFIX);
         if (datasetNamePrefix != null) {

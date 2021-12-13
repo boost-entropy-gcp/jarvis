@@ -1,6 +1,6 @@
 package ai.aliz.talendtestrunner.service.executor;
 
-import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
+import ai.aliz.jarvis.testconfig.ExecutionActionConfig;
 import org.springframework.stereotype.Service;
 
 @Service

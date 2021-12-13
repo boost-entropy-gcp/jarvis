@@ -1,19 +1,18 @@
 package ai.aliz.talendtestrunner.service.executor;
 
-import ai.aliz.talendtestrunner.db.BigQueryExecutor;
-import ai.aliz.talendtestrunner.service.executor.Executor;
-import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.testconfig.ExecutionActionConfig;
+import ai.aliz.talendtestrunner.db.BigQueryExecutor;
+import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
 @Service
 public class BqScriptExecutor implements Executor {
     
     @Autowired
-    private ContextLoader contextLoader;
+    private TestContextLoader contextLoader;
 
     @Autowired
     private BigQueryExecutor bigQueryExecutor;

@@ -1,11 +1,5 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import com.google.common.base.Preconditions;
-import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,6 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Preconditions;
+
+import org.springframework.stereotype.Service;
+
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.testconfig.AssertActionConfig;
 
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 
@@ -24,7 +26,7 @@ public class AssertActionConfigCreator {
 
     private ActionConfigForBq actionConfigForBq = new ActionConfigForBq();
 
-    public List<AssertActionConfig> getAssertActionConfigs(ContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
+    public List<AssertActionConfig> getAssertActionConfigs(TestContextLoader contextLoader, Map<String, Object> defaultProperties, File testCaseFolder) {
         Path assertFolder = actionCreatorHelperService.getTargetFolderPath(testCaseFolder, "assert");
         List<AssertActionConfig> assertActionConfigs = null;
         try {
@@ -34,7 +36,7 @@ public class AssertActionConfigCreator {
 
                     File assertContextFolder = assertActionConfigPath.toFile();
                     String directoryName = assertContextFolder.getName();
-                    Context context = actionCreatorHelperService.getContext(contextLoader, directoryName);
+                    TestContext context = actionCreatorHelperService.getContext(contextLoader, directoryName);
                     String system = context.getId();
 
                     switch (context.getContextType()) {

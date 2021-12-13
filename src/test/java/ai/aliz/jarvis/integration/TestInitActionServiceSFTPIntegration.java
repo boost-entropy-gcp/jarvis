@@ -17,10 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.context.Context;
-import ai.aliz.jarvis.context.ContextLoader;
-import ai.aliz.jarvis.service.init.InitActionConfigFactory;
-import ai.aliz.jarvis.service.init.InitActionService;
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.testconfig.InitActionConfigFactory;
+import ai.aliz.jarvis.service.initaction.InitActionService;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
 
 import org.junit.Ignore;
@@ -44,19 +44,23 @@ public class TestInitActionServiceSFTPIntegration {
      * To provide resources for this test, apply the Terraform configurations in the integration folder.
     */
     
-    private final InitActionConfigFactory initActionConfigFactory = new InitActionConfigFactory();
+    @Autowired
+    private InitActionConfigFactory initActionConfigFactory;
     
     @Autowired
     private InitActionService actionService;
     
+    @Autowired
+    private TestContextLoader contextLoader;
+    
     @Test
     public void testFileUpload() {
-        ContextLoader contextLoader = new ContextLoader("src/test/resources/integration/sftp-context.json");
-        Context sftpContext = contextLoader.getContext("SFTP");
+//        ContextLoader contextLoader = new ContextLoader("src/test/resources/integration/sftp-context.json");
+        TestContext sftpContext = contextLoader.getContext("SFTP");
         ChannelSftp channel = createChannel(sftpContext);
         Preconditions.checkArgument(findTestFileInCurrentFolder(channel).isEmpty());
     
-        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/sftp"));
+        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/sftp"));
         System.out.println(actionConfigs.get(0));
         actionService.run(actionConfigs);
     
@@ -65,7 +69,7 @@ public class TestInitActionServiceSFTPIntegration {
     }
     
     @SneakyThrows
-    private ChannelSftp createChannel(Context sftpContext) {
+    private ChannelSftp createChannel(TestContext sftpContext) {
         JSch jsch = new JSch();
         //TODO replace with password based connection
         jsch.addIdentity("~/.ssh/id_rsa");

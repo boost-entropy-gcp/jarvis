@@ -1,6 +1,6 @@
 package ai.aliz.talendtestrunner.service.assertor;
 
-import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.testconfig.AssertActionConfig;
 
 public interface Assertor {
 

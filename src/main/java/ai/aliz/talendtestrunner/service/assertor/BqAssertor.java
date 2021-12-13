@@ -1,37 +1,8 @@
 package ai.aliz.talendtestrunner.service.assertor;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.db.BigQueryExecutor;
-import ai.aliz.talendtestrunner.helper.Helper;
-import ai.aliz.talendtestrunner.service.InitActionService;
-import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.util.TestRunnerUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.flipkart.zjsonpatch.JsonDiff;
-import com.google.cloud.bigquery.Field;
-import com.google.cloud.bigquery.FieldList;
-import com.google.cloud.bigquery.LegacySQLTypeName;
-import com.google.cloud.bigquery.Schema;
-import com.google.cloud.bigquery.TableResult;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -57,17 +28,48 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static ai.aliz.talendtestrunner.helper.Helper.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.flipkart.zjsonpatch.JsonDiff;
+import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.FieldList;
+import com.google.cloud.bigquery.LegacySQLTypeName;
+import com.google.cloud.bigquery.Schema;
+import com.google.cloud.bigquery.TableResult;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.talendtestrunner.db.BigQueryExecutor;
+import ai.aliz.talendtestrunner.util.TestRunnerUtil;
+
+import org.junit.Assert;
+
 import static ai.aliz.talendtestrunner.helper.Helper.DATASET;
 import static ai.aliz.talendtestrunner.helper.Helper.PROJECT;
 import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
+import static ai.aliz.talendtestrunner.helper.Helper.TEST_INIT;
 
 @Service
 @Slf4j
 public class BqAssertor implements Assertor {
 
     @Autowired
-    ContextLoader contextLoader;
+    TestContextLoader contextLoader;
 
     public static final String FILTER_CONDITION = "filterCondition";
     @Autowired
@@ -96,7 +98,7 @@ public class BqAssertor implements Assertor {
         assertWithBigQuery(config, contextLoader.getContext(config.getSystem()));
     }
 
-    public void assertTable(String tableId, String expectedJson, Set<String> inexactMatchFields, Context context) {
+    public void assertTable(String tableId, String expectedJson, Set<String> inexactMatchFields, TestContext context) {
         String selectQuery = String.format("SELECT * FROM %s", tableId);
         String result = bigQueryExecutor.executeQuery(selectQuery, context);
 
@@ -104,7 +106,7 @@ public class BqAssertor implements Assertor {
     }
 
     @SneakyThrows
-    public void assertTable(AssertActionConfig assertActionConfig, Context context) {
+    public void assertTable(AssertActionConfig assertActionConfig, TestContext context) {
         //        String expectedResult = getSourceContent(assertActionConfig);
 
         String project = context.getParameter("project");
@@ -122,7 +124,7 @@ public class BqAssertor implements Assertor {
         assertTableFieldByField(assertActionConfig, context);
     }
 
-    public void assertWithBigQuery(AssertActionConfig assertActionConfig, Context context) {
+    public void assertWithBigQuery(AssertActionConfig assertActionConfig, TestContext context) {
         switch (assertActionConfig.getType()) {
             case "AssertDataEquals":
                 assertTable(assertActionConfig, context);
@@ -135,7 +137,7 @@ public class BqAssertor implements Assertor {
         }
     }
 
-    private void assertTableFieldByField(AssertActionConfig assertActionConfig, Context context) throws IOException {
+    private void assertTableFieldByField(AssertActionConfig assertActionConfig, TestContext context) throws IOException {
         String project = context.getParameter("project");
         String dataset = (String) assertActionConfig.getProperties().get("dataset");
         String datasetNamePrefix = context.getParameter("datasetNamePrefix");
@@ -665,7 +667,7 @@ public class BqAssertor implements Assertor {
         return propertyCandidates;
     }
 
-    public void assertNoChange(AssertActionConfig assertActionConfig, Context context) {
+    public void assertNoChange(AssertActionConfig assertActionConfig, TestContext context) {
         String project = context.getParameter(PROJECT);
         Map<String, Object> properties = assertActionConfig.getProperties();
         String dataset = (String) properties.get(DATASET);

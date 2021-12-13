@@ -1,9 +1,9 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.testconfig.InitActionConfig;
-import ai.aliz.talendtestrunner.testconfig.InitActionType;
-import ai.aliz.talendtestrunner.testconfig.StepConfig;
+import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.testconfig.InitActionType;
+import ai.aliz.jarvis.testconfig.StepConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import lombok.SneakyThrows;

@@ -11,7 +11,7 @@ public class AssertActionConfig implements StepConfig {
     private String system;
     private String type;
     private String descriptorFolder;
-    
     private Map<String, Object> properties = new HashMap<>();
     
+   
 }

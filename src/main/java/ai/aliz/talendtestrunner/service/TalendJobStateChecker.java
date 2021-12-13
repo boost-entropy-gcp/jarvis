@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ai.aliz.talendtestrunner.context.Context;
+import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.talendtestrunner.db.MxSQLQueryExecutor;
 
 import org.junit.Assert;
@@ -37,7 +37,7 @@ public class TalendJobStateChecker {
     private static final Set<String> ignoredProps = ImmutableSet.of("lastExecutedAt");
     
     @SneakyThrows
-    public void checkJobState(String expectedStateRecord, Context dbContext) {
+    public void checkJobState(String expectedStateRecord, TestContext dbContext) {
         ArrayNode expectedStateRecordArrayNode = (ArrayNode) objectMapper.readTree(expectedStateRecord);
         JsonNode expectedStateRecordNode = expectedStateRecordArrayNode.get(0);
         String job_name = expectedStateRecordNode.get("job_name").asText();
@@ -109,7 +109,7 @@ public class TalendJobStateChecker {
         return result;
     }
     
-    public String getJobState(String jobName, Context dbContext) {
+    public String getJobState(String jobName, TestContext dbContext) {
         return mxSQLQueryExecutor.executeQuery(String.format("SELECT * FROM talend.talend_job_state WHERE job_name='%s'", jobName), dbContext);
     }
 }

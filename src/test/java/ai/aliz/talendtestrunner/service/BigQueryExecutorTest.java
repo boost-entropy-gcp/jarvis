@@ -1,35 +1,36 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.db.BigQueryExecutor;
-import com.google.api.gax.paging.Page;
-import com.google.cloud.PageImpl;
-import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.BigQueryOptions;
-import com.google.cloud.bigquery.Field;
-import com.google.cloud.bigquery.FieldValue;
-import com.google.cloud.bigquery.FieldValueList;
-import com.google.cloud.bigquery.LegacySQLTypeName;
-import com.google.cloud.bigquery.Schema;
-import com.google.cloud.bigquery.StandardSQLTypeName;
-import com.google.cloud.bigquery.TableResult;
 import lombok.SneakyThrows;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import com.google.api.gax.paging.Page;
+import com.google.cloud.PageImpl;
+import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.FieldValue;
+import com.google.cloud.bigquery.FieldValueList;
+import com.google.cloud.bigquery.LegacySQLTypeName;
+import com.google.cloud.bigquery.Schema;
+import com.google.cloud.bigquery.TableResult;
+
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.talendtestrunner.db.BigQueryExecutor;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -41,7 +42,7 @@ public class BigQueryExecutorTest {
     private BigQueryExecutor bigQueryExecutor;
 
     @Autowired
-    private ContextLoader contextLoader;
+    private TestContextLoader contextLoader;
 
     @MockBean
     private BigQuery bigQuery;
@@ -55,8 +56,8 @@ public class BigQueryExecutorTest {
         TableResult tableResult = getTableResult();
         Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
         Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
-        contextLoader.parseContext(CONTEXT_PATH);
-        Context bqContext = contextLoader.getContext("TEST_ID");
+//        contextLoader.parseContext(CONTEXT_PATH);
+        TestContext bqContext = contextLoader.getContext("TEST_ID");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
         Assert.assertEquals("[{\"test_id\":\"1\",\"test\":\"test\"}]", result);
     }

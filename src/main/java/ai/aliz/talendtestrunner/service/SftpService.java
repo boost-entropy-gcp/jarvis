@@ -1,17 +1,8 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.testconfig.InitActionConfig;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -20,6 +11,18 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Set;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
+
+import org.springframework.stereotype.Service;
+
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.testconfig.InitActionConfig;
 
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 
@@ -30,9 +33,9 @@ public class SftpService {
     
     public static final String MODIFIED_AT_MARKER_PART = "_MODTIME_";
     
-    private Set<Context> alreadyUsed = Sets.newHashSet();
+    private Set<TestContext> alreadyUsed = Sets.newHashSet();
     
-    public void loadFilesToSftp(InitActionConfig initActionConfig, Context sftpContext) {
+    public void loadFilesToSftp(InitActionConfig initActionConfig, TestContext sftpContext) {
         ChannelSftp channelSftp = setupJsch(sftpContext);
         String remoteBasePath = sftpContext.getParameter("remoteBasePath");
         cleanup(channelSftp, remoteBasePath);
@@ -61,7 +64,7 @@ public class SftpService {
     }
     
     @SneakyThrows
-    public void prepareFolder(Path localFile, Context sftpContext) {
+    public void prepareFolder(Path localFile, TestContext sftpContext) {
         try {
             ChannelSftp channelSftp = setupJsch(sftpContext);
             
@@ -136,7 +139,7 @@ public class SftpService {
     }
     
     @SneakyThrows
-    private ChannelSftp setupJsch(Context sftpContext) {
+    private ChannelSftp setupJsch(TestContext sftpContext) {
         JSch jsch = new JSch();
         Session jschSession = jsch.getSession(sftpContext.getParameter("user"), sftpContext.getParameter("host"));
         

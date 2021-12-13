@@ -1,16 +1,17 @@
 package ai.aliz.talendtestrunner.service.executor;
 
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.service.TestRunnerService;
-import ai.aliz.talendtestrunner.testconfig.ExecutionActionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.testconfig.ExecutionActionConfig;
+import ai.aliz.talendtestrunner.service.TestRunnerService;
 
 @Service
 public class TalendExecutor implements Executor {
 
     @Autowired
-    private ContextLoader contextLoader;
+    private TestContextLoader contextLoader;
 
     @Autowired
     private TestRunnerService testRunnerService;

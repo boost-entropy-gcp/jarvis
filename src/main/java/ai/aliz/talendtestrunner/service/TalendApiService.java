@@ -1,13 +1,14 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.talend.Executable;
-import ai.aliz.talendtestrunner.talend.Execution;
-import ai.aliz.talendtestrunner.talend.ExecutionStillRunningException;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
-import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -18,9 +19,11 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.talendtestrunner.talend.Executable;
+import ai.aliz.talendtestrunner.talend.Execution;
+import ai.aliz.talendtestrunner.talend.ExecutionStillRunningException;
+import ai.aliz.talendtestrunner.util.PlaceholderResolver;
 
 @Service
 @Slf4j
@@ -43,13 +46,13 @@ public class TalendApiService {
     private final RetryTemplate retryTemplate;
 
 
-    public void executeTask(String taskName, Context context) {
+    public void executeTask(String taskName, TestContext context) {
         Executable task = getTask(taskName, context);
         String executionId = runTask(task, context);
         waitForTaskToFinish(executionId, context);
     }
 
-    private Executable getTask(String taskName, Context context) {
+    private Executable getTask(String taskName, TestContext context) {
         Map<String, String> parameters = context.getParameters();
         parameters.put("jobName", taskName);
 
@@ -80,7 +83,7 @@ public class TalendApiService {
         return executable;
     }
 
-    private String runTask(Executable task, Context context) {
+    private String runTask(Executable task, TestContext context) {
         String apiUrl = context.getParameters().get(API_URL);
         String endpointUrl = apiUrl + TASK_EXECUTE_ENDPOINT;
         RequestEntity<Map<String, String>> request = RequestEntity.post(URI.create(endpointUrl))
@@ -95,7 +98,7 @@ public class TalendApiService {
         return executionId;
     }
 
-    private void waitForTaskToFinish(String executionId, Context context) {
+    private void waitForTaskToFinish(String executionId, TestContext context) {
         Map<String, String> parameters = context.getParameters();
 
         String apiUrl = parameters.get(API_URL);
