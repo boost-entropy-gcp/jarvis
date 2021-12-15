@@ -17,6 +17,4 @@ public class ExecutionActionConfig implements StepConfig {
     private String descriptorFolder;
 
     private final Map<String, Object> properties = new HashMap<>();
-
-    private List<AssertActionConfig> assertActionConfigs = new ArrayList<>();
 }

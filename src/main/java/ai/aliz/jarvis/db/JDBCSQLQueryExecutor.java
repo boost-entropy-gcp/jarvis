@@ -45,7 +45,7 @@ public class JDBCSQLQueryExecutor implements QueryExecutor {
     private Map<TestContext, Connection> connectionMap = Maps.newHashMap();
     
     @Override
-    public void executeScript(String query, TestContext context) {
+    public void executeBQInitializatorScript(String query, TestContext context) {
         Arrays.stream(query.split(";"))
               .map(String::trim)
               .filter(e -> !e.isEmpty())

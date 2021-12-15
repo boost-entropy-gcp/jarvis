@@ -33,10 +33,10 @@ public class SQLExecInitiator implements Initiator {
             case MSSQL:
             case PostgreSQL:
             case MySQL:
-                JDBCSQLQueryExecutor.executeScript(sourceContent, context);
+                JDBCSQLQueryExecutor.executeBQInitializatorScript(sourceContent, context);
                 break;
             case BigQuery:
-                bigQueryExecutor.executeScript(sourceContent, context);
+                bigQueryExecutor.executeBQInitializatorScript(sourceContent, context);
                 break;
             default:
                 throw new UnsupportedOperationException("Not supported context type: " + context.getContextType());

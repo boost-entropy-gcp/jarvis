@@ -25,7 +25,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.jarvis.service.initaction.InitActionService;
-import ai.aliz.jarvis.service.shared.platform.BigQueryService;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
 import ai.aliz.jarvis.testconfig.InitActionConfigFactory;
 
@@ -62,14 +61,13 @@ public class TestInitActionServiceBQIntegration {
     private InitActionService actionService;
     @Autowired
     private TestContextLoader contextLoader;
-    @Autowired
-    private BigQueryService bigQueryService;
+ 
     
     private BigQuery bigQuery;
     
     @Before
     public void init() {
-        bigQuery = bigQueryService.createBigQueryClient(contextLoader.getContext("BQ"));
+//        bigQuery = bigQueryService.createBigQueryClient(contextLoader.getContext("BQ"));
         Preconditions.checkNotNull(bigQuery.getDataset(DATASET_ID));
     }
     

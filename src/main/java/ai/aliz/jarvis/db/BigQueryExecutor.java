@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.api.client.util.Lists;
 import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.Field;
 import com.google.cloud.bigquery.FieldList;
 import com.google.cloud.bigquery.FieldValue;
@@ -36,14 +37,13 @@ import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.service.shared.platform.BigQueryService;
 import ai.aliz.jarvis.service.shared.ExecutorServiceWrapper;
 import ai.aliz.jarvis.util.JarvisUtil;
 
+import static ai.aliz.jarvis.util.JarvisConstants.PROJECT;
 import static ai.aliz.jarvis.util.JarvisConstants.TEST_INIT;
 
 @Component
@@ -54,9 +54,6 @@ public class BigQueryExecutor implements QueryExecutor {
     private ExecutorServiceWrapper executorService;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
-    
-    @Autowired
-    private BigQueryService bigQueryService;
     
     @Override
     public void executeStatement(String query, TestContext context) {
@@ -70,8 +67,22 @@ public class BigQueryExecutor implements QueryExecutor {
         return result.toString();
     }
     
+    public void executeScript(String script, TestContext context) {
+        String resolvedScript = JarvisUtil.resolvePlaceholders(script, context.getParameters());
+        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(resolvedScript).build();
+        
+        BigQuery bigQuery = getBigQueryClient(context);
+        try {
+            log.info("Executing script:\n '{}'", resolvedScript);
+            bigQuery.query(queryConfig);
+        } catch (Exception e) {
+            log.error(String.format("Failed to execute: %s", resolvedScript), e);
+            throw Lombok.sneakyThrow(e);
+        }
+    }
+    
     @Override
-    public void executeScript(String query, TestContext context) {
+    public void executeBQInitializatorScript(String query, TestContext context) {
         List<String> deletes = Lists.newArrayList();
         List<String> inserts = Lists.newArrayList();
         splitScriptIntoStatements(query)
@@ -105,7 +116,7 @@ public class BigQueryExecutor implements QueryExecutor {
     }
     
     private BigQuery getBigQueryClient(TestContext context) {
-        return bigQueryService.createBigQueryClient(context);
+        return BigQueryOptions.newBuilder().setProjectId(context.getParameters().get(PROJECT)).build().getService();
     }
     
     private List<Runnable> statementsToRunnables(TestContext context, List<String> statements) {

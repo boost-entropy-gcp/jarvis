@@ -8,5 +8,5 @@ public interface QueryExecutor {
     
     String executeQuery(String query, TestContext context);
     
-    void executeScript(String query, TestContext context);
+    void executeBQInitializatorScript(String query, TestContext context);
 }
