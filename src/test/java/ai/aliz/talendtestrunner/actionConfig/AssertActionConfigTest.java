@@ -7,6 +7,8 @@ import ai.aliz.jarvis.testconfig.AssertActionConfig;
 
 import com.google.cloud.bigquery.BigQuery;
 import lombok.SneakyThrows;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +25,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
+@Ignore
 public class AssertActionConfigTest {
     
     private ActionConfigForBq actionConfigForBq = new ActionConfigForBq();

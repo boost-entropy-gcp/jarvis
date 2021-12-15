@@ -6,11 +6,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
+@Ignore
 public class ExecutorActionConfigTest {
 
 //    private ExecutionActionConfigCreator executionActionConfigCreator = new ExecutionActionConfigCreator();

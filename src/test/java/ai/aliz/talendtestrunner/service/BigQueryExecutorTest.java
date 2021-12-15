@@ -29,11 +29,13 @@ import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
+@Ignore
 public class BigQueryExecutorTest {
     private static final String API_URL = "apiUrl";
     private static final String CONTEXT_PATH = new File(Objects.requireNonNull(BigQueryExecutorTest.class.getClassLoader().getResource("test_context.json")).getFile()).getPath();
