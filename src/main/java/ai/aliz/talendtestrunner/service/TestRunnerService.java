@@ -4,34 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.context.TestContextType;
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
 import ai.aliz.jarvis.testconfig.ExecutionActionConfig;
-import ai.aliz.jarvis.testconfig.ExecutionType;
 import ai.aliz.jarvis.testconfig.TestCase;
 
-import ai.aliz.talendtestrunner.db.BigQueryExecutor;
-import ai.aliz.talendtestrunner.service.executor.AirflowExecutor;
-import ai.aliz.talendtestrunner.service.executor.BqScriptExecutor;
-import ai.aliz.talendtestrunner.service.executor.Executor;
-import ai.aliz.talendtestrunner.service.executor.NoOpsExecutor;
-import ai.aliz.talendtestrunner.service.executor.TalendExecutor;
-
-import ai.aliz.talendtestrunner.util.TestRunnerUtil;
-
-import static ai.aliz.talendtestrunner.helper.Helper.PROJECT;
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
-import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
 
 @Service
 @AllArgsConstructor
@@ -42,31 +23,22 @@ public class TestRunnerService {
     private final TalendApiService talendApiService;
     private final ExecutorServiceImpl executorService;
     private final ApplicationContext applicationContext;
-    private final AssertActionService assertActionService;
     private final TalendJobStateChecker talendJobStateChecker;
-    private final BigQueryExecutor bigQueryExecutor;
     private final ExecutionActionService executionActionService;
     
-    private static Map<ExecutionType, Class<? extends Executor>> executorMap = new HashMap<>();
     
-    static {
-        executorMap.put(ExecutionType.BqQuery, BqScriptExecutor.class);
-        executorMap.put(ExecutionType.Airflow, AirflowExecutor.class);
-        executorMap.put(ExecutionType.Talend, TalendExecutor.class);
-        executorMap.put(ExecutionType.NoOps, NoOpsExecutor.class);
-    }
+   
     
     
     public void runTest(TestCase testCase) {
 
         testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
     
-            Class<? extends Executor> executorClass = Objects.requireNonNull(executorMap.get(executionActionConfig.getType()));
-            Executor executor = applicationContext.getBean(executorClass);
-            executor.execute(executionActionConfig);
+//            Class<? extends Executor> executorClass = Objects.requireNonNull(executorMap.get(executionActionConfig.getType()));
+//            Executor executor = applicationContext.getBean(executorClass);
+//            executor.execute(executionActionConfig);
         });
-
-        testCase.getAssertActionConfigs().forEach(assertAction -> assertActionService.assertResult(assertAction, contextLoader));
+        
     }
     
   

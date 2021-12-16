@@ -21,7 +21,7 @@ import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.jarvis.context.TestContextType;
 import ai.aliz.jarvis.service.shared.ActionConfigUtil;
-import ai.aliz.jarvis.service.shared.ActionFactoryHelperService;
+import ai.aliz.jarvis.util.JarvisUtil;
 
 import static ai.aliz.jarvis.util.JarvisConstants.BQL_FORMAT;
 import static ai.aliz.jarvis.util.JarvisConstants.PRE;
@@ -38,10 +38,9 @@ public class InitActionConfigFactory {
         this.contextLoader = contextLoader;
     }
     
-    private ActionFactoryHelperService actionFactoryHelperService = new ActionFactoryHelperService();
     
     public List<InitActionConfig> getInitActionConfigs(Map<String, Object> defaultProperties, File testCaseFolder) {
-        Path preFolder = actionFactoryHelperService.getTargetFolderPath(testCaseFolder, PRE);
+        Path preFolder = JarvisUtil.getTargetFolderPath(testCaseFolder, PRE);
         List<InitActionConfig> initActions;
         try {
             initActions = Files.list(preFolder).flatMap(initActionFile -> {
@@ -69,7 +68,7 @@ public class InitActionConfigFactory {
                     }
                     initActionConfigs.add(initActionConfig);
                 } else {
-                    TestContext context = actionFactoryHelperService.getContext(contextLoader, fileName);
+                    TestContext context = JarvisUtil.getContext(contextLoader, fileName);
                     String system = fileName;
                     
                     TestContextType contextType = context.getContextType();

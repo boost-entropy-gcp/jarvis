@@ -1,4 +1,4 @@
-package ai.aliz.talendtestrunner.service.assertor;
+package ai.aliz.jarvis.service.assertaction;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -6,9 +6,6 @@ import org.springframework.stereotype.Service;
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.jarvis.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.service.AssertActionService;
-import ai.aliz.talendtestrunner.service.TalendJobStateChecker;
-import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
 @Service
 public class MySQLAssertor implements Assertor {
@@ -19,8 +16,8 @@ public class MySQLAssertor implements Assertor {
     @Autowired
     private AssertActionService assertActionService;
 
-    @Autowired
-    private TalendJobStateChecker talendJobStateChecker;
+//    @Autowired
+//    private TalendJobStateChecker talendJobStateChecker;
 
     @Override
     public void doAssert(AssertActionConfig config) {
@@ -28,11 +25,12 @@ public class MySQLAssertor implements Assertor {
     }
 
     public void assertWithMySQL(AssertActionConfig assertActionConfig, TestContext context) {
-        switch (assertActionConfig.getType()) {
-            case "AssertTalendJobState": {
-                String expectedData = TestRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig);
-                talendJobStateChecker.checkJobState(expectedData, context);
-            }
-        }
+        throw new UnsupportedOperationException("Not supported yet"); //FIXME
+//        switch (assertActionConfig.getType()) {
+//            case "AssertTalendJobState": {
+//                String expectedData = TestRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig);
+//                talendJobStateChecker.checkJobState(expectedData, context);
+//            }
+//        }
     }
 }

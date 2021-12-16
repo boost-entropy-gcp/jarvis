@@ -26,7 +26,8 @@ public class JarvisApplication implements CommandLineRunner {
         ctx.getEnvironment().getPropertySources().addFirst(commandLinePropertySource);
         ctx.refresh();
         SpringApplication.run(JarvisApplication.class, args);
-        
+        SpringApplication.exit(ctx);
+        ctx.close();
     }
     
     @Override

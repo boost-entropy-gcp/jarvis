@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextType;
+import ai.aliz.jarvis.db.BigQueryExecutor;
 
 @Component
 @Primary
@@ -20,7 +21,7 @@ public class QueryExecutorComposite implements QueryExecutor {
         this.queryExecutors = new EnumMap<>(TestContextType.class);
         this.queryExecutors.put(TestContextType.MSSQL, mxSQLQueryExecutor);
         this.queryExecutors.put(TestContextType.MySQL, mxSQLQueryExecutor);
-        this.queryExecutors.put(TestContextType.BigQuery, bigQueryExecutor);
+//        this.queryExecutors.put(TestContextType.BigQuery, bigQueryExecutor);
     }
 
     @Override

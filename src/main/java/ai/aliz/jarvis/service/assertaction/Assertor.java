@@ -1,4 +1,4 @@
-package ai.aliz.talendtestrunner.service.assertor;
+package ai.aliz.jarvis.service.assertaction;
 
 import ai.aliz.jarvis.testconfig.AssertActionConfig;
 

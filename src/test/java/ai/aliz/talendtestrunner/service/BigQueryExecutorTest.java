@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.talendtestrunner.db.BigQueryExecutor;
+import ai.aliz.jarvis.db.BigQueryExecutor;
 
 import org.junit.Assert;
 import org.junit.Ignore;

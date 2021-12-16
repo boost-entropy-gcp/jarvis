@@ -37,12 +37,18 @@ public class TestConfigLoader {
     public final Map<String, TestContext> contextMap;
     private final InitActionConfigFactory initActionConfigFactory;
     private final ExecutionActionConfigFactory executionActionConfigFactory;
+    private final AssertActionConfigFactory assertActionConfigFactory;
     
     @Autowired
-    public TestConfigLoader(TestContextLoader contextLoader, Environment environment, InitActionConfigFactory initActionConfigFactory, ExecutionActionConfigFactory executionActionConfigFactory) {
+    public TestConfigLoader(TestContextLoader contextLoader,
+                            Environment environment,
+                            InitActionConfigFactory initActionConfigFactory,
+                            ExecutionActionConfigFactory executionActionConfigFactory,
+                            AssertActionConfigFactory assertActionConfigFactory) {
         this.contextMap = contextLoader.getContextIdToContexts();
         this.initActionConfigFactory = initActionConfigFactory;
         this.executionActionConfigFactory = executionActionConfigFactory;
+        this.assertActionConfigFactory = assertActionConfigFactory;
         this.testSuite = this.readTestConfig(environment.getProperty("config"));
         
     }
@@ -122,12 +128,11 @@ public class TestConfigLoader {
                     List<InitActionConfig> initActions = initActionConfigFactory.getInitActionConfigs(defaultProperties, testCaseFolder);
                     testCase.getInitActionConfigs().addAll(initActions);
                     
-                    //                    List<AssertActionConfig> assertActionConfigs = assertActionConfigCreator.getAssertActionConfigs(contextLoader, defaultProperties, testCaseFolder);
-                    //                    testCase.getAssertActionConfigs().addAll(assertActionConfigs);
-                    //
-                    
                     List<ExecutionActionConfig> executionActionConfigList = executionActionConfigFactory.getExecutionActionConfig(testSuiteMap);
                     testCase.getExecutionActionConfigs().addAll(executionActionConfigList); //TODO this has to work without autodetect also
+                    
+                    List<AssertActionConfig> assertActionConfigs = assertActionConfigFactory.getAssertActionConfigs(defaultProperties, testCaseFolder);
+                    testCase.getAssertActionConfigs().addAll(assertActionConfigs);
                     
                     return testCase;
                 }).collect(Collectors.toList());

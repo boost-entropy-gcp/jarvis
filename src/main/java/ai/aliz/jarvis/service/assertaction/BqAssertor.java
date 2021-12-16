@@ -1,4 +1,4 @@
-package ai.aliz.talendtestrunner.service.assertor;
+package ai.aliz.jarvis.service.assertaction;
 
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -53,8 +53,8 @@ import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.db.BigQueryExecutor;
 import ai.aliz.jarvis.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.db.BigQueryExecutor;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
 import org.junit.Assert;
@@ -72,6 +72,7 @@ public class BqAssertor implements Assertor {
     TestContextLoader contextLoader;
 
     public static final String FILTER_CONDITION = "filterCondition";
+    
     @Autowired
     private BigQueryExecutor bigQueryExecutor;
 
@@ -460,7 +461,7 @@ public class BqAssertor implements Assertor {
     }
 
     private List<JsonNode> findAcceptableInexactDifferences(List<JsonNode> patchNodes, ArrayNode expectedResultNode,
-                                                            java.util.function.Predicate<String> eligibleForInexactComparison) {
+                                                            Predicate<String> eligibleForInexactComparison) {
         return patchNodes.stream()
                 .filter(node -> {
                     if (!node.get("op").asText().equals("replace")) {

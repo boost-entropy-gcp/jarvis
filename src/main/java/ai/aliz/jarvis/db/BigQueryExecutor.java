@@ -125,13 +125,13 @@ public class BigQueryExecutor implements QueryExecutor {
                          .collect(Collectors.toList());
     }
     
-    private TableResult executeQueryAndGetResult(String query, TestContext context) {
+    public TableResult executeQueryAndGetResult(String query, TestContext context) {
         String completedQuery = JarvisUtil.resolvePlaceholders(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
         BigQuery bigQuery = getBigQueryClient(context);
         try {
-            log.info("Executing query: '{}' \n completed as: '{}'", query, completedQuery);
+            log.info("Executing query:\n '{}' \n completed as:\n '{}'", query, completedQuery);
             return bigQuery.query(queryConfig);
         } catch (Exception e) {
             log.error("Failed to execute: " + completedQuery, e);
@@ -139,7 +139,7 @@ public class BigQueryExecutor implements QueryExecutor {
         }
     }
     
-    private ArrayNode bigQueryResultToJsonArrayNode(TableResult queryResult) {
+    public ArrayNode bigQueryResultToJsonArrayNode(TableResult queryResult) {
         FieldList schema = queryResult.getSchema().getFields();
         Iterator<FieldValueList> fieldValueListIterator = queryResult.iterateAll().iterator();
         ArrayNode result = objectMapper.createArrayNode();
