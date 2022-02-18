@@ -1,10 +1,10 @@
 package ai.aliz.talendtestrunner.db;
 
-import ai.aliz.talendtestrunner.context.Context;
+import ai.aliz.jarvis.context.TestContext;
 
 public interface QueryExecutor {
 
-    void executeStatement(String query, Context context);
+    void executeStatement(String query, TestContext context);
 
-    String executeQuery(String query, Context context);
+    String executeQuery(String query, TestContext context);
 }

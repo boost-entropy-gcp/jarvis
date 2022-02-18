@@ -24,8 +24,8 @@ import com.google.gson.JsonObject;
 
 import org.springframework.stereotype.Component;
 
-import ai.aliz.jarvis.context.Context;
-import ai.aliz.jarvis.context.ContextType;
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextType;
 import ai.aliz.jarvis.util.JarvisUtil;
 
 @Component
@@ -42,10 +42,10 @@ public class JDBCSQLQueryExecutor implements QueryExecutor {
     private static final String POSTGRE_CONNECTION_STRING_PATTERN =
             "jdbc:postgresql://{{host}}:{{port}}/{{database}}?user={{user}}&password={{password}}";
     
-    private Map<Context, Connection> connectionMap = Maps.newHashMap();
+    private Map<TestContext, Connection> connectionMap = Maps.newHashMap();
     
     @Override
-    public void executeScript(String query, Context context) {
+    public void executeBQInitializatorScript(String query, TestContext context) {
         Arrays.stream(query.split(";"))
               .map(String::trim)
               .filter(e -> !e.isEmpty())
@@ -65,16 +65,16 @@ public class JDBCSQLQueryExecutor implements QueryExecutor {
     
     @Override
     @SneakyThrows
-    public void executeStatement(String query, Context context) {
+    public void executeStatement(String query, TestContext context) {
         doWithStatement(query, context, this::executeStatement);
     }
     
     @Override
-    public String executeQuery(String query, Context context) {
+    public String executeQuery(String query, TestContext context) {
         return doWithStatement(query, context, this::queryStatementForJsonResult);
     }
     
-    private <T> T doWithStatement(String query, Context context, Function<PreparedStatement, T> statementAction) {
+    private <T> T doWithStatement(String query, TestContext context, Function<PreparedStatement, T> statementAction) {
         Connection connection = getConnectionForContext(context);
         String completedQuery = JarvisUtil.resolvePlaceholders(query, context.getParameters());
         try {
@@ -87,7 +87,7 @@ public class JDBCSQLQueryExecutor implements QueryExecutor {
         }
     }
     
-    private Connection getConnectionForContext(Context context) {
+    private Connection getConnectionForContext(TestContext context) {
         Connection connection = connectionMap.get(context);
         if (connection == null) {
             String connectionUrl = JarvisUtil.resolvePlaceholders(getConnectionPattern(context), context.getParameters());
@@ -106,8 +106,8 @@ public class JDBCSQLQueryExecutor implements QueryExecutor {
         return preparedStatement.execute();
     }
     
-    private String getConnectionPattern(Context context) {
-        ContextType contextType = context.getContextType();
+    private String getConnectionPattern(TestContext context) {
+        TestContextType contextType = context.getContextType();
         switch (contextType) {
             case MySQL:
                 return MYSQL_CONNECTION_STRING_PATTERN;

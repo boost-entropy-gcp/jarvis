@@ -3,7 +3,7 @@ package ai.aliz.jarvis.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import ai.aliz.jarvis.context.Context;
+import ai.aliz.jarvis.context.TestContext;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class TestJarvisUtil {
     public void testGetDatasetNameFromConfigProperties() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(DATASET, "dataset");
-        Context context = Context.builder().parameter(DATASET_NAME_PREFIX, "core_").build();
+        TestContext context = TestContext.builder().parameter(DATASET_NAME_PREFIX, "core_").build();
         assertEquals("core_dataset", JarvisUtil.getDatasetNameFromConfigProperties(properties, context));
     }
     
@@ -54,7 +54,7 @@ public class TestJarvisUtil {
     public void testGetDatasetNameFromConfigPropertiesNullPrefix() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(DATASET, "dataset");
-        Context context = Context.builder().build();
+        TestContext context = TestContext.builder().build();
         assertEquals("dataset", JarvisUtil.getDatasetNameFromConfigProperties(properties, context));
     }
 }

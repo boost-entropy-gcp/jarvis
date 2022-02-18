@@ -6,6 +6,8 @@ import lombok.experimental.UtilityClass;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,9 +19,12 @@ import javax.json.JsonReader;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
 
+import com.google.common.base.Preconditions;
+
 import org.apache.commons.io.IOUtils;
 
-import ai.aliz.jarvis.context.Context;
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.jarvis.testconfig.AssertActionConfig;
 import ai.aliz.jarvis.testconfig.StepConfig;
 
@@ -56,7 +61,7 @@ public class JarvisUtil {
         return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
     }
     
-    public String getDatasetNameFromConfigProperties(Map<String, Object> properties, Context context) {
+    public String getDatasetNameFromConfigProperties(Map<String, Object> properties, TestContext context) {
         String dataset = (String) properties.get(DATASET);
         String datasetNamePrefix = context.getParameter(DATASET_NAME_PREFIX);
         if (datasetNamePrefix != null) {
@@ -77,6 +82,18 @@ public class JarvisUtil {
             throw new IllegalStateException("Some placeholders have not been resolved in: '" + result + "'");
         }
         return result;
+    }
+    
+    public TestContext getContext(TestContextLoader contextLoader, String contextId) {
+        TestContext context = contextLoader.getContext(contextId);
+        Preconditions.checkNotNull(context, "No context exists with name: %s", contextId);
+        return context;
+    }
+    
+    public Path getTargetFolderPath(File testCaseFolder, String folderName) {
+        Path folderPath = Paths.get(testCaseFolder.getAbsolutePath(), folderName);
+        Preconditions.checkArgument(Files.isDirectory(folderPath), "%s folder does not exists %s", folderName, folderPath);
+        return folderPath;
     }
 }
 

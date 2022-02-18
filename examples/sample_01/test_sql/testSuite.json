@@ -1,0 +1,14 @@
+{
+  "caseAutoDetect": true,
+  "executions":[
+    {
+      "executionType": "BqQuery",
+      "queryPath": "/examples/sample_01/test_sql/test.sql",
+      "executionContext": "test_bq"
+    }
+  ],
+  
+  "defaultProperties": {
+    "assert.assertKeyColumns" : ["id"]
+  }
+}

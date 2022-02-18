@@ -4,12 +4,10 @@ import lombok.SneakyThrows;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.base.Preconditions;
@@ -19,9 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.context.ContextLoader;
-import ai.aliz.jarvis.service.init.InitActionConfigFactory;
-import ai.aliz.jarvis.service.init.InitActionService;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.testconfig.InitActionConfigFactory;
+import ai.aliz.jarvis.service.initaction.InitActionService;
 import ai.aliz.jarvis.testconfig.InitActionConfig;
 
 import org.junit.BeforeClass;
@@ -30,11 +28,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
-import static ai.aliz.jarvis.util.JarvisConstants.DATABASE;
-import static ai.aliz.jarvis.util.JarvisConstants.HOST;
-import static ai.aliz.jarvis.util.JarvisConstants.PASSWORD;
-import static ai.aliz.jarvis.util.JarvisConstants.PORT;
-import static ai.aliz.jarvis.util.JarvisConstants.USER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -52,22 +45,23 @@ public class TestInitActionServiceMSSQLIntegration {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
     
-    private final InitActionConfigFactory initActionConfigFactory = new InitActionConfigFactory();
+    @Autowired
+    private InitActionConfigFactory initActionConfigFactory;
     private static Connection CONNECTION;
     
     @Autowired
     private InitActionService actionService;
     @Autowired
-    private ContextLoader contextLoader;
+    private TestContextLoader contextLoader;
     
     @BeforeClass
     @SneakyThrows
     public static void init() {
-        Map<String, String> mssqlParameters = new ContextLoader("src/test/resources/integration/mssql-context.json").getContext("MSSQL").getParameters();
-        CONNECTION = DriverManager.getConnection("jdbc:sqlserver://" + mssqlParameters.get(HOST) + ":" + mssqlParameters.get(PORT) +
-                                                         ";databaseName=" + mssqlParameters.get(DATABASE) +
-                                                         ";user=" + mssqlParameters.get(USER) +
-                                                         ";password=" + mssqlParameters.get(PASSWORD));
+//        Map<String, String> mssqlParameters = new ContextLoader("src/test/resources/integration/mssql-context.json").getContext("MSSQL").getParameters();
+//        CONNECTION = DriverManager.getConnection("jdbc:sqlserver://" + mssqlParameters.get(HOST) + ":" + mssqlParameters.get(PORT) +
+//                                                         ";databaseName=" + mssqlParameters.get(DATABASE) +
+//                                                         ";user=" + mssqlParameters.get(USER) +
+//                                                         ";password=" + mssqlParameters.get(PASSWORD));
     }
     
     @Test
@@ -79,7 +73,7 @@ public class TestInitActionServiceMSSQLIntegration {
         Preconditions.checkArgument(!firstState.isBeforeFirst());
         
         try {
-            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/mssql-script"));
+            List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/mssql-script"));
             actionService.run(actionConfigs);
             
             ResultSet resultSet = statement.executeQuery(validationQuery);
@@ -97,7 +91,7 @@ public class TestInitActionServiceMSSQLIntegration {
         exceptionRule.expect(ExecutionException.class);
         exceptionRule.expectMessage("Invalid object name 'invalid'.");
         
-        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(contextLoader, new HashMap<>(), new File("src/test/resources/integration/mssql-script-invalid"));
+        List<InitActionConfig> actionConfigs = initActionConfigFactory.getInitActionConfigs(new HashMap<>(), new File("src/test/resources/integration/mssql-script-invalid"));
         actionService.run(actionConfigs);
     }
     

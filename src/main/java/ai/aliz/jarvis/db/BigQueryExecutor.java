@@ -10,7 +10,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +26,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.api.client.util.Lists;
 import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.Field;
 import com.google.cloud.bigquery.FieldList;
 import com.google.cloud.bigquery.FieldValue;
@@ -37,14 +37,13 @@ import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ai.aliz.jarvis.service.shared.platform.BigQueryService;
+import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.service.shared.ExecutorServiceWrapper;
-import ai.aliz.jarvis.context.Context;
 import ai.aliz.jarvis.util.JarvisUtil;
 
+import static ai.aliz.jarvis.util.JarvisConstants.PROJECT;
 import static ai.aliz.jarvis.util.JarvisConstants.TEST_INIT;
 
 @Component
@@ -56,23 +55,34 @@ public class BigQueryExecutor implements QueryExecutor {
     
     private final ObjectMapper objectMapper = new ObjectMapper();
     
-    @Autowired
-    private BigQueryService bigQueryService;
-    
     @Override
-    public void executeStatement(String query, Context context) {
+    public void executeStatement(String query, TestContext context) {
         executeQueryAndGetResult(query, context);
     }
     
     @Override
-    public String executeQuery(String query, Context context) {
+    public String executeQuery(String query, TestContext context) {
         TableResult queryResult = executeQueryAndGetResult(query, context);
         ArrayNode result = bigQueryResultToJsonArrayNode(queryResult);
         return result.toString();
     }
     
+    public void executeScript(String script, TestContext context) {
+        String resolvedScript = JarvisUtil.resolvePlaceholders(script, context.getParameters());
+        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(resolvedScript).build();
+        
+        BigQuery bigQuery = getBigQueryClient(context);
+        try {
+            log.info("Executing script:\n '{}'", resolvedScript);
+            bigQuery.query(queryConfig);
+        } catch (Exception e) {
+            log.error(String.format("Failed to execute: %s", resolvedScript), e);
+            throw Lombok.sneakyThrow(e);
+        }
+    }
+    
     @Override
-    public void executeScript(String query, Context context) {
+    public void executeBQInitializatorScript(String query, TestContext context) {
         List<String> deletes = Lists.newArrayList();
         List<String> inserts = Lists.newArrayList();
         splitScriptIntoStatements(query)
@@ -91,13 +101,13 @@ public class BigQueryExecutor implements QueryExecutor {
         executorService.executeRunnablesInParallel(insertRunnables, 60, TimeUnit.SECONDS);
     }
     
-    public int insertedRowCount(String tableId, String tableName, Context context) {
+    public int insertedRowCount(String tableId, String tableName, TestContext context) {
         TableResult tableResult = executeQueryAndGetResult("SELECT COUNT(*) FROM `" + tableId + "`WHERE " + tableName + "_INSERTED_BY != '" + TEST_INIT + "'", context);
         long count = tableResult.getValues().iterator().next().get(0).getLongValue();
         return (int) count;
     }
     
-    public Long getTableLastModifiedAt(Context context, String project, String dataset, String table) {
+    public Long getTableLastModifiedAt(TestContext context, String project, String dataset, String table) {
         BigQuery bigQuery = getBigQueryClient(context);
         log.debug("Getting last modified at for table: {}.{}.{}", project, dataset, table);
         Table bqTable = bigQuery.getTable(TableId.of(project, dataset, table));
@@ -105,23 +115,23 @@ public class BigQueryExecutor implements QueryExecutor {
         return bqTable.getLastModifiedTime();
     }
     
-    private BigQuery getBigQueryClient(Context context) {
-        return bigQueryService.createBigQueryClient(context);
+    private BigQuery getBigQueryClient(TestContext context) {
+        return BigQueryOptions.newBuilder().setProjectId(context.getParameters().get(PROJECT)).build().getService();
     }
     
-    private List<Runnable> statementsToRunnables(Context context, List<String> statements) {
+    private List<Runnable> statementsToRunnables(TestContext context, List<String> statements) {
         return statements.stream()
                          .map(statement -> (Runnable) () -> executeStatement(statement, context))
                          .collect(Collectors.toList());
     }
     
-    private TableResult executeQueryAndGetResult(String query, Context context) {
+    public TableResult executeQueryAndGetResult(String query, TestContext context) {
         String completedQuery = JarvisUtil.resolvePlaceholders(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
         BigQuery bigQuery = getBigQueryClient(context);
         try {
-            log.info("Executing query: '{}' \n completed as: '{}'", query, completedQuery);
+            log.info("Executing query:\n '{}' \n completed as:\n '{}'", query, completedQuery);
             return bigQuery.query(queryConfig);
         } catch (Exception e) {
             log.error("Failed to execute: " + completedQuery, e);
@@ -129,7 +139,7 @@ public class BigQueryExecutor implements QueryExecutor {
         }
     }
     
-    private ArrayNode bigQueryResultToJsonArrayNode(TableResult queryResult) {
+    public ArrayNode bigQueryResultToJsonArrayNode(TableResult queryResult) {
         FieldList schema = queryResult.getSchema().getFields();
         Iterator<FieldValueList> fieldValueListIterator = queryResult.iterateAll().iterator();
         ArrayNode result = objectMapper.createArrayNode();

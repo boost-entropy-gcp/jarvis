@@ -1,45 +1,43 @@
 package ai.aliz.talendtestrunner.db;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.context.ContextType;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
-
 import java.util.EnumMap;
 import java.util.Map;
 
-import static ai.aliz.talendtestrunner.context.ContextType.BigQuery;
-import static ai.aliz.talendtestrunner.context.ContextType.MSSQL;
-import static ai.aliz.talendtestrunner.context.ContextType.MySQL;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.TestContextType;
+import ai.aliz.jarvis.db.BigQueryExecutor;
 
 @Component
 @Primary
 public class QueryExecutorComposite implements QueryExecutor {
 
-    private final Map<ContextType, QueryExecutor> queryExecutors;
+    private final Map<TestContextType, QueryExecutor> queryExecutors;
 
     public QueryExecutorComposite(MxSQLQueryExecutor mxSQLQueryExecutor,
                                   BigQueryExecutor bigQueryExecutor) {
-        this.queryExecutors = new EnumMap<>(ContextType.class);
-        this.queryExecutors.put(MSSQL, mxSQLQueryExecutor);
-        this.queryExecutors.put(MySQL, mxSQLQueryExecutor);
-        this.queryExecutors.put(BigQuery, bigQueryExecutor);
+        this.queryExecutors = new EnumMap<>(TestContextType.class);
+        this.queryExecutors.put(TestContextType.MSSQL, mxSQLQueryExecutor);
+        this.queryExecutors.put(TestContextType.MySQL, mxSQLQueryExecutor);
+//        this.queryExecutors.put(TestContextType.BigQuery, bigQueryExecutor);
     }
 
     @Override
-    public void executeStatement(String query, Context context) {
+    public void executeStatement(String query, TestContext context) {
         QueryExecutor executor = getQueryExecutor(context);
         executor.executeStatement(query, context);
     }
 
     @Override
-    public String executeQuery(String query, Context context) {
+    public String executeQuery(String query, TestContext context) {
         QueryExecutor executor = getQueryExecutor(context);
         return executor.executeQuery(query, context);
     }
 
-    private QueryExecutor getQueryExecutor(Context context) {
-        ContextType contextType = context.getContextType();
+    private QueryExecutor getQueryExecutor(TestContext context) {
+        TestContextType contextType = context.getContextType();
         QueryExecutor executor = this.queryExecutors.get(contextType);
         if (executor == null) {
             throw new RuntimeException("No query executor registered for type: " + contextType);

@@ -1,12 +1,12 @@
 package ai.aliz.jarvis.db;
 
-import ai.aliz.jarvis.context.Context;
+import ai.aliz.jarvis.context.TestContext;
 
 public interface QueryExecutor {
     
-    void executeStatement(String query, Context context);
+    void executeStatement(String query, TestContext context);
     
-    String executeQuery(String query, Context context);
+    String executeQuery(String query, TestContext context);
     
-    void executeScript(String query, Context context);
+    void executeBQInitializatorScript(String query, TestContext context);
 }

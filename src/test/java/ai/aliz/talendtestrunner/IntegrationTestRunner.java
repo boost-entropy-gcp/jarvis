@@ -1,25 +1,25 @@
 package ai.aliz.talendtestrunner;
 
-import ai.aliz.talendtestrunner.context.ContextLoader;
-import ai.aliz.talendtestrunner.service.TestRunnerService;
-import ai.aliz.talendtestrunner.testconfig.TestCase;
-import ai.aliz.talendtestrunner.testconfig.TestSuite;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Properties;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Properties;
-import java.util.stream.Collectors;
+import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.testconfig.TestCase;
+import ai.aliz.talendtestrunner.service.TestRunnerService;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 @SpringBootTest
@@ -32,7 +32,7 @@ public class IntegrationTestRunner {
     private TestRunnerService testRunnerService;
     
     @Autowired
-    private ContextLoader contextLoader;
+    private TestContextLoader contextLoader;
     
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
@@ -43,18 +43,19 @@ public class IntegrationTestRunner {
     @Parameterized.Parameters(name = "{0}")
     @SneakyThrows
     public static Collection jobNames() {
-        ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
+//        ContextLoader contextLoader = new ContextLoader(new ObjectMapper());
         InputStream input = IntegrationTestRunner.class.getClassLoader().getResourceAsStream("test.properties");
         Properties properties = new Properties();
         properties.load(input);
         String configPath = properties.getProperty("test.config.path");
         contextPath = properties.getProperty("test.context.path");
-        contextLoader.parseContext(contextPath);
-        return TestSuite.readTestConfig(configPath, contextLoader)
-                .listTestCases()
-                .stream()
-                .map(testCase1 -> new Object[]{testCase1.getPath().substring(configPath.length()), testCase1})
-                .collect(Collectors.toList());
+//        contextLoader.parseContext(contextPath);
+//        return TestSuite.readTestConfig(configPath, contextLoader)
+//                .listTestCases()
+//                .stream()
+//                .map(testCase1 -> new Object[]{testCase1.getPath().substring(configPath.length()), testCase1})
+//                .collect(Collectors.toList());
+        return null;
     }
 
     private String name;
@@ -67,7 +68,7 @@ public class IntegrationTestRunner {
     
     @Test
     public void runTestCase() throws Exception {
-        contextLoader.parseContext(contextPath);
+//        contextLoader.parseContext(contextPath);
         testRunnerService.runTest(testCase);
     }
 }

@@ -1,0 +1,12 @@
+[
+  {
+    "type": "INTEGER",
+    "name": "user_id",
+    "mode": "NULLABLE"
+  },
+  {
+    "type": "INTEGER",
+    "name": "counter",
+    "mode": "NULLABLE"
+  }
+]

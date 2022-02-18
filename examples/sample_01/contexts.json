@@ -1,0 +1,18 @@
+[
+  {
+    "id": "test_bq",
+    "contextType": "BigQuery",
+    "parameters": {
+      "project": "csaba-kassai-sandbox",
+      "datasetNamePrefix": ""
+    }
+  },
+  {
+    "id": "local",
+    "contextType": "LocalContext",
+    "parameters": {
+      "repositoryRoot": "/Users/csabakassai/aliz/aliz-test-runner/repository/jarvis"
+    }
+  }
+  
+]

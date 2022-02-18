@@ -1,8 +1,8 @@
 package ai.aliz.talendtestrunner.util;
 
-import ai.aliz.talendtestrunner.context.Context;
-import ai.aliz.talendtestrunner.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.testconfig.StepConfig;
+import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.testconfig.StepConfig;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
@@ -45,7 +45,7 @@ public class TestRunnerUtil {
         return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
     }
     
-    public String getDatasetName(Map<String, Object> properties, Context context) {
+    public String getDatasetName(Map<String, Object> properties, TestContext context) {
         String dataset = (String) properties.get("dataset");
         String datasetNamePrefix = context.getParameter("datasetNamePrefix");
         if (datasetNamePrefix != null) {
