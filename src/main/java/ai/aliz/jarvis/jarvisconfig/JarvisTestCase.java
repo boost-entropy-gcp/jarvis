@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class TestCase {
+public class JarvisTestCase {
     
     private boolean autoDetected;
 

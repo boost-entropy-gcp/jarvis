@@ -1,7 +1,7 @@
 package ai.aliz.talendtestrunner.service;
 
 import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.util.TestRunnerUtil;
+import ai.aliz.talendtestrunner.util.JarvisRunnerUtil;
 import com.google.cloud.bigquery.BigQuery;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -28,7 +28,7 @@ public class AssertServiceTest {
         String path = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("test.json").getFile())).getPath();
         assertActionConfig.getProperties().put("sourcePath", path);
         String expected = "[{\"name\": \"test\", \"test\": \"test\"}]";
-        String actual = TestRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig);
+        String actual = JarvisRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig);
         Assert.assertEquals(expected, actual);
     }
 
@@ -38,7 +38,7 @@ public class AssertServiceTest {
         String path = new File(Objects.requireNonNull(AssertServiceTest.class.getClassLoader().getResource("assertTestWithProperties.json").getFile())).getPath();
         assertActionConfig.getProperties().put("sourcePath", path);
         String expected = "[{\"name\":\"test\",\"test\":\"test\"}]";
-        String actual = TestRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig);
+        String actual = JarvisRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig);
         Assert.assertEquals(expected, actual);
     }
 }

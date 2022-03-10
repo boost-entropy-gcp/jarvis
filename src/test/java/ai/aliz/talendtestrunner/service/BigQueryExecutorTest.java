@@ -24,8 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.db.BigQueryExecutor;
 
 import org.junit.Assert;
@@ -44,7 +44,7 @@ public class BigQueryExecutorTest {
     private BigQueryExecutor bigQueryExecutor;
 
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
 
     @MockBean
     private BigQuery bigQuery;
@@ -59,7 +59,7 @@ public class BigQueryExecutorTest {
         Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
         Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
 //        contextLoader.parseContext(CONTEXT_PATH);
-        TestContext bqContext = contextLoader.getContext("TEST_ID");
+        JarvisContext bqContext = contextLoader.getContext("TEST_ID");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
         Assert.assertEquals("[{\"test_id\":\"1\",\"test\":\"test\"}]", result);
     }

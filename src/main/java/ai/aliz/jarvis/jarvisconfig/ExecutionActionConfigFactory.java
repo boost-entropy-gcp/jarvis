@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.JarvisContextLoader;
 
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 
@@ -23,12 +23,12 @@ public class ExecutionActionConfigFactory {
     public static final String EXECUTIONS_KEY = "executions";
     
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
-    public List<ExecutionActionConfig> getExecutionActionConfig(Map testSuiteMap) {
-        Object executeActionJson = testSuiteMap.get(EXECUTIONS_KEY);
+    public List<ExecutionActionConfig> getExecutionActionConfig(Map jarvisTestSuiteMap) {
+        Object executeActionJson = jarvisTestSuiteMap.get(EXECUTIONS_KEY);
         if (executeActionJson != null) {
-            List<Map<String, String>> executionActions = (List<Map<String, String>>) testSuiteMap.getOrDefault(EXECUTIONS_KEY, Collections.singletonMap("type", "noOps"));
+            List<Map<String, String>> executionActions = (List<Map<String, String>>) jarvisTestSuiteMap.getOrDefault(EXECUTIONS_KEY, Collections.singletonMap("type", "noOps"));
             List<ExecutionActionConfig> executionActionConfigs = getExecutionActionConfigs(executionActions);
             return executionActionConfigs;
         }

@@ -19,7 +19,7 @@ import static ai.aliz.jarvis.util.JarvisConstants.REPOSITORY_ROOT;
 import static ai.aliz.jarvis.util.JarvisConstants.USER;
 import static ai.aliz.jarvis.util.JarvisConstants.WORKSPACE;
 
-public enum TestContextType {
+public enum JarvisContextType {
     BigQuery(Sets.newHashSet(PROJECT)),
     MySQL(Sets.newHashSet(HOST, PORT, DATABASE, USER, PASSWORD)),
     MSSQL(Sets.newHashSet(HOST, PORT, DATABASE, USER, PASSWORD)),
@@ -31,7 +31,7 @@ public enum TestContextType {
     @Getter
     private final Set<String> requiredParameters;
     
-    TestContextType(Set<String> requiredParameters) {
+    JarvisContextType(Set<String> requiredParameters) {
         this.requiredParameters = requiredParameters;
     }
 }

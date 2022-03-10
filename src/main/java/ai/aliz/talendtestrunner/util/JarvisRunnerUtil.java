@@ -1,6 +1,6 @@
 package ai.aliz.talendtestrunner.util;
 
-import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
 import ai.aliz.jarvis.jarvisconfig.StepConfig;
 import lombok.SneakyThrows;
@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 @UtilityClass
-public class TestRunnerUtil {
+public class JarvisRunnerUtil {
     
     @SneakyThrows
     public String getSourceContentFromConfigProperties(StepConfig stepConfig) {
@@ -45,7 +45,7 @@ public class TestRunnerUtil {
         return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
     }
     
-    public String getDatasetName(Map<String, Object> properties, TestContext context) {
+    public String getDatasetName(Map<String, Object> properties, JarvisContext context) {
         String dataset = (String) properties.get("dataset");
         String datasetNamePrefix = context.getParameter("datasetNamePrefix");
         if (datasetNamePrefix != null) {

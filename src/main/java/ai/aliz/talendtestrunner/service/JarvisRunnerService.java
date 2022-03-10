@@ -6,20 +6,19 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.jarvisconfig.ExecutionActionConfig;
-import ai.aliz.jarvis.jarvisconfig.TestCase;
+import ai.aliz.jarvis.jarvisconfig.JarvisTestCase;
 
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 
 @Service
 @AllArgsConstructor
 @Slf4j
-public class TestRunnerService {
+public class JarvisRunnerService {
     
-    private final TestContextLoader contextLoader;
+    private final JarvisContextLoader contextLoader;
     private final TalendApiService talendApiService;
     private final ExecutorServiceImpl executorService;
     private final ApplicationContext applicationContext;
@@ -30,9 +29,9 @@ public class TestRunnerService {
    
     
     
-    public void runTest(TestCase testCase) {
+    public void runJarvis(JarvisTestCase jarvisTestCase) {
 
-        testCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
+        jarvisTestCase.getExecutionActionConfigs().forEach(executionActionConfig -> {
     
 //            Class<? extends Executor> executorClass = Objects.requireNonNull(executorMap.get(executionActionConfig.getType()));
 //            Executor executor = applicationContext.getBean(executorClass);
@@ -43,8 +42,8 @@ public class TestRunnerService {
     
   
     @SneakyThrows
-    public void runTalendJob(TestContextLoader contextLoader, ExecutionActionConfig executionActionConfig) {
-        TestContext talendDatabaseContext = contextLoader.getContext("TalendDatabase");
+    public void runTalendJob(JarvisContextLoader contextLoader, ExecutionActionConfig executionActionConfig) {
+        JarvisContext talendDatabaseContext = contextLoader.getContext("TalendDatabase");
 
         String taskName = executionActionConfig.getProperties().get(SOURCE_PATH).toString();
 
@@ -85,7 +84,7 @@ public class TestRunnerService {
 //                }
 //            }
         } else {
-            log.info("Executing job for testcase {}", executionActionConfig);
+            log.info("Executing job for jarvisTestcase {}", executionActionConfig);
             executionActionService.run(contextLoader, taskName);
         }
 

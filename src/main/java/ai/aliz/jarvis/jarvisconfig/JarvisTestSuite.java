@@ -9,11 +9,11 @@ import java.util.Map;
 
 @Data
 @ToString(exclude = "parentSuite")
-public class TestSuite {
+public class JarvisTestSuite {
 
     private Boolean caseAutoDetect;
 
-    private final List<TestCase> testCases = new ArrayList<>();
+    private final List<JarvisTestCase> jarvisTestCases = new ArrayList<>();
     
     private String configPath;
     
@@ -21,7 +21,7 @@ public class TestSuite {
     
     private Map<String, Object> properties;
     
-    private TestSuite parentSuite;
+    private JarvisTestSuite parentSuite;
     
-    private final List<TestSuite> suites = new ArrayList<>();
+    private final List<JarvisTestSuite> suites = new ArrayList<>();
 }

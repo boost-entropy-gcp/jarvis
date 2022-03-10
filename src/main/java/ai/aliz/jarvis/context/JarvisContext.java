@@ -17,21 +17,21 @@ import static ai.aliz.jarvis.util.JarvisConstants.PARAMETERS;
 
 @Value
 @Builder
-@JsonDeserialize(builder = TestContext.TestContextBuilder.class)
-public class TestContext {
+@JsonDeserialize(builder = JarvisContext.JarvisContextBuilder.class)
+public class JarvisContext {
     
     @JsonProperty(ID)
     private String id;
     
     @JsonProperty(CONTEXT_TYPE)
-    private TestContextType contextType;
+    private JarvisContextType contextType;
     
     @Singular
     @JsonProperty(PARAMETERS)
     private Map<String, String> parameters;
     
     @JsonPOJOBuilder(withPrefix = "")
-    public static class TestContextBuilder {}
+    public static class JarvisContextBuilder {}
     
     public Map<String, String> getParameters() {
         return new HashMap<>(parameters);

@@ -13,8 +13,8 @@ import com.google.common.io.Files;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.db.BigQueryExecutor;
 import ai.aliz.jarvis.jarvisconfig.ExecutionActionConfig;
 import ai.aliz.jarvis.jarvisconfig.ExecutionType;
@@ -28,7 +28,7 @@ public class ExecuteActionService {
     private BigQueryExecutor bigQueryExecutor;
     
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
     public void run(List<ExecutionActionConfig> executionActionConfigList) {
         executionActionConfigList.forEach(this::run);
@@ -45,7 +45,7 @@ public class ExecuteActionService {
                 break;
             case BqQuery:
                 String executionContextId = executionActionConfig.getExecutionContext();
-                TestContext executionContext = contextLoader.getContext(executionContextId);
+                JarvisContext executionContext = contextLoader.getContext(executionContextId);
                 Objects.requireNonNull(executionContext, "There is no context with id: " + executionContextId);
                 String scriptPath = (String) executionActionConfig.getProperties().get(Helper.SOURCE_PATH);
                 String script = Files.asCharSource(new File(scriptPath), StandardCharsets.UTF_8).read();

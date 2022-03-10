@@ -17,9 +17,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.context.TestContextType;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContextType;
 import ai.aliz.jarvis.service.shared.ActionConfigUtil;
 import ai.aliz.jarvis.util.JarvisUtil;
 
@@ -31,16 +31,16 @@ import static ai.aliz.jarvis.util.JarvisConstants.SQL_FORMAT;
 @Service
 public class InitActionConfigFactory {
     
-    public final TestContextLoader contextLoader;
+    public final JarvisContextLoader contextLoader;
     
     @Autowired
-    public InitActionConfigFactory(TestContextLoader contextLoader) {
+    public InitActionConfigFactory(JarvisContextLoader contextLoader) {
         this.contextLoader = contextLoader;
     }
     
     
-    public List<InitActionConfig> getInitActionConfigs(Map<String, Object> defaultProperties, File testCaseFolder) {
-        Path preFolder = JarvisUtil.getTargetFolderPath(testCaseFolder, PRE);
+    public List<InitActionConfig> getInitActionConfigs(Map<String, Object> defaultProperties, File jarvisTestCaseFolder) {
+        Path preFolder = JarvisUtil.getTargetFolderPath(jarvisTestCaseFolder, PRE);
         List<InitActionConfig> initActions;
         try {
             initActions = Files.list(preFolder).flatMap(initActionFile -> {
@@ -68,10 +68,10 @@ public class InitActionConfigFactory {
                     }
                     initActionConfigs.add(initActionConfig);
                 } else {
-                    TestContext context = JarvisUtil.getContext(contextLoader, fileName);
+                    JarvisContext context = JarvisUtil.getContext(contextLoader, fileName);
                     String system = fileName;
                     
-                    TestContextType contextType = context.getContextType();
+                    JarvisContextType contextType = context.getContextType();
                     switch (contextType) {
                         case SFTP:
                             initActionConfigs.add(ActionConfigUtil.getInitActionConfigForSFTP(initActionFile, system));

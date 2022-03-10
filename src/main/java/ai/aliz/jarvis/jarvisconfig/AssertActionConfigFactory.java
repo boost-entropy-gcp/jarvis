@@ -22,8 +22,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.util.JarvisUtil;
 
 import static ai.aliz.talendtestrunner.helper.Helper.DATASET;
@@ -35,10 +35,10 @@ import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
 public class AssertActionConfigFactory {
     
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
-    public List<AssertActionConfig> getAssertActionConfigs(Map<String, Object> defaultProperties, File testCaseFolder) {
-        Path assertFolder = JarvisUtil.getTargetFolderPath(testCaseFolder, "assert");
+    public List<AssertActionConfig> getAssertActionConfigs(Map<String, Object> defaultProperties, File jarvisTestCaseFolder) {
+        Path assertFolder = JarvisUtil.getTargetFolderPath(jarvisTestCaseFolder, "assert");
         List<AssertActionConfig> assertActionConfigs = null;
         try {
             assertActionConfigs = Files.list(assertFolder).flatMap(assertActionConfigPath -> {
@@ -47,7 +47,7 @@ public class AssertActionConfigFactory {
                     
                     File assertContextFolder = assertActionConfigPath.toFile();
                     String directoryName = assertContextFolder.getName();
-                    TestContext context = JarvisUtil.getContext(contextLoader, directoryName);
+                    JarvisContext context = JarvisUtil.getContext(contextLoader, directoryName);
                     String system = context.getId();
                     
                     switch (context.getContextType()) {

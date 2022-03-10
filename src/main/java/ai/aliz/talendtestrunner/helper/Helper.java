@@ -9,7 +9,7 @@ public class Helper {
     public static final String DATASET = "dataset";
     public static final String SOURCE_FORMAT = "sourceFormat";
     public static final String PROJECT = "project";
-    public static final String TEST_INIT = "test_init";
+    public static final String JARVIS_INIT = "jarvis_init";
 
     private Helper() {
     }
