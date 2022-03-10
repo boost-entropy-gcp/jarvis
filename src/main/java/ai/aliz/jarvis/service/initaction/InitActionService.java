@@ -19,8 +19,8 @@ import ai.aliz.jarvis.service.initaction.initiator.BQLoadInitiator;
 import ai.aliz.jarvis.service.initaction.initiator.Initiator;
 import ai.aliz.jarvis.service.initaction.initiator.SFTPLoadInitiator;
 import ai.aliz.jarvis.service.initaction.initiator.SQLExecInitiator;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
-import ai.aliz.jarvis.testconfig.InitActionType;
+import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
+import ai.aliz.jarvis.jarvisconfig.InitActionType;
 
 @Service
 @Slf4j

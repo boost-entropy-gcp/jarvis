@@ -39,7 +39,7 @@ import org.threeten.bp.Duration;
 
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
 import ai.aliz.jarvis.util.JarvisUtil;
 
 import static ai.aliz.jarvis.util.JarvisConstants.JSON_FORMAT;

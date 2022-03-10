@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
 import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.TestCase;
+import ai.aliz.jarvis.jarvisconfig.TestCase;
 import ai.aliz.talendtestrunner.service.TestRunnerService;
 
 import org.junit.ClassRule;

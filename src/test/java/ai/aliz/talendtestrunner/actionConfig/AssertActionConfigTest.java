@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
 import ai.aliz.talendtestrunner.service.AssertServiceTest;
 
 import org.junit.Ignore;

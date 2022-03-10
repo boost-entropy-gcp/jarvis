@@ -7,7 +7,7 @@ import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.jarvis.db.BigQueryExecutor;
 import ai.aliz.jarvis.db.JDBCSQLQueryExecutor;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
 import ai.aliz.jarvis.util.JarvisUtil;
 
 @Service

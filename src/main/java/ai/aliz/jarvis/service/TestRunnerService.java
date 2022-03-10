@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import ai.aliz.jarvis.service.assertaction.AssertActionService;
 import ai.aliz.jarvis.service.executeaction.ExecuteActionService;
 import ai.aliz.jarvis.service.initaction.InitActionService;
-import ai.aliz.jarvis.testconfig.TestCase;
-import ai.aliz.jarvis.testconfig.TestConfigLoader;
-import ai.aliz.jarvis.testconfig.TestSuite;
+import ai.aliz.jarvis.jarvisconfig.TestCase;
+import ai.aliz.jarvis.jarvisconfig.TestConfigLoader;
+import ai.aliz.jarvis.jarvisconfig.TestSuite;
 
 @Component
 @Slf4j

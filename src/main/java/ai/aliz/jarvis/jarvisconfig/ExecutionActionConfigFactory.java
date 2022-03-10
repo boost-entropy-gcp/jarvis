@@ -1,4 +1,4 @@
-package ai.aliz.jarvis.testconfig;
+package ai.aliz.jarvis.jarvisconfig;
 
 import java.io.File;
 import java.util.ArrayList;

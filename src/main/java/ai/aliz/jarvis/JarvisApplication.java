@@ -9,7 +9,7 @@ import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 import ai.aliz.jarvis.service.TestRunnerService;
-import ai.aliz.jarvis.testconfig.TestConfigLoader;
+import ai.aliz.jarvis.jarvisconfig.TestConfigLoader;
 
 @SpringBootApplication
 public class JarvisApplication implements CommandLineRunner {

@@ -1,4 +1,4 @@
-package ai.aliz.jarvis.testconfig;
+package ai.aliz.jarvis.jarvisconfig;
 
 import lombok.Data;
 import lombok.ToString;

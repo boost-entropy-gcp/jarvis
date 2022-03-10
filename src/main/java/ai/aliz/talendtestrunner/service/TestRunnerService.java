@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.ExecutionActionConfig;
-import ai.aliz.jarvis.testconfig.TestCase;
+import ai.aliz.jarvis.jarvisconfig.ExecutionActionConfig;
+import ai.aliz.jarvis.jarvisconfig.TestCase;
 
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 

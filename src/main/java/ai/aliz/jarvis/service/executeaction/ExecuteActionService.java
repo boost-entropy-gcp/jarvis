@@ -12,13 +12,12 @@ import com.google.common.io.Files;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.ContextLoader;
 
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.jarvis.db.BigQueryExecutor;
-import ai.aliz.jarvis.testconfig.ExecutionActionConfig;
-import ai.aliz.jarvis.testconfig.ExecutionType;
+import ai.aliz.jarvis.jarvisconfig.ExecutionActionConfig;
+import ai.aliz.jarvis.jarvisconfig.ExecutionType;
 import ai.aliz.talendtestrunner.helper.Helper;
 
 @Component

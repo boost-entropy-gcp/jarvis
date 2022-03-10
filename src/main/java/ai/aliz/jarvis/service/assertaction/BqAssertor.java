@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.jarvis.db.BigQueryExecutor;
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 
 import org.junit.Assert;

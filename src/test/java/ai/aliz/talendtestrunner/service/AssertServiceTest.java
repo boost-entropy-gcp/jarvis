@@ -1,6 +1,6 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
 import ai.aliz.talendtestrunner.util.TestRunnerUtil;
 import com.google.cloud.bigquery.BigQuery;
 import org.junit.Assert;

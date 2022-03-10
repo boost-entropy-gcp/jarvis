@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import ai.aliz.jarvis.context.TestContext;
 import ai.aliz.jarvis.context.TestContextLoader;
 import ai.aliz.jarvis.context.TestContextType;
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
 
 @Component
 @Slf4j
