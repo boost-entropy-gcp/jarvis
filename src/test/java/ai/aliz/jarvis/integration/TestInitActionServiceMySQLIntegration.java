@@ -19,9 +19,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ai.aliz.jarvis.context.JarvisContextLoader;
 
-import ai.aliz.jarvis.jarvisconfig.InitActionConfigFactory;
+import ai.aliz.jarvis.config.InitActionConfigFactory;
 import ai.aliz.jarvis.service.initaction.InitActionService;
-import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;

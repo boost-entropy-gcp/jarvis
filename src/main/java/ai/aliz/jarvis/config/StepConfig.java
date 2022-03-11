@@ -1,4 +1,4 @@
-package ai.aliz.jarvis.jarvisconfig;
+package ai.aliz.jarvis.config;
 
 import java.util.Map;
 

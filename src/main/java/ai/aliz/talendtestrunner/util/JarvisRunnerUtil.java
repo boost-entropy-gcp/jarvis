@@ -1,8 +1,8 @@
 package ai.aliz.talendtestrunner.util;
 
 import ai.aliz.jarvis.context.JarvisContext;
-import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
-import ai.aliz.jarvis.jarvisconfig.StepConfig;
+import ai.aliz.jarvis.config.AssertActionConfig;
+import ai.aliz.jarvis.config.StepConfig;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;

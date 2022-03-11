@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.service.shared.platform.SFTPService;
-import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
 
 @Service
 public class SFTPLoadInitiator implements Initiator {

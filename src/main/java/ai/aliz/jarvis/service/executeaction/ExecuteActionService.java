@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.db.BigQueryExecutor;
-import ai.aliz.jarvis.jarvisconfig.ExecutionActionConfig;
-import ai.aliz.jarvis.jarvisconfig.ExecutionType;
+import ai.aliz.jarvis.config.ExecutionActionConfig;
+import ai.aliz.jarvis.config.ExecutionType;
 import ai.aliz.talendtestrunner.helper.Helper;
 
 @Component

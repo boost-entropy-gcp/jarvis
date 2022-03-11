@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.context.JarvisContext;
-import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
+import ai.aliz.jarvis.config.AssertActionConfig;
 
 @Service
 public class MySQLAssertor implements Assertor {

@@ -8,8 +8,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.context.JarvisContext;
-import ai.aliz.jarvis.jarvisconfig.ExecutionActionConfig;
-import ai.aliz.jarvis.jarvisconfig.JarvisTestCase;
+import ai.aliz.jarvis.config.ExecutionActionConfig;
+import ai.aliz.jarvis.config.JarvisTestCase;
 
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 

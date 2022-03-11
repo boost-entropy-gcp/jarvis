@@ -25,8 +25,8 @@ import org.apache.commons.io.IOUtils;
 
 import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.context.JarvisContext;
-import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
-import ai.aliz.jarvis.jarvisconfig.StepConfig;
+import ai.aliz.jarvis.config.AssertActionConfig;
+import ai.aliz.jarvis.config.StepConfig;
 
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET_NAME_PREFIX;

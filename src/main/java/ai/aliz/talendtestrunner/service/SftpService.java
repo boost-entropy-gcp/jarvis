@@ -22,7 +22,7 @@ import com.jcraft.jsch.SftpException;
 import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.JarvisContext;
-import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
 
 import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
 

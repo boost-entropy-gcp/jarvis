@@ -9,13 +9,13 @@ import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 import ai.aliz.jarvis.service.JarvisRunnerService;
-import ai.aliz.jarvis.jarvisconfig.JarvisConfigLoader;
+import ai.aliz.jarvis.config.ConfigLoader;
 
 @SpringBootApplication
 public class JarvisApplication implements CommandLineRunner {
     
     @Autowired
-    private JarvisConfigLoader jarvisConfigLoader;
+    private ConfigLoader configLoader;
     
     @Autowired
     private JarvisRunnerService jarvisRunnerService;
@@ -32,7 +32,7 @@ public class JarvisApplication implements CommandLineRunner {
     
     @Override
     public void run(String... args) throws Exception {
-        jarvisRunnerService.runJarvisTestSuite(jarvisConfigLoader.getJarvisTestSuite());
+        jarvisRunnerService.runJarvisTestSuite(configLoader.getJarvisTestSuite());
     }
     
 }

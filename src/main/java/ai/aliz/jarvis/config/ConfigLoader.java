@@ -1,4 +1,4 @@
-package ai.aliz.jarvis.jarvisconfig;
+package ai.aliz.jarvis.config;
 
 import lombok.SneakyThrows;
 
@@ -23,7 +23,7 @@ import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.context.JarvisContext;
 
 @Component
-public class JarvisConfigLoader {
+public class ConfigLoader {
     
     public static final String JARVIS_TEST_SUITE_FILE_NAME = "jarvisTestSuite.json";
     public static final String DEFAULT_PROPERTIES_KEY = "defaultProperties";
@@ -40,11 +40,11 @@ public class JarvisConfigLoader {
     private final AssertActionConfigFactory assertActionConfigFactory;
     
     @Autowired
-    public JarvisConfigLoader(JarvisContextLoader contextLoader,
-                              Environment environment,
-                              InitActionConfigFactory initActionConfigFactory,
-                              ExecutionActionConfigFactory executionActionConfigFactory,
-                              AssertActionConfigFactory assertActionConfigFactory) {
+    public ConfigLoader(JarvisContextLoader contextLoader,
+                        Environment environment,
+                        InitActionConfigFactory initActionConfigFactory,
+                        ExecutionActionConfigFactory executionActionConfigFactory,
+                        AssertActionConfigFactory assertActionConfigFactory) {
         this.contextMap = contextLoader.getContextIdToContexts();
         this.initActionConfigFactory = initActionConfigFactory;
         this.executionActionConfigFactory = executionActionConfigFactory;

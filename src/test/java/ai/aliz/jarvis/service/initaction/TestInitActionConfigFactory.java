@@ -14,9 +14,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ai.aliz.jarvis.context.JarvisContextLoader;
-import ai.aliz.jarvis.jarvisconfig.InitActionConfigFactory;
-import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
-import ai.aliz.jarvis.jarvisconfig.InitActionType;
+import ai.aliz.jarvis.config.InitActionConfigFactory;
+import ai.aliz.jarvis.config.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionType;
 
 import org.junit.Rule;
 import org.junit.Test;

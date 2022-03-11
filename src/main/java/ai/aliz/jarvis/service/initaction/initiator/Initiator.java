@@ -1,6 +1,6 @@
 package ai.aliz.jarvis.service.initaction.initiator;
 
-import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
 
 public interface Initiator {
     

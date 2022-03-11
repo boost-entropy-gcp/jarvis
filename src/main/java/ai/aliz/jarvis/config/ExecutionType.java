@@ -1,4 +1,4 @@
-package ai.aliz.jarvis.jarvisconfig;
+package ai.aliz.jarvis.config;
 
 public enum ExecutionType {
     NoOps, BqQuery, Talend, Airflow

@@ -8,9 +8,9 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 
-import ai.aliz.jarvis.jarvisconfig.AssertActionConfig;
-import ai.aliz.jarvis.jarvisconfig.InitActionConfig;
-import ai.aliz.jarvis.jarvisconfig.InitActionType;
+import ai.aliz.jarvis.config.AssertActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionType;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
