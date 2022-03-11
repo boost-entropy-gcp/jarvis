@@ -14,8 +14,7 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
 import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.config.JarvisTestCase;
-import ai.aliz.talendtestrunner.service.JarvisRunnerService;
-
+import ai.aliz.jarvis.service.JarvisRunnerService;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -71,6 +70,6 @@ public class IntegrationTestRunner {
     @Test
     public void runJarvisTestCase() throws Exception {
 //        contextLoader.parseContext(contextPath);
-        jarvisRunnerService.runJarvis(jarvisTestCase);
+        jarvisRunnerService.runJarvisTestCase(jarvisTestCase);
     }
 }
