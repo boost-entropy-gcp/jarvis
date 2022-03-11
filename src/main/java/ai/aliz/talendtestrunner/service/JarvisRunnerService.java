@@ -11,7 +11,7 @@ import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.config.ExecutionActionConfig;
 import ai.aliz.jarvis.config.JarvisTestCase;
 
-import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
+import static ai.aliz.jarvis.util.Helper.SOURCE_PATH;
 
 @Service
 @AllArgsConstructor

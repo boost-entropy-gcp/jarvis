@@ -59,10 +59,10 @@ import ai.aliz.talendtestrunner.util.JarvisRunnerUtil;
 
 import org.junit.Assert;
 
-import static ai.aliz.talendtestrunner.helper.Helper.DATASET;
-import static ai.aliz.talendtestrunner.helper.Helper.PROJECT;
-import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
-import static ai.aliz.talendtestrunner.helper.Helper.JARVIS_INIT;
+import static ai.aliz.jarvis.util.Helper.DATASET;
+import static ai.aliz.jarvis.util.Helper.PROJECT;
+import static ai.aliz.jarvis.util.Helper.TABLE;
+import static ai.aliz.jarvis.util.Helper.JARVIS_INIT;
 
 @Service
 @Slf4j

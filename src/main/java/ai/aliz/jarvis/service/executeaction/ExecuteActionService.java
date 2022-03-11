@@ -18,7 +18,7 @@ import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.db.BigQueryExecutor;
 import ai.aliz.jarvis.config.ExecutionActionConfig;
 import ai.aliz.jarvis.config.ExecutionType;
-import ai.aliz.talendtestrunner.helper.Helper;
+import ai.aliz.jarvis.util.Helper;
 
 @Component
 @Slf4j

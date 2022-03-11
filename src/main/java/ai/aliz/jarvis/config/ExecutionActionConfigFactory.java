@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import ai.aliz.jarvis.context.JarvisContextLoader;
 
-import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
+import static ai.aliz.jarvis.util.Helper.SOURCE_PATH;
 
 @Service
 public class ExecutionActionConfigFactory {

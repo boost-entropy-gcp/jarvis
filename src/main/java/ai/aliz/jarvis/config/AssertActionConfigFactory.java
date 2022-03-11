@@ -26,10 +26,10 @@ import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.util.JarvisUtil;
 
-import static ai.aliz.talendtestrunner.helper.Helper.DATASET;
-import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_FORMAT;
-import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
-import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
+import static ai.aliz.jarvis.util.Helper.DATASET;
+import static ai.aliz.jarvis.util.Helper.SOURCE_FORMAT;
+import static ai.aliz.jarvis.util.Helper.SOURCE_PATH;
+import static ai.aliz.jarvis.util.Helper.TABLE;
 
 @Service
 public class AssertActionConfigFactory {
