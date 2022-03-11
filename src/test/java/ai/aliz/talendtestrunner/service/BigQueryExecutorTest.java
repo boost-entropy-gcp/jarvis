@@ -48,16 +48,12 @@ public class BigQueryExecutorTest {
 
     @MockBean
     private BigQuery bigQuery;
-
-    @MockBean
-    private BigQueryService bigQueryService;
+    
 
     @Test
     @SneakyThrows
     public void testSampleQuery() {
         TableResult tableResult = getTableResult();
-        Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
-        Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
 //        contextLoader.parseContext(CONTEXT_PATH);
         JarvisContext bqContext = contextLoader.getContext("TEST_ID");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
