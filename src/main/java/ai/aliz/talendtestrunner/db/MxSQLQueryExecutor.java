@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.context.JarvisContextType;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
+import ai.aliz.jarvis.util.PlaceholderResolver;
 
 @Component
 @AllArgsConstructor

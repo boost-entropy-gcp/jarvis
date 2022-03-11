@@ -1,13 +1,14 @@
 package ai.aliz.talendtestrunner.util;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import ai.aliz.jarvis.util.PlaceholderResolver;
 
 import static org.hamcrest.core.Is.is;
 

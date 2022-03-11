@@ -6,7 +6,7 @@ import org.springframework.web.client.RestTemplate;
 
 import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.talendtestrunner.config.RetryConfig;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
+import ai.aliz.jarvis.util.PlaceholderResolver;
 
 @Service
 public class ExecutionActionService {

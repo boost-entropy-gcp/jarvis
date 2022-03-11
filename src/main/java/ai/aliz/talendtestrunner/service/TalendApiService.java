@@ -23,7 +23,7 @@ import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.talendtestrunner.talend.Executable;
 import ai.aliz.talendtestrunner.talend.Execution;
 import ai.aliz.talendtestrunner.talend.ExecutionStillRunningException;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
+import ai.aliz.jarvis.util.PlaceholderResolver;
 
 @Service
 @Slf4j

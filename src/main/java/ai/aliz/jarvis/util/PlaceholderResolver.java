@@ -1,4 +1,4 @@
-package ai.aliz.talendtestrunner.util;
+package ai.aliz.jarvis.util;
 
 import org.springframework.stereotype.Component;
 
