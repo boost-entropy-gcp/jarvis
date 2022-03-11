@@ -55,7 +55,7 @@ import ai.aliz.jarvis.context.JarvisContextLoader;
 import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.db.BigQueryExecutor;
 import ai.aliz.jarvis.config.AssertActionConfig;
-import ai.aliz.talendtestrunner.util.JarvisRunnerUtil;
+import ai.aliz.jarvis.util.JarvisUtil;
 
 import org.junit.Assert;
 
@@ -113,7 +113,7 @@ public class BqAssertor implements Assertor {
         String project = context.getParameter("project");
         Map<String, Object> properties = assertActionConfig.getProperties();
 
-        String dataset = JarvisRunnerUtil.getDatasetName(properties, context);
+        String dataset = JarvisUtil.getDatasetName(properties, context);
 
         String table = (String) properties.get("table");
 
@@ -154,7 +154,7 @@ public class BqAssertor implements Assertor {
         Schema schema = result.getSchema();
 
         ArrayNode actualJson = bigQueryExecutor.bigQueryResultToJsonArrayNode(result);
-        ArrayNode expectedJson = objectMapper.readValue(JarvisRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig), ArrayNode.class);
+        ArrayNode expectedJson = objectMapper.readValue(JarvisUtil.getSourceContentFromConfigProperties(assertActionConfig), ArrayNode.class);
 
         Multimap<String, VariablePlaceholder> variablePlaceholderMultimap = ArrayListMultimap.create();
         List<Map<String, Object>> expectedMap = getMapFromJson(tableId, schema, expectedJson, variablePlaceholderMultimap);

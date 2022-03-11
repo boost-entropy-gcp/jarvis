@@ -95,5 +95,15 @@ public class JarvisUtil {
         Preconditions.checkArgument(Files.isDirectory(folderPath), "%s folder does not exists %s", folderName, folderPath);
         return folderPath;
     }
+    
+    public String getDatasetName(Map<String, Object> properties, JarvisContext context) {
+        String dataset = (String) properties.get("dataset");
+        String datasetNamePrefix = context.getParameter("datasetNamePrefix");
+        if (datasetNamePrefix != null) {
+            dataset = datasetNamePrefix + dataset;
+        }
+        
+        return dataset;
+    }
 }
 
