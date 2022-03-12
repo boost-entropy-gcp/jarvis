@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@Ignore
+@Ignore  //TODO BigQueryService was removed instead of fixed by a refact ( e1396acd12828e3b25c1b10a9ae50612723c2e01 ) as the test is Ignored. Should be fixed later.
 public class BigQueryExecutorTest {
     private static final String API_URL = "apiUrl";
     private static final String CONTEXT_PATH = new File(Objects.requireNonNull(BigQueryExecutorTest.class.getClassLoader().getResource("test_context.json")).getFile()).getPath();

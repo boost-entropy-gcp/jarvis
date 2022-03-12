@@ -82,14 +82,14 @@ public class ConfigLoader {
     private void processFolder(Path folder, final JarvisTestSuite parentSuite) {
         Preconditions.checkArgument(Files.isDirectory(folder));
         
-        JarvisTestSuite currentSuit = parentSuite;
+        JarvisTestSuite currentSuite = parentSuite;
         File descriptorFile = Paths.get(folder.toString(), JARVIS_TEST_SUITE_FILE_NAME).toFile();
         if (descriptorFile.exists()) {
-            currentSuit = parseFromJson(descriptorFile, parentSuite);
+            currentSuite = parseFromJson(descriptorFile, parentSuite);
         }
         
-        final JarvisTestSuite newParent = currentSuit;
-        if (currentSuit.getJarvisTestCases().isEmpty()) {
+        final JarvisTestSuite newParent = currentSuite;
+        if (currentSuite.getJarvisTestCases().isEmpty()) {
             Files.list(folder).filter(path -> Files.isDirectory(path)).forEach(path -> processFolder(path, newParent));
         }
         
