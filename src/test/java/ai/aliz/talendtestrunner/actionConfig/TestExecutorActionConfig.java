@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @Ignore
-public class ExecutorActionConfigTest {
+public class TestExecutorActionConfig {
 
 //    private ExecutionActionConfigCreator executionActionConfigCreator = new ExecutionActionConfigCreator();
 

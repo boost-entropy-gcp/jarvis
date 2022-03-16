@@ -8,12 +8,10 @@ import org.junit.runners.JUnit4;
 import java.util.HashMap;
 import java.util.Map;
 
-import ai.aliz.jarvis.util.PlaceholderResolver;
-
 import static org.hamcrest.core.Is.is;
 
 @RunWith(JUnit4.class)
-public class PlaceholderResolverTest {
+public class TestPlaceholderResolver {
 
     @Test
     public void shouldResolvePlaceholders() {

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @Ignore
-public class AssertActionConfigTest {
+public class TestAssertActionConfig {
     
     @MockBean
     private BigQuery bigQuery;
