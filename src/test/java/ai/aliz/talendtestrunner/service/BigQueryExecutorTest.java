@@ -24,8 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.db.BigQueryExecutor;
 
 import org.junit.Assert;
@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@Ignore
+@Ignore  //TODO BigQueryService was removed instead of fixed by a refact ( e1396acd12828e3b25c1b10a9ae50612723c2e01 ) as the test is Ignored. Should be fixed later.
 public class BigQueryExecutorTest {
     private static final String API_URL = "apiUrl";
     private static final String CONTEXT_PATH = new File(Objects.requireNonNull(BigQueryExecutorTest.class.getClassLoader().getResource("test_context.json")).getFile()).getPath();
@@ -44,22 +44,18 @@ public class BigQueryExecutorTest {
     private BigQueryExecutor bigQueryExecutor;
 
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
 
     @MockBean
     private BigQuery bigQuery;
-
-    @MockBean
-    private BigQueryService bigQueryService;
+    
 
     @Test
     @SneakyThrows
     public void testSampleQuery() {
         TableResult tableResult = getTableResult();
-        Mockito.when(bigQuery.query(Mockito.any())).thenReturn(tableResult);
-        Mockito.when(bigQueryService.createBigQueryClient(Mockito.any())).thenReturn(bigQuery);
 //        contextLoader.parseContext(CONTEXT_PATH);
-        TestContext bqContext = contextLoader.getContext("TEST_ID");
+        JarvisContext bqContext = contextLoader.getContext("TEST_ID");
         String result = bigQueryExecutor.executeQuery("SELECT * FROM `{{project}}.tf_test.tf_test3`", bqContext);
         Assert.assertEquals("[{\"test_id\":\"1\",\"test\":\"test\"}]", result);
     }

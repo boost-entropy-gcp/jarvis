@@ -4,7 +4,7 @@ public interface JarvisConstants {
     //Shared
     String SOURCE_PATH = "sourcePath";
     String SOURCE_FORMAT = "sourceFormat";
-    String TEST_INIT = "test_init";
+    String JARVIS_INIT = "jarvis_init";
     String SFTP = "sftp";
     
     //Extensions

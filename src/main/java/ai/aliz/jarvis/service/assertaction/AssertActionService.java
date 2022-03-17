@@ -11,26 +11,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.context.TestContextType;
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.context.JarvisContextType;
+
+import ai.aliz.jarvis.config.AssertActionConfig;
 
 @Component
 @Slf4j
 public class AssertActionService {
     
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
     @Autowired
     private ApplicationContext applicationContext;
     
-    private static Map<TestContextType, Class<? extends Assertor>> assertActionTypeMap = new HashMap<>();
+    private static Map<JarvisContextType, Class<? extends Assertor>> assertActionTypeMap = new HashMap<>();
     
     static {
-        assertActionTypeMap.put(TestContextType.BigQuery, BqAssertor.class);
-        assertActionTypeMap.put(TestContextType.MySQL, MySQLAssertor.class);
+        assertActionTypeMap.put(JarvisContextType.BigQuery, BqAssertor.class);
+        assertActionTypeMap.put(JarvisContextType.MySQL, MySQLAssertor.class);
     }
     
     public void run(List<AssertActionConfig> assertActionConfigList) {
@@ -39,7 +40,7 @@ public class AssertActionService {
     
     public void run(AssertActionConfig assertActionConfig) {
         log.info("Starting assert action: {}", assertActionConfig);
-        TestContext context = contextLoader.getContext(assertActionConfig.getSystem());
+        JarvisContext context = contextLoader.getContext(assertActionConfig.getSystem());
         Class<? extends Assertor> assertActionClass = null;
         
         assertActionClass = Objects.requireNonNull(assertActionTypeMap.get(context.getContextType()));

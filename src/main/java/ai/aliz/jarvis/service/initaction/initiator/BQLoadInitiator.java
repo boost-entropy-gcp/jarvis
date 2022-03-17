@@ -37,9 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.Duration;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.config.InitActionConfig;
 import ai.aliz.jarvis.util.JarvisUtil;
 
 import static ai.aliz.jarvis.util.JarvisConstants.JSON_FORMAT;
@@ -47,14 +47,14 @@ import static ai.aliz.jarvis.util.JarvisConstants.NO_METADAT_ADDITION;
 import static ai.aliz.jarvis.util.JarvisConstants.PROJECT;
 import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_FORMAT;
 import static ai.aliz.jarvis.util.JarvisConstants.TABLE;
-import static ai.aliz.jarvis.util.JarvisConstants.TEST_INIT;
+import static ai.aliz.jarvis.util.JarvisConstants.JARVIS_INIT;
 
 @Slf4j
 @Service
 public class BQLoadInitiator implements Initiator {
     
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
     private static final Clock clock = Clock.systemUTC();
     
@@ -63,7 +63,7 @@ public class BQLoadInitiator implements Initiator {
         doInitActionInner(config, contextLoader.getContext(config.getSystem()));
     }
     
-    private void doInitActionInner(InitActionConfig initActionConfig, TestContext context) {
+    private void doInitActionInner(InitActionConfig initActionConfig, JarvisContext context) {
         Map<String, Object> properties = initActionConfig.getProperties();
         String sourceFormat = (String) properties.get(SOURCE_FORMAT);
         Preconditions.checkArgument(sourceFormat.equalsIgnoreCase(JSON_FORMAT), "Unsupported format: " + sourceFormat);
@@ -140,7 +140,7 @@ public class BQLoadInitiator implements Initiator {
     }
     
     private JsonArray addTableMetadataToJsonArray(JsonArray jsonArray, String tableName) {
-        jsonArray.iterator().forEachRemaining(e -> e.getAsJsonObject().addProperty(tableName + "_INSERTED_BY", TEST_INIT));
+        jsonArray.iterator().forEachRemaining(e -> e.getAsJsonObject().addProperty(tableName + "_INSERTED_BY", JARVIS_INIT));
         return jsonArray;
     }
 }

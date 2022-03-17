@@ -1,7 +1,6 @@
 package ai.aliz.jarvis.service.shared;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -9,11 +8,9 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 
-import org.apache.commons.io.FilenameUtils;
-
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
-import ai.aliz.jarvis.testconfig.InitActionType;
+import ai.aliz.jarvis.config.AssertActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionType;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

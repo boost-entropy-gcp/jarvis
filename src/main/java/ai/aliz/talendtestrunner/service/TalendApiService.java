@@ -19,11 +19,11 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.talendtestrunner.talend.Executable;
 import ai.aliz.talendtestrunner.talend.Execution;
 import ai.aliz.talendtestrunner.talend.ExecutionStillRunningException;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
+import ai.aliz.jarvis.util.PlaceholderResolver;
 
 @Service
 @Slf4j
@@ -46,13 +46,13 @@ public class TalendApiService {
     private final RetryTemplate retryTemplate;
 
 
-    public void executeTask(String taskName, TestContext context) {
+    public void executeTask(String taskName, JarvisContext context) {
         Executable task = getTask(taskName, context);
         String executionId = runTask(task, context);
         waitForTaskToFinish(executionId, context);
     }
 
-    private Executable getTask(String taskName, TestContext context) {
+    private Executable getTask(String taskName, JarvisContext context) {
         Map<String, String> parameters = context.getParameters();
         parameters.put("jobName", taskName);
 
@@ -83,7 +83,7 @@ public class TalendApiService {
         return executable;
     }
 
-    private String runTask(Executable task, TestContext context) {
+    private String runTask(Executable task, JarvisContext context) {
         String apiUrl = context.getParameters().get(API_URL);
         String endpointUrl = apiUrl + TASK_EXECUTE_ENDPOINT;
         RequestEntity<Map<String, String>> request = RequestEntity.post(URI.create(endpointUrl))
@@ -98,7 +98,7 @@ public class TalendApiService {
         return executionId;
     }
 
-    private void waitForTaskToFinish(String executionId, TestContext context) {
+    private void waitForTaskToFinish(String executionId, JarvisContext context) {
         Map<String, String> parameters = context.getParameters();
 
         String apiUrl = parameters.get(API_URL);

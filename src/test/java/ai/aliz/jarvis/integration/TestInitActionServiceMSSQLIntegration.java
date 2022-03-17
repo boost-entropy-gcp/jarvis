@@ -17,10 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.InitActionConfigFactory;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.config.InitActionConfigFactory;
 import ai.aliz.jarvis.service.initaction.InitActionService;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -52,7 +52,7 @@ public class TestInitActionServiceMSSQLIntegration {
     @Autowired
     private InitActionService actionService;
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
     @BeforeClass
     @SneakyThrows

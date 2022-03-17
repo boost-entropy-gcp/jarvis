@@ -21,10 +21,10 @@ import com.jcraft.jsch.SftpException;
 
 import org.springframework.stereotype.Service;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.config.InitActionConfig;
 
-import static ai.aliz.talendtestrunner.helper.Helper.SOURCE_PATH;
+import static ai.aliz.jarvis.util.Helper.SOURCE_PATH;
 
 
 @Service
@@ -33,9 +33,9 @@ public class SftpService {
     
     public static final String MODIFIED_AT_MARKER_PART = "_MODTIME_";
     
-    private Set<TestContext> alreadyUsed = Sets.newHashSet();
+    private Set<JarvisContext> alreadyUsed = Sets.newHashSet();
     
-    public void loadFilesToSftp(InitActionConfig initActionConfig, TestContext sftpContext) {
+    public void loadFilesToSftp(InitActionConfig initActionConfig, JarvisContext sftpContext) {
         ChannelSftp channelSftp = setupJsch(sftpContext);
         String remoteBasePath = sftpContext.getParameter("remoteBasePath");
         cleanup(channelSftp, remoteBasePath);
@@ -64,7 +64,7 @@ public class SftpService {
     }
     
     @SneakyThrows
-    public void prepareFolder(Path localFile, TestContext sftpContext) {
+    public void prepareFolder(Path localFile, JarvisContext sftpContext) {
         try {
             ChannelSftp channelSftp = setupJsch(sftpContext);
             
@@ -139,7 +139,7 @@ public class SftpService {
     }
     
     @SneakyThrows
-    private ChannelSftp setupJsch(TestContext sftpContext) {
+    private ChannelSftp setupJsch(JarvisContext sftpContext) {
         JSch jsch = new JSch();
         Session jschSession = jsch.getSession(sftpContext.getParameter("user"), sftpContext.getParameter("host"));
         

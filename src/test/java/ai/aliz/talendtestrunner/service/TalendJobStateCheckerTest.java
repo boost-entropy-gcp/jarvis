@@ -1,6 +1,6 @@
 package ai.aliz.talendtestrunner.service;
 
-import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.JarvisContextLoader;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,7 +19,7 @@ public class TalendJobStateCheckerTest {
     private TalendJobStateChecker talendJobStateChecker;
 
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
 
     @Test
     public void sampleTest() throws Exception {

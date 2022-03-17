@@ -22,9 +22,9 @@ import com.google.gson.JsonObject;
 
 import org.springframework.stereotype.Component;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextType;
-import ai.aliz.talendtestrunner.util.PlaceholderResolver;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.context.JarvisContextType;
+import ai.aliz.jarvis.util.PlaceholderResolver;
 
 @Component
 @AllArgsConstructor
@@ -39,10 +39,10 @@ public class MxSQLQueryExecutor implements QueryExecutor {
 
     private PlaceholderResolver placeholderResolver;
 
-    private Map<TestContext, Connection> connectionMap = Maps.newHashMap();
+    private Map<JarvisContext, Connection> connectionMap = Maps.newHashMap();
 
 
-    public void executeScript(String query, TestContext context) {
+    public void executeScript(String query, JarvisContext context) {
         String[] splits = query.split(";");
         for (String split : splits) {
             String trimmed = split.trim();
@@ -66,11 +66,11 @@ public class MxSQLQueryExecutor implements QueryExecutor {
 
     @Override
     @SneakyThrows
-    public void executeStatement(String query, TestContext context) {
+    public void executeStatement(String query, JarvisContext context) {
         doWithStatement(query, context, preparedStatement -> executeStatement(preparedStatement));
     }
 
-    private <T> T doWithStatement(String query, TestContext context, Function<PreparedStatement, T> statementAction) {
+    private <T> T doWithStatement(String query, JarvisContext context, Function<PreparedStatement, T> statementAction) {
         Connection connection = getConnectionForContext(context);
         String completedQuery = placeholderResolver.resolve(query, context.getParameters());
 
@@ -84,7 +84,7 @@ public class MxSQLQueryExecutor implements QueryExecutor {
         }
     }
 
-    private Connection getConnectionForContext(TestContext context) {
+    private Connection getConnectionForContext(JarvisContext context) {
         Connection connection = connectionMap.get(context);
         if (connection == null) {
             String connectionUrl = placeholderResolver.resolve(getConnectionPattern(context), context.getParameters());
@@ -103,8 +103,8 @@ public class MxSQLQueryExecutor implements QueryExecutor {
         return preparedStatement.execute();
     }
 
-    private String getConnectionPattern(TestContext context) {
-        TestContextType contextType = context.getContextType();
+    private String getConnectionPattern(JarvisContext context) {
+        JarvisContextType contextType = context.getContextType();
         switch (contextType) {
             case MySQL:
                 return My_CONNECTION_STRING_PATTERN;
@@ -116,7 +116,7 @@ public class MxSQLQueryExecutor implements QueryExecutor {
     }
 
     @Override
-    public String executeQuery(String query, TestContext context) {
+    public String executeQuery(String query, JarvisContext context) {
         return doWithStatement(query, context, this::queryStatementForJsonResult);
     }
 

@@ -1,0 +1,14 @@
+{
+  "caseAutoDetect": true,
+  "executions":[
+    {
+      "executionType": "BqQuery",
+      "queryPath": "/examples/sample_volczi/volcziTest/queryToTest.sql",
+      "executionContext": "volcziTest"
+    }
+  ],
+  
+  "defaultProperties": {
+    "assert.assertKeyColumns" : ["id"]
+  }
+}

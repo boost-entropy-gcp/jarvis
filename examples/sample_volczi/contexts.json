@@ -1,0 +1,18 @@
+[
+  {
+    "id": "volcziTest",
+    "contextType": "BigQuery",
+    "parameters": {
+      "project": "volczi-sandbox",
+      "datasetNamePrefix": ""
+    }
+  },
+  {
+    "id": "local",
+    "contextType": "LocalContext",
+    "parameters": {
+      "repositoryRoot": "C:\\dev\\jarvis"
+    }
+  }
+  
+]

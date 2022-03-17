@@ -17,11 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.InitActionConfigFactory;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.config.InitActionConfigFactory;
 import ai.aliz.jarvis.service.initaction.InitActionService;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,12 +51,12 @@ public class TestInitActionServiceSFTPIntegration {
     private InitActionService actionService;
     
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
     @Test
     public void testFileUpload() {
 //        ContextLoader contextLoader = new ContextLoader("src/test/resources/integration/sftp-context.json");
-        TestContext sftpContext = contextLoader.getContext("SFTP");
+        JarvisContext sftpContext = contextLoader.getContext("SFTP");
         ChannelSftp channel = createChannel(sftpContext);
         Preconditions.checkArgument(findTestFileInCurrentFolder(channel).isEmpty());
     
@@ -69,7 +69,7 @@ public class TestInitActionServiceSFTPIntegration {
     }
     
     @SneakyThrows
-    private ChannelSftp createChannel(TestContext sftpContext) {
+    private ChannelSftp createChannel(JarvisContext sftpContext) {
         JSch jsch = new JSch();
         //TODO replace with password based connection
         jsch.addIdentity("~/.ssh/id_rsa");

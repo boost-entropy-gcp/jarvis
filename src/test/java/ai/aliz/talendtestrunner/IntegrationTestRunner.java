@@ -11,9 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
-import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.TestCase;
-import ai.aliz.talendtestrunner.service.TestRunnerService;
+
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.config.JarvisTestCase;
+import ai.aliz.talendtestrunner.service.JarvisRunnerService;
+
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -29,10 +31,10 @@ public class IntegrationTestRunner {
     public static String contextPath = null;
 
     @Autowired
-    private TestRunnerService testRunnerService;
+    private JarvisRunnerService jarvisRunnerService;
     
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
@@ -59,16 +61,16 @@ public class IntegrationTestRunner {
     }
 
     private String name;
-    private TestCase testCase;
+    private JarvisTestCase jarvisTestCase;
     
-    public IntegrationTestRunner(String name, TestCase testCase) {
+    public IntegrationTestRunner(String name, JarvisTestCase jarvisTestCase) {
         this.name = name;
-        this.testCase = testCase;
+        this.jarvisTestCase = jarvisTestCase;
     }
     
     @Test
-    public void runTestCase() throws Exception {
+    public void runJarvisTestCase() throws Exception {
 //        contextLoader.parseContext(contextPath);
-        testRunnerService.runTest(testCase);
+        jarvisRunnerService.runJarvis(jarvisTestCase);
     }
 }

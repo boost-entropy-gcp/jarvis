@@ -39,12 +39,12 @@ import com.google.cloud.bigquery.TableResult;
 
 import org.springframework.stereotype.Component;
 
-import ai.aliz.jarvis.context.TestContext;
+import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.service.shared.ExecutorServiceWrapper;
 import ai.aliz.jarvis.util.JarvisUtil;
 
 import static ai.aliz.jarvis.util.JarvisConstants.PROJECT;
-import static ai.aliz.jarvis.util.JarvisConstants.TEST_INIT;
+import static ai.aliz.jarvis.util.JarvisConstants.JARVIS_INIT;
 
 @Component
 @AllArgsConstructor
@@ -56,18 +56,18 @@ public class BigQueryExecutor implements QueryExecutor {
     private final ObjectMapper objectMapper = new ObjectMapper();
     
     @Override
-    public void executeStatement(String query, TestContext context) {
+    public void executeStatement(String query, JarvisContext context) {
         executeQueryAndGetResult(query, context);
     }
     
     @Override
-    public String executeQuery(String query, TestContext context) {
+    public String executeQuery(String query, JarvisContext context) {
         TableResult queryResult = executeQueryAndGetResult(query, context);
         ArrayNode result = bigQueryResultToJsonArrayNode(queryResult);
         return result.toString();
     }
     
-    public void executeScript(String script, TestContext context) {
+    public void executeScript(String script, JarvisContext context) {
         String resolvedScript = JarvisUtil.resolvePlaceholders(script, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(resolvedScript).build();
         
@@ -82,7 +82,7 @@ public class BigQueryExecutor implements QueryExecutor {
     }
     
     @Override
-    public void executeBQInitializatorScript(String query, TestContext context) {
+    public void executeBQInitializatorScript(String query, JarvisContext context) {
         List<String> deletes = Lists.newArrayList();
         List<String> inserts = Lists.newArrayList();
         splitScriptIntoStatements(query)
@@ -101,13 +101,13 @@ public class BigQueryExecutor implements QueryExecutor {
         executorService.executeRunnablesInParallel(insertRunnables, 60, TimeUnit.SECONDS);
     }
     
-    public int insertedRowCount(String tableId, String tableName, TestContext context) {
-        TableResult tableResult = executeQueryAndGetResult("SELECT COUNT(*) FROM `" + tableId + "`WHERE " + tableName + "_INSERTED_BY != '" + TEST_INIT + "'", context);
+    public int insertedRowCount(String tableId, String tableName, JarvisContext context) {
+        TableResult tableResult = executeQueryAndGetResult("SELECT COUNT(*) FROM `" + tableId + "`WHERE " + tableName + "_INSERTED_BY != '" + JARVIS_INIT + "'", context);
         long count = tableResult.getValues().iterator().next().get(0).getLongValue();
         return (int) count;
     }
     
-    public Long getTableLastModifiedAt(TestContext context, String project, String dataset, String table) {
+    public Long getTableLastModifiedAt(JarvisContext context, String project, String dataset, String table) {
         BigQuery bigQuery = getBigQueryClient(context);
         log.debug("Getting last modified at for table: {}.{}.{}", project, dataset, table);
         Table bqTable = bigQuery.getTable(TableId.of(project, dataset, table));
@@ -115,17 +115,17 @@ public class BigQueryExecutor implements QueryExecutor {
         return bqTable.getLastModifiedTime();
     }
     
-    private BigQuery getBigQueryClient(TestContext context) {
+    private BigQuery getBigQueryClient(JarvisContext context) {
         return BigQueryOptions.newBuilder().setProjectId(context.getParameters().get(PROJECT)).build().getService();
     }
     
-    private List<Runnable> statementsToRunnables(TestContext context, List<String> statements) {
+    private List<Runnable> statementsToRunnables(JarvisContext context, List<String> statements) {
         return statements.stream()
                          .map(statement -> (Runnable) () -> executeStatement(statement, context))
                          .collect(Collectors.toList());
     }
     
-    public TableResult executeQueryAndGetResult(String query, TestContext context) {
+    public TableResult executeQueryAndGetResult(String query, JarvisContext context) {
         String completedQuery = JarvisUtil.resolvePlaceholders(query, context.getParameters());
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         

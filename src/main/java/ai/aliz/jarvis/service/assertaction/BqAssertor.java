@@ -51,25 +51,25 @@ import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.db.BigQueryExecutor;
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
-import ai.aliz.talendtestrunner.util.TestRunnerUtil;
+import ai.aliz.jarvis.config.AssertActionConfig;
+import ai.aliz.jarvis.util.JarvisUtil;
 
 import org.junit.Assert;
 
-import static ai.aliz.talendtestrunner.helper.Helper.DATASET;
-import static ai.aliz.talendtestrunner.helper.Helper.PROJECT;
-import static ai.aliz.talendtestrunner.helper.Helper.TABLE;
-import static ai.aliz.talendtestrunner.helper.Helper.TEST_INIT;
+import static ai.aliz.jarvis.util.Helper.DATASET;
+import static ai.aliz.jarvis.util.Helper.PROJECT;
+import static ai.aliz.jarvis.util.Helper.TABLE;
+import static ai.aliz.jarvis.util.Helper.JARVIS_INIT;
 
 @Service
 @Slf4j
 public class BqAssertor implements Assertor {
 
     @Autowired
-    TestContextLoader contextLoader;
+    JarvisContextLoader contextLoader;
 
     public static final String FILTER_CONDITION = "filterCondition";
     
@@ -99,7 +99,7 @@ public class BqAssertor implements Assertor {
         assertWithBigQuery(config, contextLoader.getContext(config.getSystem()));
     }
 
-    public void assertTable(String tableId, String expectedJson, Set<String> inexactMatchFields, TestContext context) {
+    public void assertTable(String tableId, String expectedJson, Set<String> inexactMatchFields, JarvisContext context) {
         String selectQuery = String.format("SELECT * FROM %s", tableId);
         String result = bigQueryExecutor.executeQuery(selectQuery, context);
 
@@ -107,13 +107,13 @@ public class BqAssertor implements Assertor {
     }
 
     @SneakyThrows
-    public void assertTable(AssertActionConfig assertActionConfig, TestContext context) {
+    public void assertTable(AssertActionConfig assertActionConfig, JarvisContext context) {
         //        String expectedResult = getSourceContent(assertActionConfig);
 
         String project = context.getParameter("project");
         Map<String, Object> properties = assertActionConfig.getProperties();
 
-        String dataset = TestRunnerUtil.getDatasetName(properties, context);
+        String dataset = JarvisUtil.getDatasetName(properties, context);
 
         String table = (String) properties.get("table");
 
@@ -125,7 +125,7 @@ public class BqAssertor implements Assertor {
         assertTableFieldByField(assertActionConfig, context);
     }
 
-    public void assertWithBigQuery(AssertActionConfig assertActionConfig, TestContext context) {
+    public void assertWithBigQuery(AssertActionConfig assertActionConfig, JarvisContext context) {
         switch (assertActionConfig.getType()) {
             case "AssertDataEquals":
                 assertTable(assertActionConfig, context);
@@ -138,7 +138,7 @@ public class BqAssertor implements Assertor {
         }
     }
 
-    private void assertTableFieldByField(AssertActionConfig assertActionConfig, TestContext context) throws IOException {
+    private void assertTableFieldByField(AssertActionConfig assertActionConfig, JarvisContext context) throws IOException {
         String project = context.getParameter("project");
         String dataset = (String) assertActionConfig.getProperties().get("dataset");
         String datasetNamePrefix = context.getParameter("datasetNamePrefix");
@@ -154,7 +154,7 @@ public class BqAssertor implements Assertor {
         Schema schema = result.getSchema();
 
         ArrayNode actualJson = bigQueryExecutor.bigQueryResultToJsonArrayNode(result);
-        ArrayNode expectedJson = objectMapper.readValue(TestRunnerUtil.getSourceContentFromConfigProperties(assertActionConfig), ArrayNode.class);
+        ArrayNode expectedJson = objectMapper.readValue(JarvisUtil.getSourceContentFromConfigProperties(assertActionConfig), ArrayNode.class);
 
         Multimap<String, VariablePlaceholder> variablePlaceholderMultimap = ArrayListMultimap.create();
         List<Map<String, Object>> expectedMap = getMapFromJson(tableId, schema, expectedJson, variablePlaceholderMultimap);
@@ -249,7 +249,7 @@ public class BqAssertor implements Assertor {
         Map<String, Object> assertProperties = assertActionConfig.getProperties();
 
         if (Boolean.TRUE.equals(assertProperties.get("excludePreviouslyInsertedRows"))) {
-            selectQuery = selectQuery + " WHERE " + table + "_INSERTED_BY != '" + TEST_INIT + "'";
+            selectQuery = selectQuery + " WHERE " + table + "_INSERTED_BY != '" + JARVIS_INIT + "'";
         }
 
         if (assertProperties.keySet().contains(FILTER_CONDITION)) {
@@ -668,7 +668,7 @@ public class BqAssertor implements Assertor {
         return propertyCandidates;
     }
 
-    public void assertNoChange(AssertActionConfig assertActionConfig, TestContext context) {
+    public void assertNoChange(AssertActionConfig assertActionConfig, JarvisContext context) {
         String project = context.getParameter(PROJECT);
         Map<String, Object> properties = assertActionConfig.getProperties();
         String dataset = (String) properties.get(DATASET);

@@ -23,10 +23,10 @@ import com.google.common.base.Preconditions;
 
 import org.apache.commons.io.IOUtils;
 
-import ai.aliz.jarvis.context.TestContext;
-import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
-import ai.aliz.jarvis.testconfig.StepConfig;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.config.AssertActionConfig;
+import ai.aliz.jarvis.config.StepConfig;
 
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET_NAME_PREFIX;
@@ -61,7 +61,7 @@ public class JarvisUtil {
         return IOUtils.toString(sourceFile.toURI(), StandardCharsets.UTF_8);
     }
     
-    public String getDatasetNameFromConfigProperties(Map<String, Object> properties, TestContext context) {
+    public String getDatasetNameFromConfigProperties(Map<String, Object> properties, JarvisContext context) {
         String dataset = (String) properties.get(DATASET);
         String datasetNamePrefix = context.getParameter(DATASET_NAME_PREFIX);
         if (datasetNamePrefix != null) {
@@ -84,16 +84,26 @@ public class JarvisUtil {
         return result;
     }
     
-    public TestContext getContext(TestContextLoader contextLoader, String contextId) {
-        TestContext context = contextLoader.getContext(contextId);
+    public JarvisContext getContext(JarvisContextLoader contextLoader, String contextId) {
+        JarvisContext context = contextLoader.getContext(contextId);
         Preconditions.checkNotNull(context, "No context exists with name: %s", contextId);
         return context;
     }
     
-    public Path getTargetFolderPath(File testCaseFolder, String folderName) {
-        Path folderPath = Paths.get(testCaseFolder.getAbsolutePath(), folderName);
+    public Path getTargetFolderPath(File jarvisTestCaseFolder, String folderName) {
+        Path folderPath = Paths.get(jarvisTestCaseFolder.getAbsolutePath(), folderName);
         Preconditions.checkArgument(Files.isDirectory(folderPath), "%s folder does not exists %s", folderName, folderPath);
         return folderPath;
+    }
+    
+    public String getDatasetName(Map<String, Object> properties, JarvisContext context) {
+        String dataset = (String) properties.get("dataset");
+        String datasetNamePrefix = context.getParameter("datasetNamePrefix");
+        if (datasetNamePrefix != null) {
+            dataset = datasetNamePrefix + dataset;
+        }
+        
+        return dataset;
     }
 }
 

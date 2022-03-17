@@ -8,17 +8,17 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
-import ai.aliz.jarvis.service.TestRunnerService;
-import ai.aliz.jarvis.testconfig.TestConfigLoader;
+import ai.aliz.jarvis.service.JarvisRunnerService;
+import ai.aliz.jarvis.config.ConfigLoader;
 
 @SpringBootApplication
 public class JarvisApplication implements CommandLineRunner {
     
     @Autowired
-    private TestConfigLoader configLoader;
+    private ConfigLoader configLoader;
     
     @Autowired
-    private TestRunnerService testRunnerService;
+    private JarvisRunnerService jarvisRunnerService;
     
     public static void main(String[] args) {
         CommandLinePropertySource commandLinePropertySource = new SimpleCommandLinePropertySource(args);
@@ -32,7 +32,7 @@ public class JarvisApplication implements CommandLineRunner {
     
     @Override
     public void run(String... args) throws Exception {
-        testRunnerService.runTestSuite(configLoader.getTestSuite());
+        jarvisRunnerService.runJarvisTestSuite(configLoader.getJarvisTestSuite());
     }
     
 }

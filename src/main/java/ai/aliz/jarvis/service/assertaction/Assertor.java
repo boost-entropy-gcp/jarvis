@@ -1,6 +1,6 @@
 package ai.aliz.jarvis.service.assertaction;
 
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
+import ai.aliz.jarvis.config.AssertActionConfig;
 
 public interface Assertor {
 

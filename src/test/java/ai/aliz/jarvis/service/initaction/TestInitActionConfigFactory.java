@@ -13,10 +13,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ai.aliz.jarvis.testconfig.InitActionConfigFactory;
-import ai.aliz.jarvis.context.TestContextLoader;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
-import ai.aliz.jarvis.testconfig.InitActionType;
+import ai.aliz.jarvis.context.JarvisContextLoader;
+import ai.aliz.jarvis.config.InitActionConfigFactory;
+import ai.aliz.jarvis.config.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionType;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,11 +36,11 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @TestPropertySource(properties = "context=src/test/resources/init/init-contexts.json")
-@ContextConfiguration(classes = {TestContextLoader.class, InitActionConfigFactory.class})
+@ContextConfiguration(classes = {JarvisContextLoader.class, InitActionConfigFactory.class})
 public class TestInitActionConfigFactory {
     
     @Autowired
-    private TestContextLoader contextLoader;
+    private JarvisContextLoader contextLoader;
     
     @Autowired
     private InitActionConfigFactory initActionConfigFactory;

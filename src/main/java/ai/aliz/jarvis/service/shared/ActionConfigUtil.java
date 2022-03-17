@@ -16,10 +16,10 @@ import com.google.common.collect.Lists;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONObject;
 
-import ai.aliz.jarvis.testconfig.AssertActionConfig;
-import ai.aliz.jarvis.testconfig.InitActionConfig;
-import ai.aliz.jarvis.testconfig.InitActionType;
-import ai.aliz.jarvis.testconfig.StepConfig;
+import ai.aliz.jarvis.config.AssertActionConfig;
+import ai.aliz.jarvis.config.InitActionConfig;
+import ai.aliz.jarvis.config.InitActionType;
+import ai.aliz.jarvis.config.StepConfig;
 
 import static ai.aliz.jarvis.util.JarvisConstants.ASSERT_KEY_COLUMNS;
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
