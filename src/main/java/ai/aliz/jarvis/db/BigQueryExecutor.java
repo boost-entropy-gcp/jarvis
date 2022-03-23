@@ -83,22 +83,7 @@ public class BigQueryExecutor implements QueryExecutor {
     
     @Override
     public void executeBQInitializatorScript(String query, JarvisContext context) {
-        List<String> deletes = Lists.newArrayList();
-        List<String> inserts = Lists.newArrayList();
-        splitScriptIntoStatements(query)
-                .forEach(e -> {
-                    if (e.toUpperCase().contains("DELETE FROM")) {
-                        deletes.add(e);
-                    } else {
-                        inserts.add(e);
-                    }
-                });
-        
-        List<Runnable> deleteRunnables = statementsToRunnables(context, deletes);
-        List<Runnable> insertRunnables = statementsToRunnables(context, inserts);
-        
-        executorService.executeRunnablesInParallel(deleteRunnables, 60, TimeUnit.SECONDS);
-        executorService.executeRunnablesInParallel(insertRunnables, 60, TimeUnit.SECONDS);
+        executeStatement(query, context);
     }
     
     public int insertedRowCount(String tableId, String tableName, JarvisContext context) {
