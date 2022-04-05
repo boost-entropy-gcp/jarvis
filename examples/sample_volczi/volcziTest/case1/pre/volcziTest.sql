@@ -1,4 +1,4 @@
-DELETE FROM `{{project}}.jarvis_sample_volczi.car` WHERE 1 = 1;
+TRUNCATE TABLE `{{project}}.jarvis_sample_volczi.car`;
 
 INSERT INTO `{{project}}.jarvis_sample_volczi.car`
 (id, brand, price)
