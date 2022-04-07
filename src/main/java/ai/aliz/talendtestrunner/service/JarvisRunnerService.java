@@ -20,7 +20,6 @@ public class JarvisRunnerService {
     
     private final JarvisContextLoader contextLoader;
     private final TalendApiService talendApiService;
-    private final ExecutorServiceImpl executorService;
     private final ApplicationContext applicationContext;
     private final TalendJobStateChecker talendJobStateChecker;
     private final ExecutionActionService executionActionService;
