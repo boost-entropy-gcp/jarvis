@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,6 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
-import com.google.api.client.util.Lists;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.Field;
@@ -36,6 +36,7 @@ import com.google.cloud.bigquery.QueryJobConfiguration;
 import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
+import com.google.common.collect.Lists;
 
 import org.springframework.stereotype.Component;
 
@@ -43,8 +44,8 @@ import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.service.shared.ExecutorServiceWrapper;
 import ai.aliz.jarvis.util.JarvisUtil;
 
-import static ai.aliz.jarvis.util.JarvisConstants.PROJECT;
 import static ai.aliz.jarvis.util.JarvisConstants.JARVIS_INIT;
+import static ai.aliz.jarvis.util.JarvisConstants.PROJECT;
 
 @Component
 @AllArgsConstructor
@@ -65,20 +66,6 @@ public class BigQueryExecutor implements QueryExecutor {
         TableResult queryResult = executeQueryAndGetResult(query, context);
         ArrayNode result = bigQueryResultToJsonArrayNode(queryResult);
         return result.toString();
-    }
-    
-    public void executeScript(String script, JarvisContext context) {
-        String resolvedScript = JarvisUtil.resolvePlaceholders(script, context.getParameters());
-        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(resolvedScript).build();
-        
-        BigQuery bigQuery = getBigQueryClient(context);
-        try {
-            log.info("Executing script:\n '{}'", resolvedScript);
-            bigQuery.query(queryConfig);
-        } catch (Exception e) {
-            log.error(String.format("Failed to execute: %s", resolvedScript), e);
-            throw Lombok.sneakyThrow(e);
-        }
     }
     
     @Override
@@ -111,7 +98,8 @@ public class BigQueryExecutor implements QueryExecutor {
     }
     
     public TableResult executeQueryAndGetResult(String query, JarvisContext context) {
-        String completedQuery = JarvisUtil.resolvePlaceholders(query, context.getParameters());
+        Map<String, String> parameters = context.getParameters();
+        String completedQuery = JarvisUtil.resolvePlaceholders(query, parameters);
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(completedQuery).build();
         
         BigQuery bigQuery = getBigQueryClient(context);

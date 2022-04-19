@@ -20,10 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.util.PlaceholderResolver;
 import ai.aliz.talendtestrunner.talend.Executable;
 import ai.aliz.talendtestrunner.talend.Execution;
 import ai.aliz.talendtestrunner.talend.ExecutionStillRunningException;
-import ai.aliz.jarvis.util.PlaceholderResolver;
 
 @Service
 @Slf4j
@@ -41,7 +41,6 @@ public class TalendApiService {
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER = "Bearer ";
 
-    private final PlaceholderResolver placeholderResolver;
     private final RestTemplate restTemplate;
     private final RetryTemplate retryTemplate;
 
@@ -57,7 +56,7 @@ public class TalendApiService {
         parameters.put("jobName", taskName);
 
         String apiUrl = parameters.get(API_URL);
-        String query = placeholderResolver.resolve(TASK_QUERY_PATTERN, parameters);
+        String query = PlaceholderResolver.resolve(TASK_QUERY_PATTERN, parameters);
         String endpointUrl = apiUrl + query;
 
         RequestEntity<Void> requestEntity = RequestEntity.get(URI.create(endpointUrl))

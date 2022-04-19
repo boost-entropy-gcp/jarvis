@@ -9,9 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -23,10 +21,10 @@ import com.google.common.base.Preconditions;
 
 import org.apache.commons.io.IOUtils;
 
-import ai.aliz.jarvis.context.JarvisContextLoader;
-import ai.aliz.jarvis.context.JarvisContext;
 import ai.aliz.jarvis.config.AssertActionConfig;
 import ai.aliz.jarvis.config.StepConfig;
+import ai.aliz.jarvis.context.JarvisContext;
+import ai.aliz.jarvis.context.JarvisContextLoader;
 
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET;
 import static ai.aliz.jarvis.util.JarvisConstants.DATASET_NAME_PREFIX;
@@ -34,8 +32,6 @@ import static ai.aliz.jarvis.util.JarvisConstants.SOURCE_PATH;
 
 @UtilityClass
 public class JarvisUtil {
-    
-    private static final Pattern MISSING_PLACEHOLDER_REGEX = Pattern.compile("^.*\\{\\{.*?}}.*$");
     
     @SneakyThrows
     public String getSourceContentFromConfigProperties(StepConfig stepConfig) {
@@ -70,18 +66,9 @@ public class JarvisUtil {
         return dataset;
     }
     
+    @Deprecated
     public String resolvePlaceholders(String pattern, Map<String, String> parameters) {
-        String result = pattern;
-        Iterator<Map.Entry<String, String>> parameterIterator = parameters.entrySet().iterator();
-        while (parameterIterator.hasNext()) {
-            Map.Entry<String, String> kv = parameterIterator.next();
-            result = result.replace("{{" + kv.getKey() + "}}", kv.getValue());
-        }
-        
-        if (MISSING_PLACEHOLDER_REGEX.matcher(result).matches()) {
-            throw new IllegalStateException("Some placeholders have not been resolved in: '" + result + "'");
-        }
-        return result;
+        return PlaceholderResolver.resolve(pattern, parameters);
     }
     
     public JarvisContext getContext(JarvisContextLoader contextLoader, String contextId) {

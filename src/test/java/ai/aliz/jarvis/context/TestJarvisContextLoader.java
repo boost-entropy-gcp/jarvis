@@ -1,11 +1,13 @@
 package ai.aliz.jarvis.context;
 
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import org.mockito.Mockito;
-import org.springframework.core.env.Environment;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import ai.aliz.jarvis.util.JarvisConstants;
 
@@ -88,10 +90,14 @@ public class TestJarvisContextLoader {
     public ExpectedException exceptionRule = ExpectedException.none();
     
     private JarvisContextLoader initContextLoader(String contextPath) {
-        Environment mockedEnvironment = Mockito.mock(Environment.class);
+        
+        ApplicationArguments mockedArguments = Mockito.mock(ApplicationArguments.class);
+        Mockito.when(mockedArguments.getOptionNames()).thenReturn(Collections.emptySet());
+        
+        ConfigurableEnvironment mockedEnvironment = Mockito.mock(ConfigurableEnvironment.class);
         Mockito.when(mockedEnvironment.getProperty(JarvisConstants.CONTEXT)).thenReturn(contextPath);
         
-        return new JarvisContextLoader(mockedEnvironment);
+        return new JarvisContextLoader(mockedEnvironment, mockedArguments);
     }
     
     @Test

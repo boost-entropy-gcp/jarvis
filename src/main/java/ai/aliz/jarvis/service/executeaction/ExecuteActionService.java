@@ -49,7 +49,7 @@ public class ExecuteActionService {
                 Objects.requireNonNull(executionContext, "There is no context with id: " + executionContextId);
                 String scriptPath = (String) executionActionConfig.getProperties().get(Helper.SOURCE_PATH);
                 String script = Files.asCharSource(new File(scriptPath), StandardCharsets.UTF_8).read();
-                bigQueryExecutor.executeScript(script, executionContext);
+                bigQueryExecutor.executeQuery(script, executionContext);
                 break;
             default:
                 throw new UnsupportedOperationException(String.format("Not supported executionType: " + executionType));
