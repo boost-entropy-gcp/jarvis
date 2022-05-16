@@ -1,0 +1,10 @@
+{
+  "caseAutoDetect": true,
+  "executions":[
+    {
+      "executionType": "BqQuery",
+      "queryPath": "/src/test/resources/sample_tests/test_sql/test.sql",
+      "executionContext": "invalid_bq"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "caseAutoDetect": true,
+  "executions":[
+    {
+      "executionType": "Airflow"
+    }
+  ],
+  
+  "defaultProperties": {
+    "assert.assertKeyColumns" : ["user_id"]
+  }
+}

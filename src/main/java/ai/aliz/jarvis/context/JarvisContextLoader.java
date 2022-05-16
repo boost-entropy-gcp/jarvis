@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -43,10 +45,11 @@ public class JarvisContextLoader {
         contextIdToContexts = parseContexts(contextPath, arguments).stream().collect(Collectors.toMap(JarvisContext::getId, Function.identity()));
     }
     
+    @Nonnull
     public JarvisContext getContext(String contextId) {
         JarvisContext context = contextIdToContexts.get(contextId);
         if (Objects.isNull(context)) {
-            throw new IllegalStateException("Could not find context with id " + contextId);
+            throw new IllegalStateException("Could not find context with id '" + contextId + "'");
         }
         return context;
     }

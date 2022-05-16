@@ -1,0 +1,9 @@
+{
+  "caseAutoDetect": true,
+  "executions":[
+    {
+      "executionType": "BqQuery",
+      "executionContext": "test_bq"
+    }
+  ]
+}
