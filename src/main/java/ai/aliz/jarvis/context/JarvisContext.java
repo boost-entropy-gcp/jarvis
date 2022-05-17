@@ -10,13 +10,13 @@ import lombok.ToString;
 import lombok.Value;
 import lombok.With;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.google.common.collect.ImmutableMap;
 
 import static ai.aliz.jarvis.util.JarvisConstants.CONTEXT_TYPE;
 import static ai.aliz.jarvis.util.JarvisConstants.ID;
@@ -40,8 +40,8 @@ public class JarvisContext {
     @JsonPOJOBuilder(withPrefix = "")
     public static class JarvisContextBuilder {}
     
-    public Map<String, String> getParameters() {
-        return new HashMap<>(parameters);
+    public ImmutableMap<String, String> getParameters() {
+        return ImmutableMap.copyOf(parameters);
     }
     
     public String getParameter(String paramName) {

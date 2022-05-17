@@ -1,0 +1,14 @@
+{
+  "caseAutoDetect": true,
+  "executions":[
+    {
+      "executionType": "BqQuery",
+      "queryPath": "/src/test/resources/sample_tests/test_sql/test.sql",
+      "executionContext": "test_bq"
+    }
+  ],
+  
+  "defaultProperties": {
+    "assert.assertKeyColumns" : ["user_id"]
+  }
+}
